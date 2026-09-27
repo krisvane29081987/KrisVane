@@ -1,1 +1,107 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>KrisVane — Аккаунт</title>
+  <meta name="color-scheme" content="dark" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    *{box-sizing:border-box} :root{--bg:#08090b;--card:#111318;--line:#242833;--text:#f5f7fb;--muted:#8e95a3;--accent:#6f7cff;--danger:#ff6b78;--ok:#63d79a}
+    body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 50% 0,#171a27 0,transparent 36%),var(--bg);color:var(--text);display:grid;place-items:center;padding:24px}
+    .wrap{width:min(440px,100%)} .brand{text-align:center;margin-bottom:24px}.brand h1{font-size:34px;margin:0;letter-spacing:-1.4px}.brand p{color:var(--muted);margin:8px 0 0}
+    .card{background:rgba(17,19,24,.92);border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.35);backdrop-filter:blur(16px)}
+    .tabs{display:grid;grid-template-columns:1fr 1fr;background:#0b0d11;padding:4px;border-radius:14px;margin-bottom:22px}.tab{border:0;background:transparent;color:var(--muted);padding:11px;border-radius:11px;font:inherit;font-weight:700;cursor:pointer}.tab.active{background:#1b1e27;color:#fff}
+    form{display:grid;gap:15px}.field{display:grid;gap:7px}.field.hidden{display:none}label{font-size:13px;color:#b9bfca;font-weight:650}input{width:100%;border:1px solid var(--line);background:#0b0d11;color:#fff;border-radius:13px;padding:13px 14px;font:inherit;outline:none;transition:.18s}input:focus{border-color:#6572ed;box-shadow:0 0 0 3px rgba(111,124,255,.13)}
+    .hint{font-size:12px;color:var(--muted)}button.submit{margin-top:3px;border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#7884ff,#5f6be5);color:#fff;font:inherit;font-weight:800;cursor:pointer;transition:.18s}.submit:hover{transform:translateY(-1px)}.submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
+    .msg{display:none;border-radius:13px;padding:11px 13px;font-size:13px;line-height:1.45}.msg.show{display:block}.msg.error{background:rgba(255,107,120,.09);border:1px solid rgba(255,107,120,.25);color:#ff9da6}.msg.ok{background:rgba(99,215,154,.08);border:1px solid rgba(99,215,154,.23);color:#91e8b9}
+    .session{display:none;text-align:center}.session.show{display:block}.avatar{width:62px;height:62px;margin:0 auto 12px;border-radius:50%;display:grid;place-items:center;background:#202432;font-size:24px;font-weight:900}.session h2{margin:0 0 7px}.session p{color:var(--muted);overflow-wrap:anywhere}.logout{width:100%;border:1px solid var(--line);background:#171a20;color:#fff;padding:13px;border-radius:13px;font:inherit;font-weight:750;cursor:pointer;margin-top:12px}.small{text-align:center;color:var(--muted);font-size:12px;margin-top:16px}
+  </style>
+</head>
+<body>
+  <main class="wrap">
+    <div class="brand"><h1>KrisVane</h1><p>Твой аккаунт магазина</p></div>
+    <section class="card">
+      <div id="authBox">
+        <div class="tabs">
+          <button class="tab active" data-mode="login" type="button">Вход</button>
+          <button class="tab" data-mode="signup" type="button">Регистрация</button>
+        </div>
+        <form id="authForm">
+          <div class="field hidden" id="nameField"><label for="name">Имя</label><input id="name" autocomplete="name" maxlength="80" placeholder="Например: Иван" /></div>
+          <div class="field"><label for="email">Email</label><input id="email" type="email" autocomplete="email" required placeholder="name@example.com" /></div>
+          <div class="field"><label for="password">Пароль</label><input id="password" type="password" autocomplete="current-password" minlength="6" required placeholder="Минимум 6 символов" /></div>
+          <div class="field hidden" id="repeatField"><label for="repeatPassword">Повторите пароль</label><input id="repeatPassword" type="password" autocomplete="new-password" minlength="6" placeholder="Повторите пароль" /></div>
+          <div id="message" class="msg"></div>
+          <button id="submitBtn" class="submit" type="submit">Войти</button>
+        </form>
+      </div>
+      <div id="sessionBox" class="session">
+        <div id="avatar" class="avatar">K</div><h2>Вы вошли</h2><p id="userText"></p>
+        <button id="logoutBtn" class="logout" type="button">Выйти</button>
+      </div>
+    </section>
+    <div class="small">KrisVane • безопасная авторизация через Supabase</div>
+  </main>
 
+<script>
+const SUPABASE_URL = 'https://cbkomiuylvumquhgrlve.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_OzfR7L5x3hQF56b4v7KT1g_q9tXF9sG';
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+let mode='login';
+const $=id=>document.getElementById(id);
+const tabs=[...document.querySelectorAll('.tab')];
+function setMode(next){
+  mode=next; tabs.forEach(t=>t.classList.toggle('active',t.dataset.mode===mode));
+  $('nameField').classList.toggle('hidden',mode!=='signup'); $('repeatField').classList.toggle('hidden',mode!=='signup');
+  $('password').autocomplete=mode==='signup'?'new-password':'current-password';
+  $('submitBtn').textContent=mode==='signup'?'Создать аккаунт':'Войти'; clearMessage();
+}
+tabs.forEach(t=>t.addEventListener('click',()=>setMode(t.dataset.mode)));
+function message(text,type='error'){const el=$('message');el.textContent=text;el.className='msg show '+type}
+function clearMessage(){$('message').className='msg';$('message').textContent=''}
+function loading(on){$('submitBtn').disabled=on;$('submitBtn').textContent=on?'Подождите…':(mode==='signup'?'Создать аккаунт':'Войти')}
+function friendly(err){
+  const m=(err?.message||'').toLowerCase();
+  if(m.includes('invalid login credentials')) return 'Неверный email или пароль.';
+  if(m.includes('email not confirmed')) return 'Сначала подтвердите email по ссылке из письма.';
+  if(m.includes('user already registered')) return 'Аккаунт с таким email уже существует.';
+  if(m.includes('password')) return 'Проверьте пароль. Он должен соответствовать требованиям безопасности.';
+  return err?.message||'Произошла ошибка. Попробуйте ещё раз.';
+}
+
+$('authForm').addEventListener('submit',async e=>{
+  e.preventDefault(); clearMessage();
+  const email=$('email').value.trim(), password=$('password').value;
+  if(mode==='signup'){
+    const name=$('name').value.trim(), repeat=$('repeatPassword').value;
+    if(!name) return message('Введите имя.');
+    if(password!==repeat) return message('Пароли не совпадают.');
+    loading(true);
+    const {data,error}=await client.auth.signUp({email,password,options:{data:{full_name:name},emailRedirectTo:'https://krisvane29081987.github.io/KrisVane/auth.html'}});
+    loading(false);
+    if(error) return message(friendly(error));
+    if(data.session) return showSession(data.user);
+    message('Аккаунт создан. Проверьте почту и подтвердите email, затем войдите.','ok');
+  }else{
+    loading(true);
+    const {data,error}=await client.auth.signInWithPassword({email,password});
+    loading(false);
+    if(error) return message(friendly(error));
+    showSession(data.user);
+  }
+});
+
+$('logoutBtn').addEventListener('click',async()=>{await client.auth.signOut();showAuth()});
+function showSession(user){
+  $('authBox').style.display='none'; $('sessionBox').classList.add('show');
+  const name=user?.user_metadata?.full_name||user?.email?.split('@')[0]||'Пользователь';
+  $('avatar').textContent=name.charAt(0).toUpperCase(); $('userText').textContent=`${name} • ${user?.email||''}`;
+}
+function showAuth(){$('authBox').style.display='block';$('sessionBox').classList.remove('show')}
+(async()=>{const {data:{session}}=await client.auth.getSession();if(session?.user)showSession(session.user)})();
+client.auth.onAuthStateChange((_event,session)=>{if(session?.user)showSession(session.user)});
+</script>
+</body>
+</html>
