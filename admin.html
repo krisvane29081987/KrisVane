@@ -4944,5 +4944,117 @@ window.openCreateProduct=async function(){
 })();
 </script>
 
+
+<style>
+/* v14 — fix the old .kv-image-preview class collision:
+   the PREVIEW CONTAINER must be full-width, while photo cards stay compact. */
+#kvPhotoPreview.kv-image-preview{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:wrap !important;
+  align-items:flex-start !important;
+  align-content:flex-start !important;
+  gap:10px !important;
+  width:100% !important;
+  max-width:100% !important;
+  height:auto !important;
+  min-height:0 !important;
+  overflow:visible !important;
+  flex:1 1 100% !important;
+  border:0 !important;
+  border-radius:0 !important;
+  background:transparent !important;
+  animation:none !important;
+}
+#kvPhotoPreview .kv-photo-card{
+  flex:0 0 118px !important;
+  width:118px !important;
+  max-width:118px !important;
+  height:148px !important;
+}
+</style>
+
+<script>
+/* v14 — reliable numeric suit sizes.
+   v12 looked for a category variable that the real create form does not use.
+   The source of truth is kv2CreateState.category. */
+(function(){
+  const NUMERIC=['38–40','40–42','42–44','44–46','46–48','48–50',
+                 '50–52','52–54','54–56','56–58','58–60','60–62'];
+
+  function isSuit(){
+    const c=(window.kv2CreateState?.category||'').trim();
+    return c==='Костюмы';
+  }
+  function numericTitle(){
+    const l=(typeof getUiPrefs==='function' ? getUiPrefs().language : 'uk')||'uk';
+    return ({uk:'Цифрові розміри',ru:'Цифровые размеры',en:'Numeric sizes',
+             be:'Лічбавыя памеры',zh:'数字尺码'})[l]||'Цифрові розміри';
+  }
+  function render(){
+    let block=document.getElementById('kvSuitNumericBlock');
+    if(!isSuit()){ block?.remove(); return; }
+
+    const grid=document.getElementById('kvDynamicSizeGrid');
+    if(!grid || !grid.parentElement)return;
+
+    if(!block){
+      block=document.createElement('div');
+      block.id='kvSuitNumericBlock';
+    }
+    block.innerHTML=
+      '<div class="kv-suit-size-title">'+numericTitle()+'</div>'+
+      '<div id="kvSuitNumericGrid">'+NUMERIC.map(s=>
+        '<button type="button" class="kv-suit-num'+
+        (window.kv12SuitNumericSelected?.has(s)?' selected':'')+
+        '" data-v14-suit-num="'+s+'">'+s+'</button>'
+      ).join('')+'</div>';
+
+    grid.insertAdjacentElement('afterend',block);
+  }
+
+  window.kv14RenderSuitNumeric=render;
+
+  document.addEventListener('click',function(e){
+    const b=e.target.closest('[data-v14-suit-num]');
+    if(b){
+      e.preventDefault();
+      e.stopPropagation();
+      const s=b.dataset.v14SuitNum;
+      if(!window.kv12SuitNumericSelected) window.kv12SuitNumericSelected=new Set();
+      if(window.kv12SuitNumericSelected.has(s)) window.kv12SuitNumericSelected.delete(s);
+      else window.kv12SuitNumericSelected.add(s);
+      b.classList.toggle('selected',window.kv12SuitNumericSelected.has(s));
+      if(typeof kv2MarkDirty==='function')kv2MarkDirty();
+      return;
+    }
+    if(e.target.closest('button,[role="option"],[data-value]')){
+      setTimeout(render,80);
+      setTimeout(render,240);
+    }
+  },true);
+
+  /* Numeric sizes must be real variants too, not just visual buttons. */
+  const oldCreate=window.kv2CreateProduct;
+  if(typeof oldCreate==='function'){
+    window.kv2CreateProduct=async function(){
+      if(isSuit() && window.kv12SuitNumericSelected && window.kv2CreateState?.sizes){
+        window.kv12SuitNumericSelected.forEach(s=>window.kv2CreateState.sizes.add(s));
+      }
+      return await oldCreate.apply(this,arguments);
+    };
+  }
+
+  const oldOpen=window.openCreateProduct;
+  if(typeof oldOpen==='function'){
+    window.openCreateProduct=async function(){
+      const r=await oldOpen.apply(this,arguments);
+      setTimeout(render,120);
+      return r;
+    };
+  }
+})();
+</script>
+
 </body>
 </html>
