@@ -19,6 +19,8 @@
       display: flex;
       justify-content: center;
       align-items: center;
+
+      padding: 30px 0;
     }
 
     .box {
@@ -57,6 +59,42 @@
       opacity: .9;
     }
 
+    .shipping-box {
+      margin-top: 22px;
+      padding-top: 18px;
+
+      border-top: 1px solid #252936;
+    }
+
+    .shipping-title {
+      margin-bottom: 12px;
+      font-size: 14px;
+      font-weight: 700;
+      color: #cfd3ff;
+    }
+
+    input {
+      box-sizing: border-box;
+
+      width: 100%;
+      padding: 13px 14px;
+      margin-top: 10px;
+
+      border: 1px solid #2b3040;
+      border-radius: 12px;
+
+      background: #08090c;
+      color: #fff;
+
+      font-size: 14px;
+
+      outline: none;
+    }
+
+    input:focus {
+      border-color: #5865f2;
+    }
+
     #log {
       margin-top: 20px;
 
@@ -85,6 +123,7 @@
 
   <p>Проверка корзины и оформления заказа.</p>
 
+
   <button onclick="checkSession()">
     1. Проверить авторизацию
   </button>
@@ -108,6 +147,34 @@
   <button onclick="runOrder2Lifecycle()">
     6. Провести заказ №2 до готовности
   </button>
+
+
+  <div class="shipping-box">
+
+    <div class="shipping-title">
+      🚚 Отправка заказа №2
+    </div>
+
+    <input
+      id="carrier"
+      type="text"
+      value="Nova Poshta"
+      placeholder="Служба доставки"
+    >
+
+    <input
+      id="trackingNumber"
+      type="text"
+      value="TEST-TTN-000001"
+      placeholder="ТТН"
+    >
+
+    <button onclick="shipOrder2()">
+      7. Отправить заказ №2
+    </button>
+
+  </div>
+
 
   <div id="log">Готов к тесту.</div>
 
@@ -148,6 +215,7 @@ async function checkSession() {
     error
   } = await db.auth.getUser();
 
+
   if (error || !user) {
 
     show(
@@ -157,6 +225,7 @@ async function checkSession() {
 
     return;
   }
+
 
   show(
     '✅ Авторизация работает\n\n' +
@@ -176,10 +245,12 @@ async function addTestProduct() {
 
   show('Добавляем товар...');
 
+
   const {
     data: { user },
     error: userError
   } = await db.auth.getUser();
+
 
   if (userError || !user) {
 
@@ -257,6 +328,7 @@ async function addTestProduct() {
       return;
     }
 
+
     cart = newCart;
   }
 
@@ -307,6 +379,7 @@ async function checkout() {
 
   show('Оформляем заказ...');
 
+
   const {
     data,
     error
@@ -352,12 +425,13 @@ async function checkout() {
 
 
 // ==========================================
-// 4. ВОЗВРАТ ЗАКАЗА №1 НА СКЛАД
+// 4. ВОЗВРАТ ЗАКАЗА №1
 // ==========================================
 
 async function returnOrder1() {
 
   show('Возвращаем заказ №1 на склад...');
+
 
   const {
     data: { user },
@@ -397,8 +471,7 @@ async function returnOrder1() {
   show(
     '✅ ВОЗВРАТ ВЫПОЛНЕН!\n\n' +
     'Order ID: 1\n' +
-    'Пользователь: ' + user.email +
-    '\n\nТеперь проверяем остаток товара в базе.'
+    'Пользователь: ' + user.email
   );
 }
 
@@ -441,23 +514,19 @@ async function testStatusManagement() {
 
 
   show(
-    '⚠️ Переход неожиданно был разрешён.\n\n' +
-    'Это нужно проверить.'
+    '⚠️ Переход неожиданно был разрешён.'
   );
 }
 
 
 // ==========================================
-// 6. ЗАКАЗ №2:
-// pending → confirmed → processing
-// → ready_to_ship
+// 6. ПРОВОДИМ ЗАКАЗ №2 ДО READY_TO_SHIP
 // ==========================================
 
 async function runOrder2Lifecycle() {
 
   show(
-    'Проводим заказ №2 по статусам...\n\n' +
-    'Начинаем с pending.'
+    'Проводим заказ №2 по статусам...'
   );
 
 
@@ -512,8 +581,83 @@ async function runOrder2Lifecycle() {
 
     'Текущий статус: ready_to_ship\n\n' +
 
-    'Следующий шаг — ' +
-    'тест отправки с ТТН 🚚'
+    'Теперь можно вводить службу доставки и ТТН.'
+  );
+}
+
+
+// ==========================================
+// 7. ОТПРАВКА ЗАКАЗА №2
+// ==========================================
+
+async function shipOrder2() {
+
+  const carrier =
+    document.getElementById('carrier').value.trim();
+
+  const trackingNumber =
+    document.getElementById('trackingNumber').value.trim();
+
+
+  if (!carrier) {
+
+    show(
+      '❌ Укажи службу доставки.'
+    );
+
+    return;
+  }
+
+
+  if (!trackingNumber) {
+
+    show(
+      '❌ Укажи ТТН.'
+    );
+
+    return;
+  }
+
+
+  show(
+    '🚚 Отправляем заказ №2...\n\n' +
+    'Служба: ' + carrier +
+    '\nТТН: ' + trackingNumber
+  );
+
+
+  const {
+    error
+  } = await db.rpc(
+    'admin_ship_order',
+    {
+      p_order_id: 2,
+      p_carrier: carrier,
+      p_tracking_number: trackingNumber
+    }
+  );
+
+
+  if (error) {
+
+    show(
+      '❌ ОШИБКА ОТПРАВКИ\n\n' +
+      error.message
+    );
+
+    return;
+  }
+
+
+  show(
+    '🚚 ЗАКАЗ №2 ОТПРАВЛЕН!\n\n' +
+
+    'Order ID: 2\n' +
+    'Служба доставки: ' + carrier +
+    '\nТТН: ' + trackingNumber +
+    '\n\nСтатус: shipped ✅\n\n' +
+
+    'KrisVane сохранил данные отправления.'
   );
 }
 
