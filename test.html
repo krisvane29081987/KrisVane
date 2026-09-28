@@ -97,6 +97,10 @@
     3. Оформить тестовый заказ
   </button>
 
+  <button onclick="returnOrderToStock()">
+    4. Вернуть заказ №1 на склад
+  </button>
+
   <div id="log">Готов к тесту.</div>
 
 </div>
@@ -181,10 +185,6 @@ async function addTestProduct() {
   }
 
 
-  // ------------------------------
-  // Получаем тестовый вариант
-  // ------------------------------
-
   const {
     data: variant,
     error: variantError
@@ -205,10 +205,6 @@ async function addTestProduct() {
     return;
   }
 
-
-  // ------------------------------
-  // Получаем или создаём корзину
-  // ------------------------------
 
   let {
     data: cart,
@@ -259,10 +255,6 @@ async function addTestProduct() {
     cart = newCart;
   }
 
-
-  // ------------------------------
-  // Добавляем 2 штуки
-  // ------------------------------
 
   const {
     error: itemError
@@ -350,6 +342,66 @@ async function checkout() {
     '🔥 ЗАКАЗ УСПЕШНО СОЗДАН!\n\n' +
     'Order ID: ' + data +
     '\n\nТеперь проверяем базу...'
+  );
+}
+
+
+// ==========================================
+// 4. ВОЗВРАТ ЗАКАЗА НА СКЛАД
+// ==========================================
+
+async function returnOrderToStock() {
+
+  show('Проверяем права администратора...');
+
+
+  const {
+    data: { user },
+    error: userError
+  } = await db.auth.getUser();
+
+
+  if (userError || !user) {
+
+    show(
+      '❌ Пользователь не авторизован.\n\n' +
+      (userError?.message || '')
+    );
+
+    return;
+  }
+
+
+  show('Возвращаем товар заказа №1 на склад...');
+
+
+  const {
+    data,
+    error
+  } = await db.rpc(
+    'admin_return_order_to_stock',
+    {
+      p_order_id: 1
+    }
+  );
+
+
+  if (error) {
+
+    show(
+      '❌ ОШИБКА ВОЗВРАТА\n\n' +
+      error.message
+    );
+
+    return;
+  }
+
+
+  show(
+    '✅ ВОЗВРАТ ВЫПОЛНЕН!\n\n' +
+    'Order ID: 1\n' +
+    'Пользователь: ' + user.email +
+    '\n\nТеперь проверяем остаток товара в базе.'
   );
 }
 
