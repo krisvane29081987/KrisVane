@@ -1,236 +1,1613 @@
 <!doctype html>
 <html lang="ru">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-  <meta name="theme-color" content="#090a0f">
-  <meta name="description" content="KrisVane — интернет-магазин одежды, обуви и аксессуаров.">
-  <title>KrisVane — магазин</title>
-  <style>
-    :root{
-      --bg:#090a0f;--panel:#10121a;--panel2:#151824;--line:#252a3a;--text:#f7f7fb;--muted:#9da4b6;
-      --accent:#735cff;--accent2:#3e8bff;--good:#3ddc97;--bad:#ff5d6c;--warn:#ffbf47;--shadow:0 24px 80px #0008;
-      --radius:20px;--radius2:14px;--header:76px;--max:1440px
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#090a0f">
+    <meta name="description" content="KrisVane — интернет-магазин одежды, обуви и аксессуаров.">
+    <title>KrisVane — магазин</title>
+<style>
+:root {
+    --bg:#090a0f;
+    --panel:#10121a;
+    --panel2:#151824;
+    --line:#252a3a;
+    --text:#f7f7fb;
+    --muted:#9da4b6;
+    --accent:#735cff;
+    --accent2:#3e8bff;
+    --good:#3ddc97;
+    --bad:#ff5d6c;
+    --warn:#ffbf47;
+    --shadow:0 24px 80px #0008;
+    --radius:20px;
+    --radius2:14px;
+    --header:76px;
+    --max:1440px
+}
+* {
+    box-sizing:border-box
+}
+html {
+    scroll-behavior:smooth
+}
+body {
+    margin:0;
+    background:radial-gradient(900px 550px at 82% -10%,#30207a44,transparent 60%),var(--bg);
+    color:var(--text);
+    font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif
+}
+button,input,select,textarea {
+    font:inherit
+}
+button {
+    cursor:pointer
+}
+a {
+    color:inherit;
+    text-decoration:none
+}
+img {
+    display:block;
+    max-width:100%
+}
+.shell {
+    width:min(var(--max),calc(100% - 36px));
+    margin:auto
+}
+.top {
+    height:var(--header);
+    position:sticky;
+    top:0;
+    z-index:50;
+    background:#090a0fdd;
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid #ffffff0d
+}
+.topin {
+    height:100%;
+    display:grid;
+    grid-template-columns:auto minmax(260px,680px) auto;
+    gap:24px;
+    align-items:center
+}
+.logo {
+    font-weight:950;
+    font-size:25px;
+    letter-spacing:-1.1px
+}
+.logo span {
+    color:var(--accent)
+}
+.search {
+    position:relative
+}
+.search input {
+    width:100%;
+    height:46px;
+    border:1px solid var(--line);
+    border-radius:999px;
+    background:#11131b;
+    color:var(--text);
+    outline:none;
+    padding:0 48px 0 18px;
+    transition:.2s
+}
+.search input:focus {
+    border-color:#725cff99;
+    box-shadow:0 0 0 4px #725cff18
+}
+.search button {
+    position:absolute;
+    right:5px;
+    top:5px;
+    width:36px;
+    height:36px;
+    border:0;
+    border-radius:50%;
+    background:var(--accent);
+    color:#fff
+}
+.actions {
+    display:flex;
+    gap:8px
+}
+.iconbtn {
+    min-width:44px;
+    height:44px;
+    padding:0 13px;
+    border:1px solid var(--line);
+    border-radius:13px;
+    background:#11131b;
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    transition:.2s
+}
+.iconbtn:hover {
+    transform:translateY(-1px);
+    border-color:#6d5cff88
+}
+.badge {
+    background:var(--accent);
+    border-radius:999px;
+    min-width:19px;
+    height:19px;
+    padding:0 5px;
+    display:inline-grid;
+    place-items:center;
+    font-size:11px;
+    font-weight:800
+}
+.nav {
+    border-bottom:1px solid #ffffff0d;
+    background:#0c0d13
+}
+.navin {
+    display:flex;
+    gap:8px;
+    overflow:auto;
+    padding:10px 0;
+    scrollbar-width:none
+}
+.chip {
+    white-space:nowrap;
+    border:1px solid var(--line);
+    background:#11131b;
+    color:#c9cede;
+    border-radius:999px;
+    padding:8px 14px;
+    transition:.2s
+}
+.chip:hover,.chip.active {
+    background:#725cff1c;
+    border-color:#725cff88;
+    color:#fff
+}
+.hero {
+    padding:42px 0 26px
+}
+.heroBox {
+    min-height:410px;
+    border:1px solid #ffffff12;
+    border-radius:30px;
+    overflow:hidden;
+    position:relative;
+    background:linear-gradient(120deg,#151722 0%,#16132a 48%,#34228b 100%);
+    box-shadow:var(--shadow)
+}
+.heroGlow {
+    position:absolute;
+    width:600px;
+    height:600px;
+    border-radius:50%;
+    background:#7660ff55;
+    filter:blur(90px);
+    right:-190px;
+    top:-270px
+}
+.heroText {
+    position:relative;
+    z-index:2;
+    padding:64px;
+    max-width:760px
+}
+.eyebrow {
+    color:#aaa1ff;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.14em;
+    font-size:12px
+}
+h1 {
+    font-size:clamp(42px,7vw,88px);
+    line-height:.92;
+    letter-spacing:-.06em;
+    margin:14px 0 20px
+}
+.hero p {
+    font-size:18px;
+    color:#c1c5d3;
+    max-width:600px
+}
+.primary {
+    border:0;
+    border-radius:14px;
+    padding:13px 18px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));
+    color:#fff;
+    font-weight:850;
+    box-shadow:0 10px 30px #6355ff44
+}
+.secondary {
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:12px 18px;
+    background:#11131b;
+    color:#fff;
+    font-weight:750
+}
+.heroBtns {
+    display:flex;
+    gap:10px;
+    margin-top:28px;
+    flex-wrap:wrap
+}
+.section {
+    padding:24px 0 42px
+}
+.sectionHead {
+    display:flex;
+    align-items:end;
+    justify-content:space-between;
+    gap:16px;
+    margin-bottom:18px
+}
+.sectionHead h2 {
+    margin:0;
+    font-size:28px;
+    letter-spacing:-.035em
+}
+.sectionHead p {
+    margin:4px 0 0;
+    color:var(--muted)
+}
+.grid {
+    display:grid;
+    grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:16px
+}
+.card {
+    position:relative;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    overflow:hidden;
+    transition:.28s
+}
+.card:hover {
+    transform:translateY(-4px);
+    border-color:#6c5bff70;
+    box-shadow:0 18px 55px #0006
+}
+.pic {
+    aspect-ratio:4/5;
+    background:#171923;
+    overflow:hidden;
+    position:relative
+}
+.pic img {
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    transition:.45s
+}
+.card:hover .pic img {
+    transform:scale(1.025)
+}
+.noimg {
+    width:100%;
+    height:100%;
+    display:grid;
+    place-items:center;
+    color:#777e90;
+    background:linear-gradient(135deg,#171923,#10121a)
+}
+.heart {
+    position:absolute;
+    right:10px;
+    top:10px;
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    border:1px solid #ffffff22;
+    background:#090a0fcc;
+    color:#fff;
+    z-index:2
+}
+.heart.on {
+    color:#ff6072
+}
+.tag {
+    position:absolute;
+    left:10px;
+    top:10px;
+    padding:6px 9px;
+    border-radius:999px;
+    background:#0b0c11d9;
+    border:1px solid #ffffff1c;
+    font-size:11px;
+    font-weight:900
+}
+.info {
+    padding:14px
+}
+.brand {
+    color:var(--muted);
+    font-size:12px
+}
+.name {
+    font-weight:800;
+    margin:3px 0 8px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis
+}
+.prices {
+    display:flex;
+    align-items:center;
+    gap:9px
+}
+.price {
+    font-weight:950;
+    font-size:17px
+}
+.old {
+    text-decoration:line-through;
+    color:#73798b;
+    font-size:13px
+}
+.empty {
+    grid-column:1/-1;
+    border:1px dashed var(--line);
+    border-radius:20px;
+    padding:50px;
+    text-align:center;
+    color:var(--muted)
+}
+.filters {
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin:0 0 20px
+}
+.filters select {
+    background:#11131b;
+    color:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:10px 34px 10px 12px
+}
+.drawerShade,.modalShade {
+    position:fixed;
+    inset:0;
+    background:#000a;
+    backdrop-filter:blur(6px);
+    z-index:80;
+    opacity:0;
+    pointer-events:none;
+    transition:.28s
+}
+.drawerShade.open,.modalShade.open {
+    opacity:1;
+    pointer-events:auto
+}
+.drawer {
+    position:fixed;
+    right:0;
+    top:0;
+    bottom:0;
+    width:min(440px,100%);
+    z-index:81;
+    background:#0e1017;
+    border-left:1px solid var(--line);
+    transform:translateX(105%);
+    transition:.38s cubic-bezier(.2,.8,.2,1);
+    display:flex;
+    flex-direction:column
+}
+.drawer.open {
+    transform:none
+}
+.drawerHead {
+    height:76px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:0 20px;
+    border-bottom:1px solid var(--line)
+}
+.drawerBody {
+    padding:16px;
+    overflow:auto;
+    flex:1
+}
+.drawerFoot {
+    padding:16px;
+    border-top:1px solid var(--line)
+}
+.cartItem {
+    display:grid;
+    grid-template-columns:72px 1fr auto;
+    gap:12px;
+    padding:12px 0;
+    border-bottom:1px solid #ffffff0d
+}
+.cartItem img {
+    width:72px;
+    height:90px;
+    object-fit:cover;
+    border-radius:10px;
+    background:#171923
+}
+.qty {
+    display:flex;
+    gap:7px;
+    align-items:center;
+    margin-top:8px
+}
+.qty button {
+    width:28px;
+    height:28px;
+    border:1px solid var(--line);
+    background:#151824;
+    color:#fff;
+    border-radius:8px
+}
+.total {
+    display:flex;
+    justify-content:space-between;
+    font-size:18px;
+    font-weight:900;
+    margin-bottom:12px
+}
+.modal {
+    position:fixed;
+    z-index:91;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-46%) scale(.97);
+    width:min(1040px,calc(100% - 28px));
+    max-height:90vh;
+    overflow:auto;
+    background:#0e1017;
+    border:1px solid var(--line);
+    border-radius:24px;
+    box-shadow:var(--shadow);
+    opacity:0;
+    pointer-events:none;
+    transition:.28s
+}
+.modal.open {
+    opacity:1;
+    pointer-events:auto;
+    transform:translate(-50%,-50%) scale(1)
+}
+.productView {
+    display:grid;
+    grid-template-columns:1.05fr .95fr
+}
+.gallery {
+    padding:18px
+}
+.mainImg {
+    aspect-ratio:4/5;
+    border-radius:18px;
+    overflow:hidden;
+    background:#171923
+}
+.mainImg img {
+    width:100%;
+    height:100%;
+    object-fit:contain
+}
+.thumbs {
+    display:flex;
+    gap:8px;
+    overflow:auto;
+    margin-top:10px
+}
+.thumb {
+    width:70px;
+    height:80px;
+    flex:none;
+    border:1px solid var(--line);
+    border-radius:10px;
+    overflow:hidden;
+    background:#171923
+}
+.thumb img {
+    width:100%;
+    height:100%;
+    object-fit:cover
+}
+.detail {
+    padding:28px
+}
+.detail h3 {
+    font-size:32px;
+    line-height:1.05;
+    margin:6px 0 14px
+}
+.detailDesc {
+    color:#b6bbca;
+    white-space:pre-wrap
+}
+.sizeTitle {
+    font-weight:850;
+    margin:22px 0 9px
+}
+.sizes {
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap
+}
+.size {
+    border:1px solid var(--line);
+    background:#12141c;
+    color:#fff;
+    border-radius:10px;
+    padding:9px 12px
+}
+.size.on {
+    border-color:var(--accent);
+    box-shadow:0 0 0 2px #725cff25
+}
+.size:disabled {
+    opacity:.35;
+    cursor:not-allowed
+}
+.buyrow {
+    display:flex;
+    gap:10px;
+    margin-top:24px
+}
+.buyrow .primary {
+    flex:1
+}
+.close {
+    width:42px;
+    height:42px;
+    border-radius:12px;
+    border:1px solid var(--line);
+    background:#171923;
+    color:#fff
+}
+.toastWrap {
+    position:fixed;
+    z-index:120;
+    right:16px;
+    bottom:16px;
+    display:grid;
+    gap:8px
+}
+.toast {
+    background:#151824;
+    border:1px solid var(--line);
+    border-radius:13px;
+    padding:12px 14px;
+    box-shadow:var(--shadow);
+    animation:toast .3s
+}
+@keyframes toast {
+    from {
+        transform:translateY(8px);
+        opacity:0
     }
-    *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
-    body{margin:0;background:radial-gradient(900px 550px at 82% -10%,#30207a44,transparent 60%),var(--bg);
-      color:var(--text);font:15px/1.45 Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-    button,input,select,textarea{font:inherit}
-    button{cursor:pointer}
-    a{color:inherit;text-decoration:none}
-    img{display:block;max-width:100%}
-    .shell{width:min(var(--max),calc(100% - 36px));margin:auto}
-    .top{height:var(--header);position:sticky;top:0;z-index:50;background:#090a0fdd;backdrop-filter:blur(18px);
-      border-bottom:1px solid #ffffff0d}
-    .topin{height:100%;display:grid;grid-template-columns:auto minmax(260px,680px) auto;gap:24px;align-items:center}
-    .logo{font-weight:950;font-size:25px;letter-spacing:-1.1px}.logo span{color:var(--accent)}
-    .search{position:relative}.search input{width:100%;height:46px;border:1px solid var(--line);border-radius:999px;background:#11131b;
-      color:var(--text);outline:none;padding:0 48px 0 18px;transition:.2s}
-    .search input:focus{border-color:#725cff99;box-shadow:0 0 0 4px #725cff18}
-    .search button{position:absolute;right:5px;top:5px;width:36px;height:36px;border:0;border-radius:50%;background:var(--accent);color:#fff}
-    .actions{display:flex;gap:8px}.iconbtn{min-width:44px;height:44px;padding:0 13px;border:1px solid var(--line);border-radius:13px;
-      background:#11131b;color:var(--text);display:flex;align-items:center;justify-content:center;gap:8px;transition:.2s}
-    .iconbtn:hover{transform:translateY(-1px);border-color:#6d5cff88}.badge{background:var(--accent);border-radius:999px;min-width:19px;height:19px;
-      padding:0 5px;display:inline-grid;place-items:center;font-size:11px;font-weight:800}
-    .nav{border-bottom:1px solid #ffffff0d;background:#0c0d13}.navin{display:flex;gap:8px;overflow:auto;padding:10px 0;scrollbar-width:none}
-    .chip{white-space:nowrap;border:1px solid var(--line);background:#11131b;color:#c9cede;border-radius:999px;padding:8px 14px;transition:.2s}
-    .chip:hover,.chip.active{background:#725cff1c;border-color:#725cff88;color:#fff}
-    .hero{padding:42px 0 26px}.heroBox{min-height:410px;border:1px solid #ffffff12;border-radius:30px;overflow:hidden;position:relative;
-      background:linear-gradient(120deg,#151722 0%,#16132a 48%,#34228b 100%);box-shadow:var(--shadow)}
-    .heroGlow{position:absolute;width:600px;height:600px;border-radius:50%;background:#7660ff55;filter:blur(90px);right:-190px;top:-270px}
-    .heroText{position:relative;z-index:2;padding:64px;max-width:760px}.eyebrow{color:#aaa1ff;font-weight:800;text-transform:uppercase;letter-spacing:.14em;font-size:12px}
-    h1{font-size:clamp(42px,7vw,88px);line-height:.92;letter-spacing:-.06em;margin:14px 0 20px}
-    .hero p{font-size:18px;color:#c1c5d3;max-width:600px}.primary{border:0;border-radius:14px;padding:13px 18px;background:linear-gradient(135deg,var(--accent),var(--accent2));
-      color:#fff;font-weight:850;box-shadow:0 10px 30px #6355ff44}.secondary{border:1px solid var(--line);border-radius:14px;padding:12px 18px;background:#11131b;color:#fff;font-weight:750}
-    .heroBtns{display:flex;gap:10px;margin-top:28px;flex-wrap:wrap}
-    .section{padding:24px 0 42px}.sectionHead{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-bottom:18px}
-    .sectionHead h2{margin:0;font-size:28px;letter-spacing:-.035em}.sectionHead p{margin:4px 0 0;color:var(--muted)}
-    .grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}
-    .card{position:relative;background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:.28s}
-    .card:hover{transform:translateY(-4px);border-color:#6c5bff70;box-shadow:0 18px 55px #0006}
-    .pic{aspect-ratio:4/5;background:#171923;overflow:hidden;position:relative}.pic img{width:100%;height:100%;object-fit:cover;transition:.45s}
-    .card:hover .pic img{transform:scale(1.025)}.noimg{width:100%;height:100%;display:grid;place-items:center;color:#777e90;background:linear-gradient(135deg,#171923,#10121a)}
-    .heart{position:absolute;right:10px;top:10px;width:38px;height:38px;border-radius:50%;border:1px solid #ffffff22;background:#090a0fcc;color:#fff;z-index:2}
-    .heart.on{color:#ff6072}.tag{position:absolute;left:10px;top:10px;padding:6px 9px;border-radius:999px;background:#0b0c11d9;border:1px solid #ffffff1c;font-size:11px;font-weight:900}
-    .info{padding:14px}.brand{color:var(--muted);font-size:12px}.name{font-weight:800;margin:3px 0 8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .prices{display:flex;align-items:center;gap:9px}.price{font-weight:950;font-size:17px}.old{text-decoration:line-through;color:#73798b;font-size:13px}
-    .empty{grid-column:1/-1;border:1px dashed var(--line);border-radius:20px;padding:50px;text-align:center;color:var(--muted)}
-    .filters{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 20px}.filters select{background:#11131b;color:#fff;border:1px solid var(--line);border-radius:12px;padding:10px 34px 10px 12px}
-    .drawerShade,.modalShade{position:fixed;inset:0;background:#000a;backdrop-filter:blur(6px);z-index:80;opacity:0;pointer-events:none;transition:.28s}
-    .drawerShade.open,.modalShade.open{opacity:1;pointer-events:auto}
-    .drawer{position:fixed;right:0;top:0;bottom:0;width:min(440px,100%);z-index:81;background:#0e1017;border-left:1px solid var(--line);
-      transform:translateX(105%);transition:.38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column}
-    .drawer.open{transform:none}.drawerHead{height:76px;display:flex;align-items:center;justify-content:space-between;padding:0 20px;border-bottom:1px solid var(--line)}
-    .drawerBody{padding:16px;overflow:auto;flex:1}.drawerFoot{padding:16px;border-top:1px solid var(--line)}
-    .cartItem{display:grid;grid-template-columns:72px 1fr auto;gap:12px;padding:12px 0;border-bottom:1px solid #ffffff0d}.cartItem img{width:72px;height:90px;object-fit:cover;border-radius:10px;background:#171923}
-    .qty{display:flex;gap:7px;align-items:center;margin-top:8px}.qty button{width:28px;height:28px;border:1px solid var(--line);background:#151824;color:#fff;border-radius:8px}
-    .total{display:flex;justify-content:space-between;font-size:18px;font-weight:900;margin-bottom:12px}
-    .modal{position:fixed;z-index:91;left:50%;top:50%;transform:translate(-50%,-46%) scale(.97);width:min(1040px,calc(100% - 28px));max-height:90vh;
-      overflow:auto;background:#0e1017;border:1px solid var(--line);border-radius:24px;box-shadow:var(--shadow);opacity:0;pointer-events:none;transition:.28s}
-    .modal.open{opacity:1;pointer-events:auto;transform:translate(-50%,-50%) scale(1)}
-    .productView{display:grid;grid-template-columns:1.05fr .95fr}.gallery{padding:18px}.mainImg{aspect-ratio:4/5;border-radius:18px;overflow:hidden;background:#171923}
-    .mainImg img{width:100%;height:100%;object-fit:contain}.thumbs{display:flex;gap:8px;overflow:auto;margin-top:10px}.thumb{width:70px;height:80px;flex:none;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#171923}
-    .thumb img{width:100%;height:100%;object-fit:cover}.detail{padding:28px}.detail h3{font-size:32px;line-height:1.05;margin:6px 0 14px}.detailDesc{color:#b6bbca;white-space:pre-wrap}
-    .sizeTitle{font-weight:850;margin:22px 0 9px}.sizes{display:flex;gap:8px;flex-wrap:wrap}.size{border:1px solid var(--line);background:#12141c;color:#fff;border-radius:10px;padding:9px 12px}
-    .size.on{border-color:var(--accent);box-shadow:0 0 0 2px #725cff25}.size:disabled{opacity:.35;cursor:not-allowed}
-    .buyrow{display:flex;gap:10px;margin-top:24px}.buyrow .primary{flex:1}.close{width:42px;height:42px;border-radius:12px;border:1px solid var(--line);background:#171923;color:#fff}
-    .toastWrap{position:fixed;z-index:120;right:16px;bottom:16px;display:grid;gap:8px}.toast{background:#151824;border:1px solid var(--line);border-radius:13px;padding:12px 14px;box-shadow:var(--shadow);animation:toast .3s}
-    @keyframes toast{from{transform:translateY(8px);opacity:0}}
-    .skeleton{background:linear-gradient(90deg,#141620 25%,#202330 40%,#141620 60%);background-size:300% 100%;animation:sk 1.4s infinite}
-    @keyframes sk{to{background-position:-300% 0}}
-    footer{border-top:1px solid #ffffff0d;margin-top:30px;padding:42px 0;color:#9298aa}.footerGrid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:24px}
-    .mobileNav{display:none}
-    @media(max-width:1050px){.grid{grid-template-columns:repeat(3,1fr)}.topin{grid-template-columns:auto 1fr auto}.actionText{display:none}}
-    @media(max-width:760px){
-      body{padding-bottom:70px}.shell{width:min(100% - 22px,var(--max))}.top{height:64px}.topin{grid-template-columns:auto 1fr auto;gap:10px}.search{display:none}
-      .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.hero{padding-top:18px}.heroBox{min-height:350px}.heroText{padding:34px 24px}.hero p{font-size:15px}
-      .section{padding:18px 0 30px}.productView{grid-template-columns:1fr}.detail{padding:20px}.gallery{padding-bottom:0}.modal{max-height:94vh}
-      .footerGrid{grid-template-columns:1fr}.mobileNav{position:fixed;display:grid;grid-template-columns:repeat(4,1fr);left:0;right:0;bottom:0;height:66px;z-index:60;background:#0b0c12ee;
-        backdrop-filter:blur(15px);border-top:1px solid var(--line)}.mobileNav button{border:0;background:transparent;color:#a5abbb;font-size:11px}.mobileNav b{display:block;color:#fff;font-size:18px}
+}
+.skeleton {
+    background:linear-gradient(90deg,#141620 25%,#202330 40%,#141620 60%);
+    background-size:300% 100%;
+    animation:sk 1.4s infinite
+}
+@keyframes sk {
+    to {
+        background-position:-300% 0
     }
-    @media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.info{padding:10px}.name{font-size:13px}.price{font-size:15px}.heroBox{min-height:320px}}
-
-    /* KrisVane v2 — client filters, menu and persistent view */
-    .topin{grid-template-columns:auto auto minmax(260px,680px) auto}
-    .menuBtn{width:44px;height:44px;border:1px solid var(--line);border-radius:13px;background:#11131b;color:var(--text);
-      display:grid;place-items:center;padding:0;transition:.2s}
-    .menuBtn:hover{border-color:#6d5cff88;transform:translateY(-1px)}
-    .hamb{width:18px;display:grid;gap:4px}.hamb i{display:block;height:2px;background:currentColor;border-radius:10px}
-    .filterBar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;margin:0 0 20px}
-    .filters{margin:0;display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px}
-    .filterField{display:grid;gap:6px}.filterField label{font-size:12px;color:var(--muted);font-weight:800}
-    .filterField select,.filterField input{width:100%;height:43px;background:#11131b;color:#fff;border:1px solid var(--line);
-      border-radius:12px;padding:0 12px;outline:none}
-    .filterField select:focus,.filterField input:focus{border-color:#725cff99;box-shadow:0 0 0 3px #725cff14}
-    .resetFilters{height:43px;align-self:end;white-space:nowrap}
-    .sideShade{position:fixed;inset:0;background:#000a;backdrop-filter:blur(6px);z-index:100;opacity:0;pointer-events:none;transition:.28s}
-    .sideShade.open{opacity:1;pointer-events:auto}
-    .sideMenu{position:fixed;left:0;top:0;bottom:0;width:min(390px,92vw);z-index:101;background:#0d0f16;border-right:1px solid var(--line);
-      transform:translateX(-105%);transition:.38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:30px 0 80px #0008}
-    .sideMenu.open{transform:none}.sideHead{height:76px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
-    .sideBody{padding:16px;overflow:auto}.menuSection{padding:8px 0 18px}.menuSectionTitle{font-size:11px;color:var(--muted);font-weight:900;
-      text-transform:uppercase;letter-spacing:.12em;padding:0 8px 8px}
-    .menuItem{width:100%;min-height:48px;border:0;background:transparent;color:#e8eaf2;border-radius:12px;padding:10px 12px;
-      display:flex;align-items:center;gap:12px;text-align:left;transition:.2s}
-    .menuItem:hover{background:#ffffff0a}.menuItem .mi{width:28px;text-align:center;font-size:18px}.menuItem small{display:block;color:var(--muted);margin-top:2px}
-    .settingsPanel{display:grid;gap:10px;padding:10px 8px}.settingsPanel label{font-size:12px;color:var(--muted);font-weight:800}
-    .settingsPanel select{height:42px;border:1px solid var(--line);border-radius:11px;background:#12141c;color:#fff;padding:0 10px}
-    body[data-theme="light"]{--bg:#f3f5fa;--panel:#fff;--panel2:#f8f9fc;--line:#dce1eb;--text:#151823;--muted:#687084;--shadow:0 24px 80px #29304420}
-    body[data-theme="light"] .top,body[data-theme="light"] .nav{background:#f7f8fbe8}
-    body[data-theme="light"] .iconbtn,body[data-theme="light"] .menuBtn,body[data-theme="light"] .search input,
+}
+footer {
+    border-top:1px solid #ffffff0d;
+    margin-top:30px;
+    padding:42px 0;
+    color:#9298aa
+}
+.footerGrid {
+    display:grid;
+    grid-template-columns:2fr 1fr 1fr;
+    gap:24px
+}
+.mobileNav {
+    display:none
+}
+@media(max-width:1050px) {
+    .grid {
+        grid-template-columns:repeat(3,1fr)
+    }
+    .topin {
+        grid-template-columns:auto 1fr auto
+    }
+    .actionText {
+        display:none
+    }
+}
+@media(max-width:760px) {
+    body {
+        padding-bottom:70px
+    }
+    .shell {
+        width:min(100% - 22px,var(--max))
+    }
+    .top {
+        height:64px
+    }
+    .topin {
+        grid-template-columns:auto 1fr auto;
+        gap:10px
+    }
+    .search {
+        display:none
+    }
+    .grid {
+        grid-template-columns:repeat(2,minmax(0,1fr));
+        gap:10px
+    }
+    .hero {
+        padding-top:18px
+    }
+    .heroBox {
+        min-height:350px
+    }
+    .heroText {
+        padding:34px 24px
+    }
+    .hero p {
+        font-size:15px
+    }
+    .section {
+        padding:18px 0 30px
+    }
+    .productView {
+        grid-template-columns:1fr
+    }
+    .detail {
+        padding:20px
+    }
+    .gallery {
+        padding-bottom:0
+    }
+    .modal {
+        max-height:94vh
+    }
+    .footerGrid {
+        grid-template-columns:1fr
+    }
+    .mobileNav {
+        position:fixed;
+        display:grid;
+        grid-template-columns:repeat(4,1fr);
+        left:0;
+        right:0;
+        bottom:0;
+        height:66px;
+        z-index:60;
+        background:#0b0c12ee;
+        backdrop-filter:blur(15px);
+        border-top:1px solid var(--line)
+    }
+    .mobileNav button {
+        border:0;
+        background:transparent;
+        color:#a5abbb;
+        font-size:11px
+    }
+    .mobileNav b {
+        display:block;
+        color:#fff;
+        font-size:18px
+    }
+}
+@media(max-width:420px) {
+    .grid {
+        grid-template-columns:1fr 1fr
+    }
+    .info {
+        padding:10px
+    }
+    .name {
+        font-size:13px
+    }
+    .price {
+        font-size:15px
+    }
+    .heroBox {
+        min-height:320px
+    }
+}
+/* KrisVane v2 — client filters, menu and persistent view */
+    .topin {
+    grid-template-columns:auto auto minmax(260px,680px) auto
+}
+.menuBtn {
+    width:44px;
+    height:44px;
+    border:1px solid var(--line);
+    border-radius:13px;
+    background:#11131b;
+    color:var(--text);
+    display:grid;
+    place-items:center;
+    padding:0;
+    transition:.2s
+}
+.menuBtn:hover {
+    border-color:#6d5cff88;
+    transform:translateY(-1px)
+}
+.hamb {
+    width:18px;
+    display:grid;
+    gap:4px
+}
+.hamb i {
+    display:block;
+    height:2px;
+    background:currentColor;
+    border-radius:10px
+}
+.filterBar {
+    display:grid;
+    grid-template-columns:minmax(0,1fr) auto;
+    gap:12px;
+    align-items:start;
+    margin:0 0 20px
+}
+.filters {
+    margin:0;
+    display:grid;
+    grid-template-columns:repeat(5,minmax(150px,1fr));
+    gap:10px
+}
+.filterField {
+    display:grid;
+    gap:6px
+}
+.filterField label {
+    font-size:12px;
+    color:var(--muted);
+    font-weight:800
+}
+.filterField select,.filterField input {
+    width:100%;
+    height:43px;
+    background:#11131b;
+    color:#fff;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:0 12px;
+    outline:none
+}
+.filterField select:focus,.filterField input:focus {
+    border-color:#725cff99;
+    box-shadow:0 0 0 3px #725cff14
+}
+.resetFilters {
+    height:43px;
+    align-self:end;
+    white-space:nowrap
+}
+.sideShade {
+    position:fixed;
+    inset:0;
+    background:#000a;
+    backdrop-filter:blur(6px);
+    z-index:100;
+    opacity:0;
+    pointer-events:none;
+    transition:.28s
+}
+.sideShade.open {
+    opacity:1;
+    pointer-events:auto
+}
+.sideMenu {
+    position:fixed;
+    left:0;
+    top:0;
+    bottom:0;
+    width:min(390px,92vw);
+    z-index:101;
+    background:#0d0f16;
+    border-right:1px solid var(--line);
+    transform:translateX(-105%);
+    transition:.38s cubic-bezier(.2,.8,.2,1);
+    display:flex;
+    flex-direction:column;
+    box-shadow:30px 0 80px #0008
+}
+.sideMenu.open {
+    transform:none
+}
+.sideHead {
+    height:76px;
+    padding:0 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    border-bottom:1px solid var(--line)
+}
+.sideBody {
+    padding:16px;
+    overflow:auto
+}
+.menuSection {
+    padding:8px 0 18px
+}
+.menuSectionTitle {
+    font-size:11px;
+    color:var(--muted);
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.12em;
+    padding:0 8px 8px
+}
+.menuItem {
+    width:100%;
+    min-height:48px;
+    border:0;
+    background:transparent;
+    color:#e8eaf2;
+    border-radius:12px;
+    padding:10px 12px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    text-align:left;
+    transition:.2s
+}
+.menuItem:hover {
+    background:#ffffff0a
+}
+.menuItem .mi {
+    width:28px;
+    text-align:center;
+    font-size:18px
+}
+.menuItem small {
+    display:block;
+    color:var(--muted);
+    margin-top:2px
+}
+.settingsPanel {
+    display:grid;
+    gap:10px;
+    padding:10px 8px
+}
+.settingsPanel label {
+    font-size:12px;
+    color:var(--muted);
+    font-weight:800
+}
+.settingsPanel select {
+    height:42px;
+    border:1px solid var(--line);
+    border-radius:11px;
+    background:#12141c;
+    color:#fff;
+    padding:0 10px
+}
+body[data-theme="light"] {
+    --bg:#f3f5fa;
+    --panel:#fff;
+    --panel2:#f8f9fc;
+    --line:#dce1eb;
+    --text:#151823;
+    --muted:#687084;
+    --shadow:0 24px 80px #29304420
+}
+body[data-theme="light"] .top,body[data-theme="light"] .nav {
+    background:#f7f8fbe8
+}
+body[data-theme="light"] .iconbtn,body[data-theme="light"] .menuBtn,body[data-theme="light"] .search input,
     body[data-theme="light"] .filterField select,body[data-theme="light"] .filterField input,body[data-theme="light"] .sideMenu,
-    body[data-theme="light"] .drawer,body[data-theme="light"] .modal,body[data-theme="light"] .secondary{background:#fff;color:#151823}
-    body[data-theme="graphite"]{--bg:#111214;--panel:#181a1e;--panel2:#1d2025;--line:#30343c;--text:#f5f6f8;--muted:#9da3ae;--accent:#8a909d;--accent2:#5f6673}
-    body[data-theme="blue"]{--bg:#07101d;--panel:#0c1728;--panel2:#102039;--line:#203653;--text:#f4f8ff;--muted:#8ea3bd;--accent:#3287ff;--accent2:#54b8ff}
-    body[data-density="compact"] .section{padding-top:14px} body[data-density="compact"] .grid{gap:10px}
-    body[data-density="compact"] .info{padding:10px} body[data-density="compact"] .filterField select,body[data-density="compact"] .filterField input{height:39px}
-    body[data-motion="off"] *,body[data-motion="off"] *:before,body[data-motion="off"] *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
-    @media(max-width:1180px){.filters{grid-template-columns:repeat(3,minmax(150px,1fr))}}
-    @media(max-width:760px){.topin{grid-template-columns:auto auto 1fr auto}.logo{font-size:21px}.filterBar{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.resetFilters{width:100%}}
-    @media(max-width:480px){.filters{grid-template-columns:1fr}.topin{gap:7px}.menuBtn{width:40px;height:40px}.logo{font-size:19px}}
+    body[data-theme="light"] .drawer,body[data-theme="light"] .modal,body[data-theme="light"] .secondary {
+    background:#fff;
+    color:#151823
+}
+body[data-theme="graphite"] {
+    --bg:#111214;
+    --panel:#181a1e;
+    --panel2:#1d2025;
+    --line:#30343c;
+    --text:#f5f6f8;
+    --muted:#9da3ae;
+    --accent:#8a909d;
+    --accent2:#5f6673
+}
+body[data-theme="blue"] {
+    --bg:#07101d;
+    --panel:#0c1728;
+    --panel2:#102039;
+    --line:#203653;
+    --text:#f4f8ff;
+    --muted:#8ea3bd;
+    --accent:#3287ff;
+    --accent2:#54b8ff
+}
+body[data-density="compact"] .section {
+    padding-top:14px
+}
+body[data-density="compact"] .grid {
+    gap:10px
+}
+body[data-density="compact"] .info {
+    padding:10px
+}
+body[data-density="compact"] .filterField select,body[data-density="compact"] .filterField input {
+    height:39px
+}
+body[data-motion="off"] *,body[data-motion="off"] *:before,body[data-motion="off"] *:after {
+    animation:none!important;
+    transition:none!important;
+    scroll-behavior:auto!important
+}
+@media(max-width:1180px) {
+    .filters {
+        grid-template-columns:repeat(3,minmax(150px,1fr))
+    }
+}
+@media(max-width:760px) {
+    .topin {
+        grid-template-columns:auto auto 1fr auto
+    }
+    .logo {
+        font-size:21px
+    }
+    .filterBar {
+        grid-template-columns:1fr
+    }
+    .filters {
+        grid-template-columns:1fr 1fr
+    }
+    .resetFilters {
+        width:100%
+    }
+}
+@media(max-width:480px) {
+    .filters {
+        grid-template-columns:1fr
+    }
+    .topin {
+        gap:7px
+    }
+    .menuBtn {
+        width:40px;
+        height:40px
+    }
+    .logo {
+        font-size:19px
+    }
+}
+/* =========================================================
+       FILTER PANEL
+       The panel uses the same "open -> accelerate -> settle"
+       feeling as the admin interface instead of appearing at once.
+       ========================================================= */
 
-    @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
-  </style>
-</head>
-<body>
-<header class="top"><div class="shell topin">
-  <button class="menuBtn" id="menuBtn" aria-label="Открыть меню"><span class="hamb"><i></i><i></i><i></i></span></button>
-  <a class="logo" href="#" aria-label="KrisVane">Kris<span>Vane</span></a>
-  <div class="search"><input id="search" placeholder="Поиск товаров, брендов, категорий…" autocomplete="off"><button id="searchBtn">⌕</button></div>
-  <div class="actions">
-    <button class="iconbtn" id="favBtn" title="Избранное">♡ <span class="badge" id="favCount">0</span></button>
-    <button class="iconbtn" id="cartBtn" title="Корзина">🛍 <span class="badge" id="cartCount">0</span><span class="actionText">Корзина</span></button>
-    <button class="iconbtn" id="accountBtn" title="Аккаунт">◉</button>
-  </div>
-</div></header>
+    .catalogHeading {
+    align-items: center;
+}
+.filterToggle {
+    min-width: 150px;
+    height: 44px;
+    padding: 0 15px;
+    border: 1px solid var(--line);
+    border-radius: 13px;
+    background: var(--panel);
+    color: var(--text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 9px;
+    font-weight: 850;
+    transition:
+        border-color .25s ease,
+        background .25s ease,
+        transform .25s ease;
+}
+.filterToggle:hover {
+    border-color: #725cff88;
+    background: var(--panel2);
+    transform: translateY(-1px);
+}
+.filterToggleIcon {
+    color: var(--accent);
+    font-size: 18px;
+}
+.filterArrow {
+    margin-left: 3px;
+    font-size: 17px;
+    transition: transform .9s cubic-bezier(.18,.82,.18,1);
+}
+.filterToggle.open .filterArrow {
+    transform: rotate(180deg);
+}
+.filterCollapse {
+    display: grid;
+    grid-template-rows: 0fr;
+    opacity: 0;
+    transform: translateY(-8px);
+    transition:
+        grid-template-rows .95s cubic-bezier(.16,.82,.18,1),
+        opacity .42s ease,
+        transform .95s cubic-bezier(.16,.82,.18,1);
+}
+.filterCollapse.open {
+    grid-template-rows: 1fr;
+    opacity: 1;
+    transform: translateY(0);
+}
+.filterCollapseInner {
+    min-height: 0;
+    overflow: hidden;
+}
+.filterBar {
+    padding-top: 4px;
+    padding-bottom: 22px;
+}
+/* Keep the hamburger above normal page content and guarantee clicks. */
+    .menuBtn {
+    position: relative;
+    z-index: 55;
+    pointer-events: auto;
+    touch-action: manipulation;
+    user-select: none;
+}
+.menuBtn * {
+    pointer-events: none;
+}
+.sideShade {
+    visibility: hidden;
+}
+.sideShade.open {
+    visibility: visible;
+}
+.sideMenu {
+    visibility: hidden;
+}
+.sideMenu.open {
+    visibility: visible;
+}
+@media (max-width: 760px) {
+    .catalogHeading {
+        align-items: stretch;
+    }
+    .filterToggle {
+        width: 100%;
+    }
+}
+@media(prefers-reduced-motion:reduce) {
+    *,*:before,*:after {
+        scroll-behavior:auto!important;
+        animation-duration:.01ms!important;
+        transition-duration:.01ms!important
+    }
+}
+    
+/* ===== KrisVane Store v5: appearance, custom dropdowns, favorite navigation ===== */
+body[data-theme="midnight"]{
+  --bg:#070b16;--panel:#0d1424;--panel2:#111b31;--text:#f4f7ff;--muted:#8ea0bd;
+  --line:#253451;--accent:#4f8cff;--accent2:#57c5ff;
+}
+body[data-theme="emerald"]{
+  --bg:#07110f;--panel:#0d1816;--panel2:#10211d;--text:#f2fff9;--muted:#8fb7a8;
+  --line:#21473d;--accent:#35c98c;--accent2:#7de2b9;
+}
+body[data-theme="pink"]{
+  --bg:#120910;--panel:#1b0e19;--panel2:#241221;--text:#fff5fc;--muted:#c59ab9;
+  --line:#51243f;--accent:#ed62b5;--accent2:#ff8ccd;
+}
+body[data-theme="amber"]{
+  --bg:#110d04;--panel:#1d1607;--panel2:#261c08;--text:#fff9e9;--muted:#c8b27e;
+  --line:#5b4313;--accent:#ffad0a;--accent2:#ffd05a;
+}
+body[data-theme="ocean"]{
+  --bg:#061012;--panel:#0b191d;--panel2:#0e2328;--text:#effdff;--muted:#89b9c0;
+  --line:#20505a;--accent:#20b9cf;--accent2:#62e1ec;
+}
+body[data-theme="ruby"]{
+  --bg:#120708;--panel:#1d0b0e;--panel2:#280e13;--text:#fff4f5;--muted:#c9999e;
+  --line:#57222a;--accent:#e9475d;--accent2:#ff8190;
+}
+body[data-theme="lime"]{
+  --bg:#0b1005;--panel:#111a08;--panel2:#17230a;--text:#f9ffef;--muted:#a9bd86;
+  --line:#3d5721;--accent:#8bcf37;--accent2:#b8ec6c;
+}
+body[data-theme="mono"]{
+  --bg:#090909;--panel:#111;--panel2:#181818;--text:#f5f5f5;--muted:#999;
+  --line:#303030;--accent:#ededed;--accent2:#aaa;
+}
+body[data-theme="light"]{
+  --bg:#f4f5f8;--panel:#fff;--panel2:#f0f2f7;--text:#161821;--muted:#687080;
+  --line:#d8dce7;--accent:#6656e8;--accent2:#477dff;
+}
+body[data-text-size="small"]{font-size:14px}
+body[data-text-size="large"]{font-size:17px}
+body[data-glow="bright"] .heroGlow{opacity:1;filter:blur(8px) saturate(1.25)}
+body[data-glow="soft"] .heroGlow{opacity:.35}
+body[data-glow="off"] .heroGlow{display:none}
+body[data-density="compact"] .section{padding-top:38px;padding-bottom:38px}
+body[data-density="compact"] .card .info{padding:12px}
+body[data-density="compact"] .filters{gap:8px}
+body[data-motion="simple"] *{animation-duration:.22s!important;transition-duration:.22s!important}
+body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="off"] *::after{
+  animation:none!important;transition:none!important;scroll-behavior:auto!important;
+}
 
-<nav class="nav"><div class="shell navin" id="categoryNav">
-  <button class="chip active" data-category="">Все</button>
-  <button class="chip" data-category="new">Новинки</button>
-</div></nav>
+.menuItem.appearanceEntry{
+  border:1px solid transparent;
+}
+.menuItem.appearanceEntry.active{
+  background:linear-gradient(135deg,#765cff1c,#4d83ff12);
+  border-color:#765cff45;
+}
+.appearanceCollapse{
+  display:grid;
+  grid-template-rows:0fr;
+  opacity:0;
+  transform:translateY(-8px);
+  transition:grid-template-rows .82s cubic-bezier(.16,.82,.18,1),opacity .35s ease,transform .82s cubic-bezier(.16,.82,.18,1);
+}
+.appearanceCollapse.open{grid-template-rows:1fr;opacity:1;transform:none}
+.appearanceCollapseInner{min-height:0;overflow:hidden}
+.appearanceSettings{
+  margin:8px 0 16px;
+  padding:14px;
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:var(--panel2);
+}
+.appearanceSettings .settingGrid{display:grid;grid-template-columns:1fr;gap:13px}
+.appearanceSettings label{display:block;color:var(--accent);font-size:12px;font-weight:900;margin:0 0 6px}
+.appearanceSettings select{
+  width:100%;height:44px;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  color:var(--text);padding:0 12px;font:inherit;font-weight:700;outline:none
+}
+.appearanceActions{display:flex;gap:8px;margin-top:14px}
+.appearanceActions button{flex:1}
 
-<main>
-<section class="hero"><div class="shell"><div class="heroBox">
-  <div class="heroGlow"></div><div class="heroText">
-    <div class="eyebrow">KRISVANE / NEW DROP</div>
-    <h1>Твой стиль.<br>Твои правила.</h1>
-    <p>Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.</p>
-    <div class="heroBtns"><button class="primary" id="heroCatalog">Смотреть каталог</button><button class="secondary" id="heroNew">Новинки</button></div>
-  </div>
-</div></div></section>
+.kvSelect{position:relative}
+.kvSelectNative{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important}
+.kvSelectButton{
+  width:100%;min-height:43px;border:1px solid var(--line);border-radius:12px;background:var(--panel);
+  color:var(--text);padding:10px 12px;display:flex;align-items:center;justify-content:space-between;
+  gap:10px;text-align:left;font:inherit;cursor:pointer
+}
+.kvSelectButton .kvArrow{transition:transform .72s cubic-bezier(.16,.82,.18,1)}
+.kvSelect.open .kvSelectButton{border-color:#765cff88;box-shadow:0 0 0 3px #765cff12}
+.kvSelect.open .kvArrow{transform:rotate(180deg)}
+.kvSelectDrop{
+  display:grid;grid-template-rows:0fr;opacity:0;transform:translateY(-7px);
+  transition:grid-template-rows .72s cubic-bezier(.16,.82,.18,1),opacity .3s ease,transform .72s cubic-bezier(.16,.82,.18,1);
+}
+.kvSelect.open .kvSelectDrop{grid-template-rows:1fr;opacity:1;transform:none}
+.kvSelectDropInner{min-height:0;overflow:hidden}
+.kvSelectOptions{
+  margin-top:7px;padding:7px;border:1px solid var(--line);border-radius:13px;background:var(--panel2);
+  max-height:230px;overflow:auto;box-shadow:0 16px 45px #0005
+}
+.kvOption{
+  width:100%;border:0;background:transparent;color:var(--text);border-radius:9px;padding:9px 10px;
+  text-align:left;font:inherit;cursor:pointer;transition:background .18s ease,color .18s ease
+}
+.kvOption:hover,.kvOption.selected{background:#765cff20;color:var(--accent2)}
+.kvOption.zero:not(.selected){color:var(--muted);opacity:.62}
+.kvOptionCount{margin-left:auto;color:var(--muted);font-variant-numeric:tabular-nums}
+.kvOption{display:flex;align-items:center;justify-content:space-between;gap:12px}
 
-<section class="section" id="catalog"><div class="shell">
-  <div class="sectionHead"><div><h2 id="catalogTitle">Каталог</h2><p id="catalogSub">Фильтры используют категории, подкатегории, бренды, размеры и состояние из каталога KrisVane.</p></div></div>
-  <div class="filterBar">
-    <div class="filters">
-      <div class="filterField"><label>Категория</label><select id="categoryFilter"><option value="">Все категории</option></select></div>
-      <div class="filterField"><label>Подкатегория</label><select id="subcategoryFilter"><option value="">Все подкатегории</option></select></div>
-      <div class="filterField"><label>Бренд</label><select id="brandFilter"><option value="">Все бренды</option></select></div>
-      <div class="filterField"><label>Размер</label><select id="sizeFilter"><option value="">Все размеры</option></select></div>
-      <div class="filterField"><label>Состояние / NEW</label><select id="conditionFilter"><option value="">Любое состояние</option></select></div>
-      <div class="filterField"><label>Наличие</label><select id="stockFilter"><option value="all">Все товары</option><option value="available">В наличии</option><option value="out">Нет в наличии</option></select></div>
-      <div class="filterField"><label>Цена от</label><input id="priceMin" type="number" min="0" inputmode="numeric" placeholder="0 грн"></div>
-      <div class="filterField"><label>Цена до</label><input id="priceMax" type="number" min="0" inputmode="numeric" placeholder="Без лимита"></div>
-      <div class="filterField"><label>Сортировка</label><select id="sort"><option value="default">По умолчанию</option><option value="priceAsc">Сначала дешевле</option><option value="priceDesc">Сначала дороже</option><option value="new">Сначала новые</option><option value="nameAsc">По названию А–Я</option></select></div>
-    </div>
-    <button class="secondary resetFilters" id="clearFilters">Сбросить фильтр</button>
-  </div>
-  <div class="grid" id="products"></div>
-  <div style="text-align:center;margin-top:22px"><button class="secondary" id="loadMore" hidden>Показать ещё</button></div>
-</div></section>
-</main>
+.catalogModeBar{
+  display:none;align-items:center;gap:12px;margin:0 0 20px;padding:12px 14px;border:1px solid var(--line);
+  border-radius:14px;background:var(--panel)
+}
+.catalogModeBar.show{display:flex}
+.catalogModeBar b{font-size:15px}
+.catalogModeBar .secondary{margin-left:auto}
 
-<footer><div class="shell footerGrid">
-  <div><div class="logo">Kris<span>Vane</span></div><p>Интернет-магазин одежды, обуви и аксессуаров.</p></div>
-  <div><b>Покупателям</b><p>Каталог</p><p>Избранное</p><p>Корзина</p></div>
-  <div><b>Доставка</b><p>Nova Poshta</p><p>Украина</p></div>
-</div></footer>
+@media(max-width:650px){
+  .appearanceActions{flex-direction:column}
+  .catalogModeBar{align-items:flex-start;flex-wrap:wrap}
+  .catalogModeBar .secondary{margin-left:0}
+}
 
-<div class="sideShade" id="sideShade"></div>
-<aside class="sideMenu" id="sideMenu" aria-label="Меню KrisVane">
-  <div class="sideHead"><div class="logo">Kris<span>Vane</span></div><button class="close" id="closeMenu">✕</button></div>
-  <div class="sideBody">
-    <div class="menuSection"><div class="menuSectionTitle">Аккаунт</div>
-      <button class="menuItem" id="menuProfile"><span class="mi">◉</span><span><b>Профиль</b><small>Вход, данные аккаунта и заказы</small></span></button>
-      <button class="menuItem" id="menuFavorites"><span class="mi">♡</span><span><b>Избранное</b><small>Сохранённые товары</small></span></button>
-      <button class="menuItem" id="menuCart"><span class="mi">🛍</span><span><b>Корзина</b><small>Товары перед оформлением</small></span></button>
-    </div>
-    <div class="menuSection"><div class="menuSectionTitle">Покупки</div>
-      <button class="menuItem" id="menuDelivery"><span class="mi">▤</span><span><b>Доставка</b><small>Nova Poshta, город и отделение — на этапе оформления</small></span></button>
-      <button class="menuItem" id="menuOrders"><span class="mi">◫</span><span><b>Мои заказы</b><small>История и статусы заказов</small></span></button>
-    </div>
-    <div class="menuSection"><div class="menuSectionTitle">Настройки сайта</div>
-      <div class="settingsPanel">
-        <label for="siteTheme">Тема</label><select id="siteTheme"><option value="dark">Тёмная · фиолетовая</option><option value="blue">Тёмная · синяя</option><option value="graphite">Графитовая</option><option value="light">Светлая</option></select>
-        <label for="siteDensity">Плотность интерфейса</label><select id="siteDensity"><option value="normal">Обычная</option><option value="compact">Компактная</option></select>
-        <label for="siteMotion">Анимации</label><select id="siteMotion"><option value="full">Полные</option><option value="off">Нет</option></select>
-        <label for="rememberView">Запоминать место на сайте</label><select id="rememberView"><option value="yes">Да</option><option value="no">Нет</option></select>
+</style>
+  </head>
+  <body>
+    <header class="top">
+      <div class="shell topin">
+        <button class="menuBtn" id="menuBtn" type="button" aria-label="Открыть меню" aria-expanded="false">
+          <span class="hamb">
+            <i>
+            </i>
+            <i>
+            </i>
+            <i>
+            </i>
+          </span>
+        </button>
+        <a class="logo" href="#" aria-label="KrisVane">Kris<span>Vane</span>
+        </a>
+        <div class="search">
+          <input id="search" placeholder="Поиск товаров, брендов, категорий…" autocomplete="off">
+          <button id="searchBtn">⌕</button>
+        </div>
+        <div class="actions">
+          <button class="iconbtn" id="favBtn" title="Избранное">♡ <span class="badge" id="favCount">0</span>
+          </button>
+          <button class="iconbtn" id="cartBtn" title="Корзина">🛍 <span class="badge" id="cartCount">0</span>
+            <span class="actionText">Корзина</span>
+          </button>
+          <button class="iconbtn" id="accountBtn" title="Аккаунт">◉</button>
+        </div>
       </div>
+    </header>
+    <nav class="nav">
+      <div class="shell navin" id="categoryNav">
+        <button class="chip active" data-category="">Все</button>
+        <button class="chip" data-category="new">Новинки</button>
+      </div>
+    </nav>
+    <main>
+      <section class="hero">
+        <div class="shell">
+          <div class="heroBox">
+            <div class="heroGlow">
+            </div>
+            <div class="heroText">
+              <div class="eyebrow">KRISVANE / NEW DROP</div>
+              <h1>Твой стиль.<br>Твои правила.</h1>
+              <p>Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.</p>
+              <div class="heroBtns">
+                <button class="primary" id="heroCatalog">Смотреть каталог</button>
+                <button class="secondary" id="heroNew">Новинки</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="section" id="catalog">
+        <div class="shell">
+          <div class="catalogModeBar" id="catalogModeBar">
+            <button class="secondary" id="backToCatalog" type="button">← Назад в каталог</button>
+            <b id="catalogModeLabel">Избранное</b>
+          </div>
+          <div class="sectionHead catalogHeading">
+            <div>
+              <h2 id="catalogTitle">Каталог</h2>
+              <p id="catalogSub">Товары KrisVane из каталога магазина.</p>
+            </div>
+            <button class="filterToggle" id="filterToggle" type="button" aria-expanded="false">
+              <span class="filterToggleIcon">☷</span>
+              <span>Фильтры</span>
+              <span class="filterArrow">⌄</span>
+            </button>
+          </div>
+          <div class="filterCollapse" id="filterCollapse">
+            <div class="filterCollapseInner">
+              <div class="filterBar">
+                <div class="filters">
+                  <div class="filterField">
+                    <label>Категория</label>
+                    <select id="categoryFilter">
+                      <option value="">Все категории</option>
+                    </select>
+                  </div>
+                  <div class="filterField">
+                    <label>Подкатегория</label>
+                    <select id="subcategoryFilter">
+                      <option value="">Все подкатегории</option>
+                    </select>
+                  </div>
+                  <div class="filterField">
+                    <label>Бренд</label>
+                    <select id="brandFilter">
+                      <option value="">Все бренды</option>
+                    </select>
+                  </div>
+                  <div class="filterField">
+                    <label>Размер</label>
+                    <select id="sizeFilter">
+                      <option value="">Все размеры</option>
+                    </select>
+                  </div>
+                  <div class="filterField">
+                    <label>Состояние / NEW</label>
+                    <select id="conditionFilter">
+                      <option value="">Любое состояние</option>
+                    </select>
+                  </div>
+                  <div class="filterField">
+                    <label>Наличие</label>
+                    <select id="stockFilter">
+                      <option value="all">Все товары</option>
+                      <option value="available">В наличии</option>
+                      <option value="out">Нет в наличии</option>
+                    </select>
+                  </div>
+                  <div class="filterField">
+                    <label>Цена от</label>
+                    <input id="priceMin" type="number" min="0" inputmode="numeric" placeholder="0 грн">
+                  </div>
+                  <div class="filterField">
+                    <label>Цена до</label>
+                    <input id="priceMax" type="number" min="0" inputmode="numeric" placeholder="Без лимита">
+                  </div>
+                  <div class="filterField">
+                    <label>Сортировка</label>
+                    <select id="sort">
+                      <option value="default">По умолчанию</option>
+                      <option value="priceAsc">Сначала дешевле</option>
+                      <option value="priceDesc">Сначала дороже</option>
+                      <option value="new">Сначала новые</option>
+                      <option value="nameAsc">По названию А–Я</option>
+                    </select>
+                  </div>
+                </div>
+                <button class="secondary resetFilters" id="clearFilters" type="button">
+          Сбросить фильтр
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="grid" id="products">
+          </div>
+          <div style="text-align:center;margin-top:22px">
+            <button class="secondary" id="loadMore" hidden>Показать ещё</button>
+          </div>
+        </div>
+      </section>
+    </main>
+    <footer>
+      <div class="shell footerGrid">
+        <div>
+          <div class="logo">Kris<span>Vane</span>
+          </div>
+          <p>Интернет-магазин одежды, обуви и аксессуаров.</p>
+        </div>
+        <div>
+          <b>Покупателям</b>
+          <p>Каталог</p>
+          <p>Избранное</p>
+          <p>Корзина</p>
+        </div>
+        <div>
+          <b>Доставка</b>
+          <p>Nova Poshta</p>
+          <p>Украина</p>
+        </div>
+      </div>
+    </footer>
+    <div class="sideShade" id="sideShade">
     </div>
-  </div>
-</aside>
+    <aside class="sideMenu" id="sideMenu" aria-label="Меню KrisVane">
+      <div class="sideHead">
+        <div class="logo">Kris<span>Vane</span>
+        </div>
+        <button class="close" id="closeMenu">✕</button>
+      </div>
+      <div class="sideBody">
+        <div class="menuSection">
+          <div class="menuSectionTitle">Аккаунт</div>
+          <button class="menuItem" id="menuProfile">
+            <span class="mi">◉</span>
+            <span>
+              <b>Профиль</b>
+              <small>Вход, данные аккаунта и заказы</small>
+            </span>
+          </button>
+          <button class="menuItem" id="menuFavorites">
+            <span class="mi">♡</span>
+            <span>
+              <b>Избранное</b>
+              <small>Сохранённые товары</small>
+            </span>
+          </button>
+          <button class="menuItem" id="menuCart">
+            <span class="mi">🛍</span>
+            <span>
+              <b>Корзина</b>
+              <small>Товары перед оформлением</small>
+            </span>
+          </button>
+        </div>
+        <div class="menuSection">
+          <div class="menuSectionTitle">Покупки</div>
+          <button class="menuItem" id="menuDelivery">
+            <span class="mi">▤</span>
+            <span>
+              <b>Доставка</b>
+              <small>Nova Poshta, город и отделение — на этапе оформления</small>
+            </span>
+          </button>
+          <button class="menuItem" id="menuOrders">
+            <span class="mi">◫</span>
+            <span>
+              <b>Мои заказы</b>
+              <small>История и статусы заказов</small>
+            </span>
+          </button>
+        </div>
+        <div class="menuSection" id="appearanceMenuSection">
+          <div class="menuSectionTitle">Настройки</div>
 
-<div class="drawerShade" id="drawerShade"></div><aside class="drawer" id="cartDrawer">
-  <div class="drawerHead"><b style="font-size:20px">Корзина</b><button class="close" id="closeCart">✕</button></div>
-  <div class="drawerBody" id="cartBody"></div>
-  <div class="drawerFoot"><div class="total"><span>Итого</span><span id="cartTotal">0 грн</span></div><button class="primary" id="checkoutBtn" style="width:100%">Оформить заказ</button></div>
-</aside>
+          <button class="menuItem appearanceEntry" id="menuAppearance" type="button" aria-expanded="false">
+            <span class="mi">◐</span>
+            <span>
+              <b>Настройки вида</b>
+              <small>Тема, язык, плотность, анимации и оформление</small>
+            </span>
+            <span class="filterArrow" style="margin-left:auto">⌄</span>
+          </button>
 
-<div class="modalShade" id="modalShade"></div><section class="modal" id="productModal" aria-modal="true" role="dialog"></section>
+          <div class="appearanceCollapse" id="appearanceCollapse">
+            <div class="appearanceCollapseInner">
+              <div class="appearanceSettings">
+                <div class="settingGrid">
+                  <div>
+                    <label for="siteTheme">Тема</label>
+                    <select id="siteTheme">
+                      <option value="dark">Тёмная · фиолетовая</option>
+                      <option value="blue">Тёмная · синяя</option>
+                      <option value="graphite">Графитовая</option>
+                      <option value="midnight">Полночная · синяя</option>
+                      <option value="emerald">Изумрудная</option>
+                      <option value="pink">Розовая</option>
+                      <option value="amber">Янтарная</option>
+                      <option value="ocean">Океан</option>
+                      <option value="ruby">Рубиновая</option>
+                      <option value="lime">Лайм</option>
+                      <option value="mono">Монохромная</option>
+                      <option value="light">Светлая</option>
+                    </select>
+                  </div>
 
-<nav class="mobileNav">
-  <button data-mobile="home"><b>⌂</b>Главная</button><button data-mobile="catalog"><b>▦</b>Каталог</button>
-  <button data-mobile="fav"><b>♡</b>Избранное</button><button data-mobile="cart"><b>🛍</b>Корзина</button>
-</nav>
-<div class="toastWrap" id="toasts"></div>
+                  <div>
+                    <label for="siteLanguage">Язык сайта</label>
+                    <select id="siteLanguage">
+                      <option value="ru">Русский</option>
+                      <option value="uk">Українська</option>
+                      <option value="en">English</option>
+                      <option value="pl">Polski</option>
+                      <option value="de">Deutsch</option>
+                      <option value="fr">Français</option>
+                      <option value="es">Español</option>
+                      <option value="it">Italiano</option>
+                      <option value="pt">Português</option>
+                      <option value="nl">Nederlands</option>
+                      <option value="tr">Türkçe</option>
+                      <option value="ro">Română</option>
+                      <option value="cs">Čeština</option>
+                      <option value="ja">日本語</option>
+                      <option value="ko">한국어</option>
+                      <option value="zh">中文</option>
+                      <option value="ar">العربية</option>
+                    </select>
+                  </div>
 
+                  <div>
+                    <label for="siteDensity">Плотность интерфейса</label>
+                    <select id="siteDensity">
+                      <option value="normal">Обычная</option>
+                      <option value="compact">Компактная</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="siteMotion">Анимации</label>
+                    <select id="siteMotion">
+                      <option value="full">Полные · рекомендуется</option>
+                      <option value="simple">Упрощённые</option>
+                      <option value="off">Нет</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="siteTextSize">Размер текста</label>
+                    <select id="siteTextSize">
+                      <option value="normal">Обычный</option>
+                      <option value="small">Меньше</option>
+                      <option value="large">Больше</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="siteGlow">Эффект свечения</label>
+                    <select id="siteGlow">
+                      <option value="normal">Обычное</option>
+                      <option value="bright">Яркое</option>
+                      <option value="soft">Мягкое</option>
+                      <option value="off">Нет</option>
+                    </select>
+                  </div>
+
+                  <div>
+                    <label for="rememberView">Запоминать вид и место на сайте</label>
+                    <select id="rememberView">
+                      <option value="yes">Да</option>
+                      <option value="no">Нет</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="appearanceActions">
+                  <button class="secondary" id="resetAppearance" type="button">Сбросить оформление</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </aside>
+    <div class="drawerShade" id="drawerShade">
+    </div>
+    <aside class="drawer" id="cartDrawer">
+      <div class="drawerHead">
+        <b style="font-size:20px">Корзина</b>
+        <button class="close" id="closeCart">✕</button>
+      </div>
+      <div class="drawerBody" id="cartBody">
+      </div>
+      <div class="drawerFoot">
+        <div class="total">
+          <span>Итого</span>
+          <span id="cartTotal">0 грн</span>
+        </div>
+        <button class="primary" id="checkoutBtn" style="width:100%">Оформить заказ</button>
+      </div>
+    </aside>
+    <div class="modalShade" id="modalShade">
+    </div>
+    <section class="modal" id="productModal" aria-modal="true" role="dialog">
+    </section>
+    <nav class="mobileNav">
+      <button data-mobile="home">
+        <b>⌂</b>Главная</button>
+        <button data-mobile="catalog">
+          <b>▦</b>Каталог</button>
+          <button data-mobile="fav">
+            <b>♡</b>Избранное</button>
+            <button data-mobile="cart">
+              <b>🛍</b>Корзина</button>
+            </nav>
+            
+<div id="localFileNotice" style="
+  display:none;
+  position:fixed;
+  left:16px;
+  right:16px;
+  bottom:16px;
+  z-index:99999;
+  padding:12px 16px;
+  border:1px solid #765cff66;
+  border-radius:14px;
+  background:#11131bea;
+  color:#e9eaff;
+  box-shadow:0 18px 60px #0008;
+  backdrop-filter:blur(16px);
+  font:600 13px/1.45 system-ui,sans-serif;
+">
+  Локальный предпросмотр: интерфейс работает, но каталог Supabase лучше проверять
+  на GitHub Pages после замены index.html.
+</div>
+
+<div class="toastWrap" id="toasts">
+            </div>
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm";
 
 const SUPABASE_URL = "https://cbkomiuylvumquhgrlve.supabase.co";
 const SUPABASE_KEY = "sb_publishable_OzfR7L5x3hQF56b4v7KT1g_q9tXF9sG";
 const sb = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+if (location.protocol === "file:") {
+  const localNotice = document.querySelector("#localFileNotice");
+  if (localNotice) {
+    localNotice.style.display = "block";
+    setTimeout(() => {
+      localNotice.style.display = "none";
+    }, 6500);
+  }
+}
 
 const $ = s => document.querySelector(s);
 const $$ = s => [...document.querySelectorAll(s)];
@@ -243,27 +1620,145 @@ const store = {
 const state={
   products:[],filtered:[],categories:[],subcategories:[],variants:new Map(),images:new Map(),
   category:"",subcategory:"",brand:"",size:"",condition:"",query:"",sort:"default",stock:"all",priceMin:"",priceMax:"",page:1,pageSize:24,
-  favorites:new Set(store.get("favorites",[])),cart:store.get("cart",[]),selectedProduct:null,selectedVariant:null,user:null
-;
-const viewDefaults={theme:"dark",density:"normal",motion:"full",remember:"yes",scrollY:0,category:"",subcategory:"",brand:"",size:"",condition:"",sort:"default",stock:"all",priceMin:"",priceMax:"",query:""};
-const view={...viewDefaults,...store.get("view",{})};
+  favorites: new Set(store.get("favorites", [])),
+  cart: store.get("cart", []),
+  selectedProduct: null,
+  selectedVariant: null,
+  user: null
+};
+const VIEW_SCHEMA_VERSION = 4;
+const viewDefaults = {
+  version: VIEW_SCHEMA_VERSION,
+  theme: "dark",
+  language: "ru",
+  density: "normal",
+  motion: "full",
+  textSize: "normal",
+  glow: "normal",
+  remember: "yes",
+  scrollY: 0,
+  filtersOpen: false,
+  appearanceOpen: false,
+  catalogMode: "catalog",
+  category: "",
+  subcategory: "",
+  brand: "",
+  size: "",
+  condition: "",
+  sort: "default",
+  stock: "all",
+  priceMin: "",
+  priceMax: "",
+  query: ""
+};
+const savedView = store.get("view", {});
+const view = {
+  ...viewDefaults,
+  ...savedView
+};
+
+if (Number(savedView.version || 0) !== VIEW_SCHEMA_VERSION) {
+  view.category = "";
+  view.subcategory = "";
+  view.brand = "";
+  view.size = "";
+  view.condition = "";
+  view.sort = "default";
+  view.stock = "all";
+  view.priceMin = "";
+  view.priceMax = "";
+  view.query = "";
+  view.filtersOpen = false;
+  view.version = VIEW_SCHEMA_VERSION;
+}
 function saveView(){
   if(view.remember!=="yes") return;
-  store.set("view",{...view,scrollY:window.scrollY,category:state.category,subcategory:state.subcategory,brand:state.brand,size:state.size,condition:state.condition,
-    sort:state.sort,stock:state.stock,priceMin:state.priceMin,priceMax:state.priceMax,query:state.query});
+  store.set("view", {
+    ...view,
+    version: VIEW_SCHEMA_VERSION,
+    filtersOpen: document.querySelector("#filterCollapse")?.classList.contains("open") || false,
+    appearanceOpen: document.querySelector("#appearanceCollapse")?.classList.contains("open") || false,
+    scrollY: window.scrollY,
+    category: state.category,
+    subcategory: state.subcategory,
+    brand: state.brand,
+    size: state.size,
+    condition: state.condition,
+    sort: state.sort,
+    stock: state.stock,
+    priceMin: state.priceMin,
+    priceMax: state.priceMax,
+    query: state.query
+  });
 }
-function applyAppearance(){
-  document.body.dataset.theme=view.theme||"dark";
-  document.body.dataset.density=view.density||"normal";
-  document.body.dataset.motion=view.motion||"full";
-  if($("#siteTheme"))$("#siteTheme").value=view.theme||"dark";
-  if($("#siteDensity"))$("#siteDensity").value=view.density||"normal";
-  if($("#siteMotion"))$("#siteMotion").value=view.motion||"full";
-  if($("#rememberView"))$("#rememberView").value=view.remember||"yes";
+function applyAppearance() {
+  document.body.dataset.theme = view.theme || "dark";
+  document.body.dataset.density = view.density || "normal";
+  document.body.dataset.motion = view.motion || "full";
+  document.body.dataset.textSize = view.textSize || "normal";
+  document.body.dataset.glow = view.glow || "normal";
+
+  document.documentElement.lang = view.language || "ru";
+  document.documentElement.dir = view.language === "ar" ? "rtl" : "ltr";
+
+  if ($("#siteTheme")) $("#siteTheme").value = view.theme || "dark";
+  if ($("#siteLanguage")) $("#siteLanguage").value = view.language || "ru";
+  if ($("#siteDensity")) $("#siteDensity").value = view.density || "normal";
+  if ($("#siteMotion")) $("#siteMotion").value = view.motion || "full";
+  if ($("#siteTextSize")) $("#siteTextSize").value = view.textSize || "normal";
+  if ($("#siteGlow")) $("#siteGlow").value = view.glow || "normal";
+  if ($("#rememberView")) $("#rememberView").value = view.remember || "yes";
 }
+
+const I18N = {
+  ru: {catalog:"Каталог",catalogSub:"Товары KrisVane из каталога магазина.",favorites:"Избранное",back:"← Назад в каталог",filters:"Фильтры",reset:"Сбросить фильтр",nothing:"Ничего не найдено",nothingSub:"Попробуйте изменить поиск или фильтры.",appearance:"Настройки вида",search:"Поиск товаров, брендов, категорий…"},
+  uk: {catalog:"Каталог",catalogSub:"Товари KrisVane з каталогу магазину.",favorites:"Обране",back:"← Назад до каталогу",filters:"Фільтри",reset:"Скинути фільтр",nothing:"Нічого не знайдено",nothingSub:"Спробуйте змінити пошук або фільтри.",appearance:"Налаштування вигляду",search:"Пошук товарів, брендів, категорій…"},
+  en: {catalog:"Catalog",catalogSub:"KrisVane products from the store catalog.",favorites:"Favorites",back:"← Back to catalog",filters:"Filters",reset:"Reset filters",nothing:"Nothing found",nothingSub:"Try changing your search or filters.",appearance:"Appearance settings",search:"Search products, brands, categories…"},
+  pl: {catalog:"Katalog",catalogSub:"Produkty KrisVane z katalogu sklepu.",favorites:"Ulubione",back:"← Wróć do katalogu",filters:"Filtry",reset:"Resetuj filtry",nothing:"Nic nie znaleziono",nothingSub:"Zmień wyszukiwanie lub filtry.",appearance:"Ustawienia wyglądu",search:"Szukaj produktów, marek, kategorii…"},
+  de: {catalog:"Katalog",catalogSub:"KrisVane-Produkte aus dem Shop-Katalog.",favorites:"Favoriten",back:"← Zurück zum Katalog",filters:"Filter",reset:"Filter zurücksetzen",nothing:"Nichts gefunden",nothingSub:"Suche oder Filter ändern.",appearance:"Darstellung",search:"Produkte, Marken, Kategorien suchen…"},
+  fr: {catalog:"Catalogue",catalogSub:"Produits KrisVane du catalogue.",favorites:"Favoris",back:"← Retour au catalogue",filters:"Filtres",reset:"Réinitialiser",nothing:"Aucun résultat",nothingSub:"Modifiez la recherche ou les filtres.",appearance:"Apparence",search:"Rechercher produits, marques, catégories…"},
+  es: {catalog:"Catálogo",catalogSub:"Productos KrisVane del catálogo.",favorites:"Favoritos",back:"← Volver al catálogo",filters:"Filtros",reset:"Restablecer filtros",nothing:"No se encontró nada",nothingSub:"Cambia la búsqueda o los filtros.",appearance:"Apariencia",search:"Buscar productos, marcas, categorías…"},
+  it: {catalog:"Catalogo",catalogSub:"Prodotti KrisVane dal catalogo.",favorites:"Preferiti",back:"← Torna al catalogo",filters:"Filtri",reset:"Reimposta filtri",nothing:"Nessun risultato",nothingSub:"Modifica ricerca o filtri.",appearance:"Aspetto",search:"Cerca prodotti, marchi, categorie…"},
+  pt: {catalog:"Catálogo",catalogSub:"Produtos KrisVane do catálogo.",favorites:"Favoritos",back:"← Voltar ao catálogo",filters:"Filtros",reset:"Redefinir filtros",nothing:"Nada encontrado",nothingSub:"Altere a pesquisa ou os filtros.",appearance:"Aparência",search:"Pesquisar produtos, marcas, categorias…"},
+  nl: {catalog:"Catalogus",catalogSub:"KrisVane-producten uit de winkelcatalogus.",favorites:"Favorieten",back:"← Terug naar catalogus",filters:"Filters",reset:"Filters wissen",nothing:"Niets gevonden",nothingSub:"Wijzig de zoekopdracht of filters.",appearance:"Weergave",search:"Zoek producten, merken, categorieën…"},
+  tr: {catalog:"Katalog",catalogSub:"Mağaza kataloğundaki KrisVane ürünleri.",favorites:"Favoriler",back:"← Kataloğa dön",filters:"Filtreler",reset:"Filtreleri sıfırla",nothing:"Sonuç bulunamadı",nothingSub:"Aramayı veya filtreleri değiştirin.",appearance:"Görünüm ayarları",search:"Ürün, marka, kategori ara…"},
+  ro: {catalog:"Catalog",catalogSub:"Produse KrisVane din catalogul magazinului.",favorites:"Favorite",back:"← Înapoi la catalog",filters:"Filtre",reset:"Resetează filtrele",nothing:"Nimic găsit",nothingSub:"Modifică căutarea sau filtrele.",appearance:"Aspect",search:"Caută produse, mărci, categorii…"},
+  cs: {catalog:"Katalog",catalogSub:"Produkty KrisVane z katalogu obchodu.",favorites:"Oblíbené",back:"← Zpět do katalogu",filters:"Filtry",reset:"Resetovat filtry",nothing:"Nic nenalezeno",nothingSub:"Změňte hledání nebo filtry.",appearance:"Vzhled",search:"Hledat produkty, značky, kategorie…"},
+  ja: {catalog:"カタログ",catalogSub:"KrisVaneの商品カタログ。",favorites:"お気に入り",back:"← カタログに戻る",filters:"フィルター",reset:"フィルターをリセット",nothing:"見つかりません",nothingSub:"検索またはフィルターを変更してください。",appearance:"表示設定",search:"商品・ブランド・カテゴリを検索…"},
+  ko: {catalog:"카탈로그",catalogSub:"KrisVane 매장 상품 카탈로그.",favorites:"즐겨찾기",back:"← 카탈로그로 돌아가기",filters:"필터",reset:"필터 초기화",nothing:"검색 결과 없음",nothingSub:"검색어나 필터를 변경해 보세요.",appearance:"화면 설정",search:"상품, 브랜드, 카테고리 검색…"},
+  zh: {catalog:"商品目录",catalogSub:"KrisVane 商店商品目录。",favorites:"收藏",back:"← 返回商品目录",filters:"筛选",reset:"重置筛选",nothing:"未找到结果",nothingSub:"请更改搜索或筛选条件。",appearance:"外观设置",search:"搜索商品、品牌、分类…"},
+  ar: {catalog:"الكتالوج",catalogSub:"منتجات KrisVane من كتالوج المتجر.",favorites:"المفضلة",back:"العودة إلى الكتالوج →",filters:"التصفية",reset:"إعادة ضبط التصفية",nothing:"لم يتم العثور على نتائج",nothingSub:"جرّب تغيير البحث أو عوامل التصفية.",appearance:"إعدادات المظهر",search:"ابحث عن المنتجات والعلامات والفئات…"}
+};
+
+function tr(key) {
+  const language = I18N[view.language] ? view.language : "ru";
+  return I18N[language][key] || I18N.ru[key] || key;
+}
+
+function applyLanguage() {
+  const filterText = $("#filterToggle span:nth-child(2)");
+  if (filterText) filterText.textContent = tr("filters");
+
+  if ($("#clearFilters")) $("#clearFilters").textContent = tr("reset");
+  if ($("#search")) $("#search").placeholder = tr("search");
+  if ($("#backToCatalog")) $("#backToCatalog").textContent = tr("back");
+
+  const appearanceTitle = $("#menuAppearance b");
+  if (appearanceTitle) appearanceTitle.textContent = tr("appearance");
+
+  if (view.catalogMode === "favorites") {
+    if ($("#catalogTitle")) $("#catalogTitle").textContent = tr("favorites");
+    if ($("#catalogModeLabel")) $("#catalogModeLabel").textContent = tr("favorites");
+  } else {
+    if ($("#catalogTitle")) $("#catalogTitle").textContent = tr("catalog");
+    if ($("#catalogSub")) $("#catalogSub").textContent = tr("catalogSub");
+  }
+}
+
 Object.assign(state,{category:view.category||"",subcategory:view.subcategory||"",brand:view.brand||"",size:view.size||"",condition:view.condition||"",
   sort:view.sort||"default",stock:view.stock||"all",priceMin:view.priceMin||"",priceMax:view.priceMax||"",query:view.query||""});
 applyAppearance();
+applyLanguage();
 
 function toast(msg){const n=document.createElement("div");n.className="toast";n.textContent=msg;$("#toasts").append(n);setTimeout(()=>n.remove(),2600)}
 function saveLocal(){store.set("favorites",[...state.favorites]);store.set("cart",state.cart);renderCounts()}
@@ -273,64 +1768,747 @@ function imageUrl(row){
   return row.public_url||row.url||row.image_url||row.src||row.path||row.storage_path||"";
 }
 function productImages(id){return (state.images.get(id)||[]).sort((a,b)=>(a.sort_order||0)-(b.sort_order||0))}
-function productVariants(id){return state.variants.get(id)||[]}
+function productVariants(id){
+  const key = String(id);
+  return state.variants.get(key) || [];
+}
 function firstImage(p){return imageUrl(productImages(p.id)[0])||p.image_url||p.cover_url||""}
 function available(v){return Math.max(0,Number(v.stock_quantity||0)-Number(v.reserved_quantity||0))}
 function productAvailable(p){const vs=productVariants(p.id);return vs.length?vs.some(v=>available(v)>0):true}
-function skeletons(){ $("#products").innerHTML=Array.from({length:8},()=>`<article class="card"><div class="pic skeleton"></div><div class="info"><div class="skeleton" style="height:14px;border-radius:6px"></div><div class="skeleton" style="height:20px;border-radius:6px;margin-top:10px"></div></div></article>`).join("") }
+function skeletons(){ $("#products").innerHTML=Array.from({length:8},()=>`<article class="card">
+              <div class="pic skeleton">
+              </div>
+              <div class="info">
+                <div class="skeleton" style="height:14px;border-radius:6px">
+                </div>
+                <div class="skeleton" style="height:20px;border-radius:6px;margin-top:10px">
+                </div>
+              </div>
+            </article>`).join("") }
 
-async function loadAll(){
+async function loadAll() {
   skeletons();
-  const [pc,cc,sc,vc,ic]=await Promise.all([
-    sb.from("products").select("*").eq("is_published",true).order("sort_order",{ascending:true}).order("created_at",{ascending:false}),
-    sb.from("categories").select("*").order("sort_order",{ascending:true}),
-    sb.from("subcategories").select("*").order("sort_order",{ascending:true}),
+
+  /*
+   * Products are the critical request.
+   * Categories, variants and images are useful additions, but a problem in one
+   * of those tables must never make the entire storefront look empty.
+   */
+  const productRequest = await sb
+    .from("products")
+    .select("*")
+    .eq("is_published", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: false });
+
+  if (productRequest.error) {
+    console.error("KrisVane products:", productRequest.error);
+
+    $("#products").innerHTML = `
+            <div class="empty">
+              <b>Не удалось загрузить товары.</b>
+              <br>
+        Обновите страницу. Если ошибка повторится — она будет видна в консоли браузера.
+            </div>
+    `;
+
+    return;
+  }
+
+  state.products = productRequest.data || [];
+
+  const optionalRequests = await Promise.allSettled([
+    sb.from("categories").select("*").order("sort_order", { ascending: true }),
+    sb.from("subcategories").select("*").order("sort_order", { ascending: true }),
     sb.from("product_variants").select("*"),
-    sb.from("product_images").select("*").order("sort_order",{ascending:true})
+    sb.from("product_images").select("*").order("sort_order", { ascending: true })
   ]);
-  if(pc.error){console.error(pc.error);$("#products").innerHTML=`<div class="empty">Не удалось загрузить каталог. Попробуйте обновить страницу.</div>`;return}
-  state.products=pc.data||[];state.categories=cc.data||[];state.subcategories=sc.data||[];
-  for(const v of vc.data||[]){const a=state.variants.get(v.product_id)||[];a.push(v);state.variants.set(v.product_id,a)}
-  for(const im of ic.data||[]){const a=state.images.get(im.product_id)||[];a.push(im);state.images.set(im.product_id,a)}
-  renderCategories();syncFilterOptions();applyFilters();
+
+  const categoriesRequest =
+    optionalRequests[0].status === "fulfilled" ? optionalRequests[0].value : null;
+
+  const subcategoriesRequest =
+    optionalRequests[1].status === "fulfilled" ? optionalRequests[1].value : null;
+
+  const variantsRequest =
+    optionalRequests[2].status === "fulfilled" ? optionalRequests[2].value : null;
+
+  const imagesRequest =
+    optionalRequests[3].status === "fulfilled" ? optionalRequests[3].value : null;
+
+  state.categories =
+    categoriesRequest && !categoriesRequest.error ? categoriesRequest.data || [] : [];
+
+  state.subcategories =
+    subcategoriesRequest && !subcategoriesRequest.error ? subcategoriesRequest.data || [] : [];
+
+  state.variants.clear();
+  state.images.clear();
+
+  if (variantsRequest && !variantsRequest.error) {
+    for (const variant of variantsRequest.data || []) {
+      const key = String(variant.product_id);
+      const list = state.variants.get(key) || [];
+      list.push(variant);
+      state.variants.set(key, list);
+    }
+  }
+
+  if (imagesRequest && !imagesRequest.error) {
+    for (const image of imagesRequest.data || []) {
+      const list = state.images.get(image.product_id) || [];
+      list.push(image);
+      state.images.set(image.product_id, list);
+    }
+  }
+
+  /*
+   * Validate persisted filters against the fresh database.
+   * A deleted category/brand/size can therefore never hide all products forever.
+   */
+  const validCategoryIds = new Set(
+    state.categories.map(category => String(category.id))
+  );
+
+  const validSubcategoryIds = new Set(
+    state.subcategories.map(subcategory => String(subcategory.id))
+  );
+
+  const validBrands = new Set(
+    state.products.map(product => String(product.brand || "KrisVane"))
+  );
+
+  const validSizes = new Set(
+    [...state.variants.values()]
+      .flat()
+      .map(variantLabel)
+      .filter(Boolean)
+  );
+
+  if (
+    state.category &&
+    state.category !== "new" &&
+    !validCategoryIds.has(String(state.category))
+  ) {
+    state.category = "";
+  }
+
+  if (
+    state.subcategory &&
+    !validSubcategoryIds.has(String(state.subcategory))
+  ) {
+    state.subcategory = "";
+  }
+
+  if (
+    state.brand &&
+    !validBrands.has(String(state.brand))
+  ) {
+    state.brand = "";
+  }
+
+  if (
+    state.size &&
+    !validSizes.has(String(state.size))
+  ) {
+    state.size = "";
+  }
+
+  renderCategories();
+  syncFilterOptions();
+  applyFilters();
+
+  /*
+   * Safety net for the first storefront build:
+   * if remembered filters produce zero results while products exist,
+   * show the catalog instead of making it look as if products disappeared.
+   */
+  if (state.products.length > 0 && state.filtered.length === 0) {
+    Object.assign(state, {
+      category: "",
+      subcategory: "",
+      brand: "",
+      size: "",
+      condition: "",
+      query: "",
+      sort: "default",
+      stock: "all",
+      priceMin: "",
+      priceMax: ""
+    });
+
+    renderCategories();
+    syncFilterOptions();
+    applyFilters();
+  }
 }
 function renderCategories(){
-  const root=$("#categoryNav");const fixed=`<button class="chip ${state.category===""?"active":""}" data-category="">Все</button><button class="chip ${state.category==="new"?"active":""}" data-category="new">Новинки</button>`;
+  const root=$("#categoryNav");const fixed=`<button class="chip ${state.category===""?"active":""}" data-category="">Все</button>
+            <button class="chip ${state.category==="new"?"active":""}" data-category="new">Новинки</button>`;
   root.innerHTML=fixed+state.categories.map(c=>`<button class="chip ${String(state.category)===String(c.id)?"active":""}" data-category="${esc(c.id)}">${esc(c.name)}</button>`).join("");
 }
 
-function variantLabel(v){return String(v.name||v.size||v.variant_name||v.sku||"").trim()}
+function variantLabel(v){
+  if (!v) return "";
+
+  const direct = [
+    v.size,
+    v.size_name,
+    v.size_label,
+    v.variant_name,
+    v.name,
+    v.option_value,
+    v.value
+  ].find(value => String(value ?? "").trim());
+
+  if (direct) return String(direct).trim();
+
+  if (v.attributes && typeof v.attributes === "object") {
+    const nested =
+      v.attributes.size ??
+      v.attributes.Size ??
+      v.attributes["Размер"] ??
+      v.attributes["Розмір"];
+
+    if (String(nested ?? "").trim()) {
+      return String(nested).trim();
+    }
+  }
+
+  return String(v.sku || "").trim();
+}
 function conditionValue(p){
   const raw=String(p.condition||p.new_condition||p.item_condition||"").trim();
   if(raw)return raw;
   if(p.is_new===true)return "Новое";
   return "";
 }
-function fillSelect(el,items,selected,emptyLabel){
-  if(!el)return;
-  const vals=[...new Set(items.filter(Boolean).map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ru",{numeric:true}));
-  el.innerHTML=`<option value="">${emptyLabel}</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
-  el.value=vals.includes(String(selected))?String(selected):"";
+
+
+const STORE_TAXONOMY = [
+  {
+    name: "Одежда",
+    subcategories: [
+      "Худи","Свитшоты","Футболки","Лонгсливы","Рубашки","Поло",
+      "Свитеры","Кардиганы","Водолазки","Кофты","Толстовки",
+      "Куртки","Пуховики","Ветровки","Бомберы","Парки","Пальто",
+      "Жилеты","Джинсы","Брюки","Штаны","Джоггеры","Шорты",
+      "Юбки","Платья","Сарафаны","Комбинезоны","Леггинсы",
+      "Нижнее бельё","Носки","Домашняя одежда"
+    ],
+    brands: [
+      "KrisVane","The North Face","Nike","adidas","Puma","New Balance",
+      "Under Armour","Columbia","Carhartt WIP","Champion","Levi's",
+      "Tommy Hilfiger","Calvin Klein","Lacoste","Stone Island","CP Company",
+      "Moncler","Uniqlo","Zara","H&M","Mango","Bershka","Pull&Bear"
+    ]
+  },
+  {
+    name: "Обувь",
+    subcategories: [
+      "Кроссовки","Кеды","Ботинки","Туфли","Лоферы","Мокасины",
+      "Сандалии","Босоножки","Шлёпанцы","Сабо","Балетки",
+      "Сапоги","Полусапоги","Ботфорты","Угги","Домашняя обувь"
+    ],
+    brands: [
+      "Nike","adidas","Jordan","Puma","New Balance","Reebok","ASICS",
+      "Converse","Vans","Skechers","Salomon","Timberland","Dr. Martens",
+      "Crocs","UGG","The North Face","KrisVane"
+    ]
+  },
+  {
+    name: "Костюмы",
+    subcategories: [
+      "Спортивные костюмы","Брючные костюмы","Костюмы с юбкой",
+      "Костюмы-тройки","Комплекты"
+    ],
+    brands: [
+      "KrisVane","Nike","adidas","Puma","Under Armour","New Balance",
+      "Lacoste","Hugo Boss","Armani","Tommy Hilfiger","Calvin Klein"
+    ]
+  },
+  {
+    name: "Сумки и рюкзаки",
+    subcategories: [
+      "Рюкзаки","Сумки через плечо","Сумки на плечо","Шопперы",
+      "Поясные сумки","Спортивные сумки","Дорожные сумки",
+      "Клатчи","Портфели","Сумки для ноутбука","Кошельки","Кардхолдеры"
+    ],
+    brands: [
+      "KrisVane","Nike","adidas","Puma","The North Face","Vans",
+      "Tommy Hilfiger","Calvin Klein","Guess","Michael Kors",
+      "Gucci","Prada","Louis Vuitton","Dior"
+    ]
+  },
+  {
+    name: "Аксессуары",
+    subcategories: [
+      "Ремни","Зонты","Очки","Солнцезащитные очки","Шарфы",
+      "Платки","Перчатки","Варежки","Галстуки","Бабочки",
+      "Брелоки","Чехлы","Косметички","Кошельки","Кардхолдеры"
+    ],
+    brands: [
+      "KrisVane","Nike","adidas","Puma","Lacoste","Tommy Hilfiger",
+      "Calvin Klein","Gucci","Prada","Louis Vuitton","Dior","Versace"
+    ]
+  },
+  {
+    name: "Головные уборы",
+    subcategories: [
+      "Кепки","Бейсболки","Панамы","Шапки","Бини","Береты",
+      "Шляпы","Козырьки","Балаклавы"
+    ],
+    brands: [
+      "KrisVane","Nike","adidas","Puma","New Era","The North Face",
+      "Carhartt WIP","Champion","Lacoste","Tommy Hilfiger"
+    ]
+  },
+  {
+    name: "Украшения",
+    subcategories: [
+      "Серьги","Кольца","Цепочки","Колье","Ожерелья",
+      "Браслеты","Кулоны","Подвески","Броши","Пирсинг","Наборы украшений"
+    ],
+    brands: [
+      "KrisVane","Swarovski","Pandora","Tiffany & Co.","Cartier",
+      "Gucci","Versace","Dior","Louis Vuitton"
+    ]
+  }
+];
+
+function normalizeCatalogText(value) {
+  return String(value || "")
+    .trim()
+    .toLocaleLowerCase("ru")
+    .replace(/ё/g, "е");
 }
-function syncFilterOptions(){
-  const cat=$("#categoryFilter");
-  cat.innerHTML=`<option value="">Все категории</option>`+state.categories.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
-  cat.value=state.category==="new"?"":state.category;
-  const subs=state.subcategories.filter(s=>!state.category||state.category==="new"||String(s.category_id)===String(state.category));
-  $("#subcategoryFilter").innerHTML=`<option value="">Все подкатегории</option>`+subs.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
-  $("#subcategoryFilter").value=subs.some(s=>String(s.id)===String(state.subcategory))?state.subcategory:"";
-  fillSelect($("#brandFilter"),state.products.map(p=>p.brand||"KrisVane"),state.brand,"Все бренды");
-  fillSelect($("#sizeFilter"),[...state.variants.values()].flat().map(variantLabel),state.size,"Все размеры");
-  fillSelect($("#conditionFilter"),state.products.map(conditionValue),state.condition,"Любое состояние");
-  $("#sort").value=state.sort;$("#stockFilter").value=state.stock;$("#priceMin").value=state.priceMin;$("#priceMax").value=state.priceMax;$("#search").value=state.query;
+
+function dbCategoryByName(name) {
+  const wanted = normalizeCatalogText(name);
+  return state.categories.find(category =>
+    normalizeCatalogText(category.name) === wanted
+  ) || null;
 }
+
+function dbSubcategoryByName(name) {
+  const wanted = normalizeCatalogText(name);
+  return state.subcategories.find(subcategory =>
+    normalizeCatalogText(subcategory.name) === wanted
+  ) || null;
+}
+
+function categoryDisplayValue(categoryName) {
+  const dbCategory = dbCategoryByName(categoryName);
+  return dbCategory ? String(dbCategory.id) : `preset:${categoryName}`;
+}
+
+function subcategoryDisplayValue(subcategoryName) {
+  const dbSubcategory = dbSubcategoryByName(subcategoryName);
+  return dbSubcategory ? String(dbSubcategory.id) : `preset:${subcategoryName}`;
+}
+
+function selectedCategoryName() {
+  if (!state.category) return "";
+
+  if (String(state.category).startsWith("preset:")) {
+    return String(state.category).slice(7);
+  }
+
+  const category = state.categories.find(item =>
+    String(item.id) === String(state.category)
+  );
+
+  return category?.name || "";
+}
+
+function categoryProductMatches(product, value) {
+  if (!value) return true;
+
+  if (String(value).startsWith("preset:")) {
+    const categoryName = String(value).slice(7);
+    const dbCategory = dbCategoryByName(categoryName);
+
+    if (!dbCategory) return false;
+    return String(product.category_id) === String(dbCategory.id);
+  }
+
+  return String(product.category_id) === String(value);
+}
+
+function subcategoryProductMatches(product, value) {
+  if (!value) return true;
+
+  if (String(value).startsWith("preset:")) {
+    const subcategoryName = String(value).slice(7);
+    const dbSubcategory = dbSubcategoryByName(subcategoryName);
+
+    if (!dbSubcategory) return false;
+    return String(product.subcategory_id) === String(dbSubcategory.id);
+  }
+
+  return String(product.subcategory_id) === String(value);
+}
+
+function fullCategoryOptions() {
+  const options = [];
+  const seen = new Set();
+
+  for (const group of STORE_TAXONOMY) {
+    const value = categoryDisplayValue(group.name);
+    options.push({ value, label: group.name });
+    seen.add(normalizeCatalogText(group.name));
+  }
+
+  for (const category of state.categories) {
+    if (seen.has(normalizeCatalogText(category.name))) continue;
+    options.push({ value: String(category.id), label: category.name });
+  }
+
+  return options;
+}
+
+function fullSubcategoryOptions() {
+  const selectedName = selectedCategoryName();
+  const selectedGroup = STORE_TAXONOMY.find(group =>
+    normalizeCatalogText(group.name) === normalizeCatalogText(selectedName)
+  );
+
+  const orderedNames = [];
+
+  if (selectedGroup) {
+    orderedNames.push(...selectedGroup.subcategories);
+  }
+
+  for (const group of STORE_TAXONOMY) {
+    if (group === selectedGroup) continue;
+    orderedNames.push(...group.subcategories);
+  }
+
+  const options = [];
+  const seen = new Set();
+
+  for (const name of orderedNames) {
+    const normalized = normalizeCatalogText(name);
+    if (seen.has(normalized)) continue;
+
+    seen.add(normalized);
+    options.push({
+      value: subcategoryDisplayValue(name),
+      label: name
+    });
+  }
+
+  for (const subcategory of state.subcategories) {
+    const normalized = normalizeCatalogText(subcategory.name);
+    if (seen.has(normalized)) continue;
+
+    seen.add(normalized);
+    options.push({
+      value: String(subcategory.id),
+      label: subcategory.name
+    });
+  }
+
+  return options;
+}
+
+function relevantBrandsForCatalog() {
+  const categoryName = selectedCategoryName();
+
+  const group = STORE_TAXONOMY.find(item =>
+    normalizeCatalogText(item.name) === normalizeCatalogText(categoryName)
+  );
+
+  const prioritized = group ? group.brands : [];
+
+  return uniqueSorted([
+    ...prioritized,
+    ...FILTER_CATALOG.brands,
+    ...state.products.map(product => product.brand || "KrisVane")
+  ]);
+}
+
+const FILTER_CATALOG = {
+  brands: [
+    "KrisVane","Nike","adidas","Jordan","Puma","New Balance","Reebok","ASICS",
+    "Converse","Vans","Under Armour","Fila","Skechers","Salomon","Timberland",
+    "Dr. Martens","Crocs","UGG","The North Face","Columbia","Lacoste","Levi's",
+    "Tommy Hilfiger","Calvin Klein","Hugo Boss","Diesel","Zara","H&M","Mango",
+    "Bershka","Pull&Bear","Stradivarius","Massimo Dutti","Uniqlo","COS",
+    "Carhartt WIP","Champion","Supreme","Stüssy","Stone Island","CP Company",
+    "Off-White","Palm Angels","Fear of God","Essentials","Balenciaga","Gucci",
+    "Prada","Louis Vuitton","Dior","Versace","Burberry","Moncler","Armani"
+  ],
+  sizes: [
+    "XXXS","XXS","XS","S","M","L","XL","XXL","XXXL","4XL","5XL",
+    "28","29","30","31","32","33","34","35","36","37","38","39","40","41",
+    "42","43","44","45","46","47","48","49","50",
+    "80","86","92","98","104","110","116","122","128","134","140","146",
+    "152","158","164","170","176",
+    "ONE SIZE"
+  ],
+  conditions: ["Новое","Б/У","Уценка"]
+};
+
+function uniqueSorted(values) {
+  return [...new Set(
+    values
+      .filter(value => String(value ?? "").trim())
+      .map(value => String(value).trim())
+  )].sort((a,b) => a.localeCompare(b, "ru", {numeric:true, sensitivity:"base"}));
+}
+
+function productMatchesBase(product, ignoreKey) {
+  const q = state.query.trim().toLowerCase();
+
+  if (ignoreKey !== "query" && q) {
+    const searchable = [
+      product.name,
+      product.brand,
+      product.sku,
+      product.description
+    ];
+
+    if (!searchable.some(value =>
+      String(value || "").toLowerCase().includes(q)
+    )) return false;
+  }
+
+  if (ignoreKey !== "category") {
+    if (state.category === "new") {
+      const isNew =
+        product.is_new === true ||
+        String(product.condition || "").toLowerCase().includes("new");
+
+      if (!isNew) return false;
+    } else if (
+      state.category &&
+      !categoryProductMatches(product, state.category)
+    ) {
+      return false;
+    }
+  }
+
+  if (
+    ignoreKey !== "subcategory" &&
+    state.subcategory &&
+    !subcategoryProductMatches(product, state.subcategory)
+  ) return false;
+
+  if (
+    ignoreKey !== "brand" &&
+    state.brand &&
+    String(product.brand || "KrisVane") !== String(state.brand)
+  ) return false;
+
+  if (
+    ignoreKey !== "size" &&
+    state.size &&
+    !productVariants(product.id).some(variant =>
+      variantLabel(variant) === state.size
+    )
+  ) return false;
+
+  if (
+    ignoreKey !== "condition" &&
+    state.condition &&
+    conditionValue(product) !== state.condition
+  ) return false;
+
+  if (ignoreKey !== "stock") {
+    if (state.stock === "available" && !productAvailable(product)) return false;
+    if (state.stock === "out" && productAvailable(product)) return false;
+  }
+
+  if (
+    ignoreKey !== "priceMin" &&
+    state.priceMin !== "" &&
+    Number(product.price || 0) < Number(state.priceMin)
+  ) return false;
+
+  if (
+    ignoreKey !== "priceMax" &&
+    state.priceMax !== "" &&
+    Number(product.price || 0) > Number(state.priceMax)
+  ) return false;
+
+  return true;
+}
+
+function countForFilter(key, value) {
+  return state.products.filter(product => {
+    if (!productMatchesBase(product, key)) return false;
+
+    if (key === "category") {
+      if (value === "new") {
+        return product.is_new === true ||
+          String(product.condition || "").toLowerCase().includes("new");
+      }
+      return categoryProductMatches(product, value);
+    }
+
+    if (key === "subcategory") {
+      return subcategoryProductMatches(product, value);
+    }
+
+    if (key === "brand") {
+      return String(product.brand || "KrisVane") === String(value);
+    }
+
+    if (key === "size") {
+      return productVariants(product.id).some(variant =>
+        variantLabel(variant) === String(value)
+      );
+    }
+
+    if (key === "condition") {
+      return conditionValue(product) === String(value);
+    }
+
+    if (key === "stock") {
+      if (value === "available") return productAvailable(product);
+      if (value === "out") return !productAvailable(product);
+      return true;
+    }
+
+    return true;
+  }).length;
+}
+
+function setCountedOptions(select, options, selected, emptyLabel, key) {
+  if (!select) return;
+
+  const selectedString = String(selected ?? "");
+  const optionHtml = options.map(option => {
+    const value = String(option.value ?? "");
+    const label = String(option.label ?? value);
+    const count = Number(option.count ?? countForFilter(key, value));
+
+    return `<option value="${esc(value)}" data-count="${count}">${esc(label)} · ${count}</option>`;
+  }).join("");
+
+  select.innerHTML =
+    `<option value="" data-count="${state.products.filter(product => productMatchesBase(product, key)).length}">${emptyLabel}</option>` +
+    optionHtml;
+
+  select.value = [...select.options].some(option =>
+    option.value === selectedString
+  ) ? selectedString : "";
+}
+
+function syncFilterOptions() {
+  const categoryOptions = fullCategoryOptions().map(category => ({
+    ...category,
+    count: countForFilter("category", category.value)
+  }));
+
+  setCountedOptions(
+    $("#categoryFilter"),
+    categoryOptions,
+    state.category === "new" ? "" : state.category,
+    "Все категории",
+    "category"
+  );
+
+  /*
+   * Full taxonomy remains visible even when there are zero products.
+   * Subcategories belonging to the selected category are placed first.
+   */
+  const subcategoryOptions = fullSubcategoryOptions();
+
+  setCountedOptions(
+    $("#subcategoryFilter"),
+    subcategoryOptions.map(subcategory => ({
+      ...subcategory,
+      count: countForFilter("subcategory", subcategory.value)
+    })),
+    state.subcategory,
+    "Все подкатегории",
+    "subcategory"
+  );
+
+  const brands = relevantBrandsForCatalog();
+
+  setCountedOptions(
+    $("#brandFilter"),
+    brands.map(brand => ({
+      value: brand,
+      label: brand,
+      count: countForFilter("brand", brand)
+    })),
+    state.brand,
+    "Все бренды",
+    "brand"
+  );
+
+  const databaseSizes = [...state.variants.values()]
+    .flat()
+    .map(variantLabel)
+    .filter(Boolean);
+
+  const sizes = uniqueSorted([
+    ...FILTER_CATALOG.sizes,
+    ...databaseSizes
+  ]);
+
+  setCountedOptions(
+    $("#sizeFilter"),
+    sizes.map(size => ({
+      value: size,
+      label: size,
+      count: countForFilter("size", size)
+    })),
+    state.size,
+    "Все размеры",
+    "size"
+  );
+
+  const conditions = uniqueSorted([
+    ...FILTER_CATALOG.conditions,
+    ...state.products.map(conditionValue)
+  ]);
+
+  setCountedOptions(
+    $("#conditionFilter"),
+    conditions.map(condition => ({
+      value: condition,
+      label: condition,
+      count: countForFilter("condition", condition)
+    })),
+    state.condition,
+    "Любое состояние",
+    "condition"
+  );
+
+  const stockSelect = $("#stockFilter");
+  if (stockSelect) {
+    const availableCount = countForFilter("stock", "available");
+    const outCount = countForFilter("stock", "out");
+
+    stockSelect.innerHTML = `
+      <option value="all">Все товары · ${state.products.filter(product => productMatchesBase(product, "stock")).length}</option>
+      <option value="available">В наличии · ${availableCount}</option>
+      <option value="out">Нет в наличии · ${outCount}</option>
+    `;
+
+    stockSelect.value = state.stock;
+  }
+
+  $("#sort").value = state.sort;
+  $("#priceMin").value = state.priceMin;
+  $("#priceMax").value = state.priceMax;
+  $("#search").value = state.query;
+
+  enhanceStoreSelects();
+}
+
 function applyFilters(){
   let a=[...state.products];
   const q=state.query.trim().toLowerCase();
   if(q)a=a.filter(p=>[p.name,p.brand,p.sku,p.description].some(v=>String(v||"").toLowerCase().includes(q)));
   if(state.category==="new")a=a.filter(p=>p.is_new===true||String(p.condition||"").toLowerCase().includes("new"));
-  else if(state.category)a=a.filter(p=>String(p.category_id)===String(state.category));
-  if(state.subcategory)a=a.filter(p=>String(p.subcategory_id)===String(state.subcategory));
+  else if(state.category)a=a.filter(p=>categoryProductMatches(p, state.category));
+  if(state.subcategory)a=a.filter(p=>subcategoryProductMatches(p, state.subcategory));
   if(state.brand)a=a.filter(p=>String(p.brand||"KrisVane")===String(state.brand));
   if(state.size)a=a.filter(p=>productVariants(p.id).some(v=>variantLabel(v)===state.size));
   if(state.condition)a=a.filter(p=>conditionValue(p)===state.condition);
@@ -342,19 +2520,33 @@ function applyFilters(){
   if(state.sort==="priceDesc")a.sort((x,y)=>Number(y.price)-Number(x.price));
   if(state.sort==="new")a.sort((x,y)=>new Date(y.created_at)-new Date(x.created_at));
   if(state.sort==="nameAsc")a.sort((x,y)=>String(x.name||"").localeCompare(String(y.name||""),"ru"));
-  state.filtered=a;state.page=1;renderProducts();saveView();
+  state.filtered = a;
+  state.page = 1;
+  renderProducts();
+
+  /*
+   * Recalculate every facet after applying a filter so the user always sees
+   * how many products remain for every possible choice, including zero.
+   */
+  syncFilterOptions();
+  saveView();
 }
 function renderProducts(){
   const show=state.filtered.slice(0,state.page*state.pageSize);
-  if(!show.length){$("#products").innerHTML=`<div class="empty"><b>Ничего не найдено</b><br>Попробуйте изменить поиск или фильтры.</div>`;$("#loadMore").hidden=true;return}
+  if(!show.length){$("#products").innerHTML=`<div class="empty"><b>${esc(tr("nothing"))}</b><br>${esc(tr("nothingSub"))}</div>`;$("#loadMore").hidden=true;return}
   $("#products").innerHTML=show.map(p=>{
     const img=firstImage(p),fav=state.favorites.has(String(p.id)),stock=productAvailable(p);
     return `<article class="card" data-product="${esc(p.id)}">
-      <div class="pic">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:`<div class="noimg">Нет фото</div>`}
-      ${p.is_new?`<span class="tag">NEW</span>`:""}<button class="heart ${fav?"on":""}" data-fav="${esc(p.id)}">${fav?"♥":"♡"}</button></div>
-      <div class="info"><div class="brand">${esc(p.brand||"KrisVane")}</div><div class="name">${esc(p.name||"Товар")}</div>
-      <div class="prices"><span class="price">${money(p.price)}</span>${p.old_price?`<span class="old">${money(p.old_price)}</span>`:""}</div>
-      ${!stock?`<div style="color:var(--muted);font-size:12px;margin-top:5px">Нет в наличии</div>`:""}</div></article>`
+            <div class="pic">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:`<div class="noimg">Нет фото</div>`}
+      ${p.is_new?`<span class="tag">NEW</span>`:""}<button class="heart ${fav?"on":""}" data-fav="${esc(p.id)}">${fav?"♥":"♡"}</button>
+          </div>
+          <div class="info">
+            <div class="brand">${esc(p.brand||"KrisVane")}</div>
+            <div class="name">${esc(p.name||"Товар")}</div>
+            <div class="prices">
+              <span class="price">${money(p.price)}</span>${p.old_price?`<span class="old">${money(p.old_price)}</span>`:""}</div>
+      ${!stock?`<div style="color:var(--muted);font-size:12px;margin-top:5px">Нет в наличии</div>`:""}</div>
+            </article>`
   }).join("");
   $("#loadMore").hidden=show.length>=state.filtered.length;
 }
@@ -366,14 +2558,32 @@ function openProduct(id){
   state.selectedProduct=p;state.selectedVariant=null;
   const imgs=productImages(p.id),vs=productVariants(p.id),main=firstImage(p);
   $("#productModal").innerHTML=`<div class="productView">
-    <div class="gallery"><div class="mainImg">${main?`<img id="mainProductImg" src="${esc(main)}" alt="${esc(p.name)}">`:`<div class="noimg">Нет фото</div>`}</div>
-    <div class="thumbs">${imgs.map(im=>{const u=imageUrl(im);return u?`<button class="thumb" data-thumb="${esc(u)}"><img src="${esc(u)}"></button>`:""}).join("")}</div></div>
-    <div class="detail"><div style="display:flex;justify-content:space-between;gap:15px"><div><div class="brand">${esc(p.brand||"KrisVane")}</div><h3>${esc(p.name)}</h3></div><button class="close" id="closeProduct">✕</button></div>
-    <div class="prices"><span class="price" style="font-size:24px">${money(p.price)}</span>${p.old_price?`<span class="old">${money(p.old_price)}</span>`:""}</div>
-    <p class="detailDesc">${esc(p.description||"")}</p>
-    ${vs.length?`<div class="sizeTitle">Размер</div><div class="sizes">${vs.map(v=>`<button class="size" data-variant="${esc(v.id)}" ${available(v)<=0?"disabled":""}>${esc(v.name||v.size||v.variant_name||v.sku||"Размер")} ${available(v)<=0?"· нет":""}</button>`).join("")}</div>`:""}
-    <div class="buyrow"><button class="primary" id="addCart" ${vs.length?"disabled":""}>Добавить в корзину</button><button class="secondary" id="modalFav">${state.favorites.has(String(p.id))?"♥":"♡"}</button></div>
-    <p style="color:var(--muted);font-size:12px">Артикул: ${esc(p.sku||"—")}</p></div></div>`;
+            <div class="gallery">
+              <div class="mainImg">${main?`<img id="mainProductImg" src="${esc(main)}" alt="${esc(p.name)}">`:`<div class="noimg">Нет фото</div>`}</div>
+              <div class="thumbs">${imgs.map(im=>{const u=imageUrl(im);return u?`<button class="thumb" data-thumb="${esc(u)}">
+                <img src="${esc(u)}">
+              </button>`:""}).join("")}</div>
+            </div>
+            <div class="detail">
+              <div style="display:flex;justify-content:space-between;gap:15px">
+                <div>
+                  <div class="brand">${esc(p.brand||"KrisVane")}</div>
+                  <h3>${esc(p.name)}</h3>
+                </div>
+                <button class="close" id="closeProduct">✕</button>
+              </div>
+              <div class="prices">
+                <span class="price" style="font-size:24px">${money(p.price)}</span>${p.old_price?`<span class="old">${money(p.old_price)}</span>`:""}</div>
+                <p class="detailDesc">${esc(p.description||"")}</p>
+    ${vs.length?`<div class="sizeTitle">Размер</div>
+                <div class="sizes">${vs.map(v=>`<button class="size" data-variant="${esc(v.id)}" ${available(v)<=0?"disabled":""}>${esc(v.name||v.size||v.variant_name||v.sku||"Размер")} ${available(v)<=0?"· нет":""}</button>`).join("")}</div>`:""}
+                <div class="buyrow">
+                  <button class="primary" id="addCart" ${vs.length?"disabled":""}>Добавить в корзину</button>
+                  <button class="secondary" id="modalFav">${state.favorites.has(String(p.id))?"♥":"♡"}</button>
+                </div>
+                <p style="color:var(--muted);font-size:12px">Артикул: ${esc(p.sku||"—")}</p>
+              </div>
+            </div>`;
   $("#modalShade").classList.add("open");$("#productModal").classList.add("open");document.body.style.overflow="hidden";
 }
 function closeProduct(){$("#modalShade").classList.remove("open");$("#productModal").classList.remove("open");document.body.style.overflow=""}
@@ -390,9 +2600,20 @@ function addCart(){
 function renderCart(){
   const root=$("#cartBody");
   if(!state.cart.length)root.innerHTML=`<div class="empty" style="padding:40px 15px">Корзина пока пуста.</div>`;
-  else root.innerHTML=state.cart.map(x=>`<div class="cartItem"><div>${x.image?`<img src="${esc(x.image)}">`:`<div class="noimg" style="height:90px;border-radius:10px">—</div>`}</div>
-    <div><b>${esc(x.name)}</b>${x.variant?`<div style="color:var(--muted);font-size:12px">Размер: ${esc(x.variant)}</div>`:""}<div class="qty"><button data-minus="${esc(x.key)}">−</button><b>${x.qty}</b><button data-plus="${esc(x.key)}">+</button></div></div>
-    <div style="text-align:right"><b>${money(x.price*x.qty)}</b><button data-remove="${esc(x.key)}" style="display:block;margin:10px 0 0 auto;border:0;background:none;color:#ff7180">Удалить</button></div></div>`).join("");
+  else root.innerHTML=state.cart.map(x=>`<div class="cartItem">
+            <div>${x.image?`<img src="${esc(x.image)}">`:`<div class="noimg" style="height:90px;border-radius:10px">—</div>`}</div>
+            <div>
+              <b>${esc(x.name)}</b>${x.variant?`<div style="color:var(--muted);font-size:12px">Размер: ${esc(x.variant)}</div>`:""}<div class="qty">
+              <button data-minus="${esc(x.key)}">−</button>
+              <b>${x.qty}</b>
+              <button data-plus="${esc(x.key)}">+</button>
+            </div>
+          </div>
+          <div style="text-align:right">
+            <b>${money(x.price*x.qty)}</b>
+            <button data-remove="${esc(x.key)}" style="display:block;margin:10px 0 0 auto;border:0;background:none;color:#ff7180">Удалить</button>
+          </div>
+        </div>`).join("");
   $("#cartTotal").textContent=money(state.cart.reduce((s,x)=>s+x.price*x.qty,0));renderCounts()
 }
 function openCart(){renderCart();$("#drawerShade").classList.add("open");$("#cartDrawer").classList.add("open");document.body.style.overflow="hidden"}
@@ -426,6 +2647,133 @@ document.addEventListener("click",e=>{
   const rem=e.target.closest("[data-remove]");if(rem){state.cart=state.cart.filter(x=>x.key!==rem.dataset.remove);saveLocal();renderCart();return}
   const mob=e.target.closest("[data-mobile]");if(mob){const a=mob.dataset.mobile;if(a==="cart")openCart();else if(a==="catalog")$("#catalog").scrollIntoView();else if(a==="fav"){state.category="";state.query="";$("#search").value="";state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalog").scrollIntoView()}else scrollTo({top:0,behavior:"smooth"})}
 });
+
+function enhanceSelect(select) {
+  if (!select || select.dataset.kvEnhanced === "1") return;
+
+  select.dataset.kvEnhanced = "1";
+  select.classList.add("kvSelectNative");
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "kvSelect";
+
+  const button = document.createElement("button");
+  button.type = "button";
+  button.className = "kvSelectButton";
+
+  const value = document.createElement("span");
+  value.className = "kvSelectValue";
+
+  const arrow = document.createElement("span");
+  arrow.className = "kvArrow";
+  arrow.textContent = "⌄";
+
+  button.append(value, arrow);
+
+  const drop = document.createElement("div");
+  drop.className = "kvSelectDrop";
+
+  const dropInner = document.createElement("div");
+  dropInner.className = "kvSelectDropInner";
+
+  const options = document.createElement("div");
+  options.className = "kvSelectOptions";
+
+  dropInner.append(options);
+  drop.append(dropInner);
+
+  select.parentNode.insertBefore(wrapper, select);
+  wrapper.append(select, button, drop);
+
+  function rebuild() {
+    const selected = select.options[select.selectedIndex];
+    value.textContent = selected?.textContent || "—";
+
+    options.innerHTML = "";
+    [...select.options].forEach(option => {
+      const optionButton = document.createElement("button");
+      optionButton.type = "button";
+      optionButton.className = "kvOption";
+      const rawText = option.textContent;
+      const count = option.dataset.count;
+
+      if (count !== undefined) {
+        const labelSpan = document.createElement("span");
+        const countSpan = document.createElement("span");
+
+        const separatorIndex = rawText.lastIndexOf(" · ");
+        labelSpan.textContent = separatorIndex >= 0
+          ? rawText.slice(0, separatorIndex)
+          : rawText;
+
+        countSpan.className = "kvOptionCount";
+        countSpan.textContent = count;
+
+        optionButton.append(labelSpan, countSpan);
+
+        if (Number(count) === 0) {
+          optionButton.classList.add("zero");
+        }
+      } else {
+        optionButton.textContent = rawText;
+      }
+
+      optionButton.dataset.value = option.value;
+
+      if (option.value === select.value) {
+        optionButton.classList.add("selected");
+      }
+
+      optionButton.addEventListener("click", event => {
+        event.preventDefault();
+        event.stopPropagation();
+
+        select.value = option.value;
+        select.dispatchEvent(new Event("change", {bubbles: true}));
+        rebuild();
+        wrapper.classList.remove("open");
+      });
+
+      options.append(optionButton);
+    });
+  }
+
+  const observer = new MutationObserver(rebuild);
+  observer.observe(select, {childList: true, subtree: true, attributes: true});
+
+  select.addEventListener("change", rebuild);
+
+  button.addEventListener("click", event => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    document.querySelectorAll(".kvSelect.open").forEach(other => {
+      if (other !== wrapper) other.classList.remove("open");
+    });
+
+    wrapper.classList.toggle("open");
+  });
+
+  rebuild();
+}
+
+function enhanceStoreSelects() {
+  document.querySelectorAll(
+    "#categoryFilter,#subcategoryFilter,#brandFilter,#sizeFilter,#conditionFilter,#stockFilter,#sort," +
+    "#siteTheme,#siteLanguage,#siteDensity,#siteMotion,#siteTextSize,#siteGlow,#rememberView"
+  ).forEach(enhanceSelect);
+}
+
+document.addEventListener("click", event => {
+  if (!event.target.closest(".kvSelect")) {
+    document.querySelectorAll(".kvSelect.open").forEach(item =>
+      item.classList.remove("open")
+    );
+  }
+});
+
+enhanceStoreSelects();
+
 $("#search").addEventListener("input",e=>{state.query=e.target.value;clearTimeout(window.__kvq);window.__kvq=setTimeout(applyFilters,180)});
 $("#searchBtn").onclick=()=>applyFilters();
 $("#categoryFilter").onchange=e=>{state.category=e.target.value;state.subcategory="";renderCategories();syncFilterOptions();applyFilters()};
@@ -441,31 +2789,279 @@ $("#clearFilters").onclick=()=>{Object.assign(state,{category:"",subcategory:"",
   renderCategories();syncFilterOptions();applyFilters()};
 $("#loadMore").onclick=()=>{state.page++;renderProducts()};$("#cartBtn").onclick=openCart;$("#closeCart").onclick=closeCart;$("#drawerShade").onclick=closeCart;
 $("#modalShade").onclick=closeProduct;$("#productModal").addEventListener("click",e=>{if(e.target.closest("#closeProduct"))closeProduct();if(e.target.closest("#addCart"))addCart();if(e.target.closest("#modalFav")&&state.selectedProduct){toggleFav(state.selectedProduct.id);e.target.closest("#modalFav").textContent=state.favorites.has(String(state.selectedProduct.id))?"♥":"♡"}});
-$("#favBtn").onclick=()=>{state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalogTitle").textContent="Избранное";$("#catalog").scrollIntoView()};
+function showFavorites() {
+  view.catalogMode = "favorites";
+  state.filtered = state.products.filter(product =>
+    state.favorites.has(String(product.id))
+  );
+  state.page = 1;
+  renderProducts();
+
+  $("#catalogModeBar")?.classList.add("show");
+  if ($("#catalogTitle")) $("#catalogTitle").textContent = tr("favorites");
+  if ($("#catalogModeLabel")) $("#catalogModeLabel").textContent = tr("favorites");
+
+  saveView();
+  $("#catalog")?.scrollIntoView({behavior: view.motion === "off" ? "auto" : "smooth"});
+}
+
+function showCatalog() {
+  view.catalogMode = "catalog";
+  $("#catalogModeBar")?.classList.remove("show");
+  applyFilters();
+  applyLanguage();
+  saveView();
+  $("#catalog")?.scrollIntoView({behavior: view.motion === "off" ? "auto" : "smooth"});
+}
+
+$("#favBtn").onclick = showFavorites;
+$("#backToCatalog")?.addEventListener("click", showCatalog);
 $("#accountBtn").onclick=account;$("#checkoutBtn").onclick=checkout;$("#heroCatalog").onclick=()=>$("#catalog").scrollIntoView();$("#heroNew").onclick=()=>{state.category="new";renderCategories();applyFilters();$("#catalog").scrollIntoView()};
 
-function openMenu(){$("#sideShade").classList.add("open");$("#sideMenu").classList.add("open");document.body.style.overflow="hidden"}
-function closeMenu(){$("#sideShade").classList.remove("open");$("#sideMenu").classList.remove("open");document.body.style.overflow=""}
-$("#menuBtn").onclick=openMenu;$("#closeMenu").onclick=closeMenu;$("#sideShade").onclick=closeMenu;
-$("#menuProfile").onclick=()=>{closeMenu();account()};
-$("#menuFavorites").onclick=()=>{closeMenu();state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalogTitle").textContent="Избранное";$("#catalog").scrollIntoView()};
-$("#menuCart").onclick=()=>{closeMenu();openCart()};
-$("#menuDelivery").onclick=()=>{closeMenu();toast("Город и отделение Nova Poshta выбираются при оформлении заказа.")};
-$("#menuOrders").onclick=async()=>{closeMenu();const {data}=await sb.auth.getSession();if(!data.session){store.set("returnAfterAuth","orders");location.href="auth.html";return}toast("Раздел «Мои заказы» подготовлен к следующему этапу.")};
-$("#siteTheme").onchange=e=>{view.theme=e.target.value;applyAppearance();saveView()};
-$("#siteDensity").onchange=e=>{view.density=e.target.value;applyAppearance();saveView()};
-$("#siteMotion").onchange=e=>{view.motion=e.target.value;applyAppearance();saveView()};
-$("#rememberView").onchange=e=>{view.remember=e.target.value;if(view.remember==="yes")saveView();else store.set("view",{...viewDefaults,remember:"no",theme:view.theme,density:view.density,motion:view.motion})};
+function openMenu() {
+  const shade = $("#sideShade");
+  const menu = $("#sideMenu");
+  const button = $("#menuBtn");
+
+  if (!shade || !menu) {
+    console.error("KrisVane menu elements were not found.");
+    return;
+  }
+
+  shade.classList.add("open");
+  menu.classList.add("open");
+
+  if (button) {
+    button.setAttribute("aria-expanded", "true");
+  }
+
+  document.body.style.overflow = "hidden";
+}
+
+function closeMenu() {
+  const shade = $("#sideShade");
+  const menu = $("#sideMenu");
+  const button = $("#menuBtn");
+
+  shade?.classList.remove("open");
+  menu?.classList.remove("open");
+
+  if (button) {
+    button.setAttribute("aria-expanded", "false");
+  }
+
+  document.body.style.overflow = "";
+}
+
+function setFiltersOpen(open, save = true) {
+  const panel = $("#filterCollapse");
+  const button = $("#filterToggle");
+
+  if (!panel || !button) {
+    return;
+  }
+
+  panel.classList.toggle("open", open);
+  button.classList.toggle("open", open);
+  button.setAttribute("aria-expanded", String(open));
+
+  view.filtersOpen = open;
+
+  if (save) {
+    saveView();
+  }
+}
+
+$("#menuBtn")?.addEventListener("click", event => {
+  event.preventDefault();
+  event.stopPropagation();
+  openMenu();
+});
+
+$("#closeMenu")?.addEventListener("click", closeMenu);
+$("#sideShade")?.addEventListener("click", closeMenu);
+
+$("#filterToggle")?.addEventListener("click", () => {
+  const isOpen = $("#filterCollapse")?.classList.contains("open") || false;
+  setFiltersOpen(!isOpen);
+});
+
+setFiltersOpen(Boolean(view.filtersOpen), false);
+
+function setAppearanceOpen(open, save = true) {
+  const panel = $("#appearanceCollapse");
+  const button = $("#menuAppearance");
+
+  if (!panel || !button) return;
+
+  panel.classList.toggle("open", open);
+  button.classList.toggle("active", open);
+  button.setAttribute("aria-expanded", String(open));
+  view.appearanceOpen = open;
+
+  if (save) saveView();
+}
+
+$("#menuAppearance")?.addEventListener("click", event => {
+  event.preventDefault();
+  const isOpen = $("#appearanceCollapse")?.classList.contains("open") || false;
+  setAppearanceOpen(!isOpen);
+});
+
+setAppearanceOpen(Boolean(view.appearanceOpen), false);
+
+
+$("#menuProfile")?.addEventListener("click", () => {
+  closeMenu();
+  account();
+});
+
+$("#menuFavorites")?.addEventListener("click", () => {
+  closeMenu();
+  showFavorites();
+});
+
+$("#menuCart")?.addEventListener("click", () => {
+  closeMenu();
+  openCart();
+});
+
+$("#menuDelivery")?.addEventListener("click", () => {
+  closeMenu();
+  toast("Город и отделение Nova Poshta выбираются при оформлении заказа.");
+});
+
+$("#menuOrders")?.addEventListener("click", async () => {
+  closeMenu();
+
+  const { data } = await sb.auth.getSession();
+
+  if (!data.session) {
+    store.set("returnAfterAuth", "orders");
+    location.href = "auth.html";
+    return;
+  }
+
+  toast("Раздел «Мои заказы» подготовлен к следующему этапу.");
+});
+
+$("#siteTheme")?.addEventListener("change", event => {
+  view.theme = event.target.value;
+  applyAppearance();
+  saveView();
+});
+
+$("#siteDensity")?.addEventListener("change", event => {
+  view.density = event.target.value;
+  applyAppearance();
+  saveView();
+});
+
+$("#siteMotion")?.addEventListener("change", event => {
+  view.motion = event.target.value;
+  applyAppearance();
+  saveView();
+});
+
+$("#rememberView")?.addEventListener("change", event => {
+  view.remember = event.target.value;
+
+  if (view.remember === "yes") {
+    saveView();
+  } else {
+    store.set("view", {
+      ...viewDefaults,
+      version: VIEW_SCHEMA_VERSION,
+      remember: "no",
+      theme: view.theme,
+      density: view.density,
+      motion: view.motion
+    });
+  }
+});
+
 let __saveScrollTimer;
-window.addEventListener("scroll",()=>{if(view.remember!=="yes")return;clearTimeout(__saveScrollTimer);__saveScrollTimer=setTimeout(saveView,180)},{passive:true});
-window.addEventListener("beforeunload",saveView);
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProduct();closeCart();closeMenu()}});
+
+window.addEventListener(
+  "scroll",
+  () => {
+    if (view.remember !== "yes") {
+      return;
+    }
+
+    clearTimeout(__saveScrollTimer);
+
+    __saveScrollTimer = setTimeout(() => {
+      saveView();
+    }, 180);
+  },
+  { passive: true }
+);
+
+window.addEventListener("beforeunload", saveView);
+
+document.addEventListener("keydown", event => {
+  if (event.key === "Escape") {
+    closeProduct();
+    closeCart();
+    closeMenu();
+
+    if ($("#filterCollapse")?.classList.contains("open")) {
+      setFiltersOpen(false);
+    }
+  }
+});
 
 window.addEventListener("pageshow",()=>renderCounts());
 
 renderCounts();
 loadAll().then?.(()=>{});
 if(view.remember==="yes")setTimeout(()=>window.scrollTo({top:Number(view.scrollY||0),behavior:"auto"}),450);
+      
+const appearanceBindings = [
+  ["#siteTheme", "theme"],
+  ["#siteLanguage", "language"],
+  ["#siteDensity", "density"],
+  ["#siteMotion", "motion"],
+  ["#siteTextSize", "textSize"],
+  ["#siteGlow", "glow"],
+  ["#rememberView", "remember"]
+];
+
+appearanceBindings.forEach(([selector, key]) => {
+  $(selector)?.addEventListener("change", event => {
+    view[key] = event.target.value;
+    applyAppearance();
+    applyLanguage();
+    saveView();
+  });
+});
+
+$("#resetAppearance")?.addEventListener("click", () => {
+  const remembered = view.remember;
+  Object.assign(view, {
+    theme: "dark",
+    language: "ru",
+    density: "normal",
+    motion: "full",
+    textSize: "normal",
+    glow: "normal",
+    remember: remembered
+  });
+
+  applyAppearance();
+  applyLanguage();
+  saveView();
+});
+
+window.addEventListener("beforeunload", saveView);
+
+if (view.catalogMode === "favorites") {
+  showFavorites();
+} else {
+  $("#catalogModeBar")?.classList.remove("show");
+}
+
 </script>
-</body>
-</html>
+    </body>
+  </html>
