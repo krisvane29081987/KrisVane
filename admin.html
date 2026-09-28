@@ -965,6 +965,48 @@
       .np-test-row,.np-tools,.np-saved { grid-template-columns:1fr; }
     }
 
+
+    /* =========================
+       ADMIN SECTIONS / DATA MANAGER
+    ========================= */
+    .nav-item { cursor:pointer; }
+    .nav-separator { height:1px; background:var(--border); margin:16px 8px; }
+    .admin-view { display:none; animation:viewIn .28s ease both; }
+    .admin-view.active { display:block; }
+    @keyframes viewIn { from { opacity:0; transform:translateY(5px); } to { opacity:1; transform:none; } }
+    .section-head { display:flex; align-items:flex-end; justify-content:space-between; gap:14px; margin-bottom:20px; }
+    .section-head h2 { margin:0; font-size:22px; }
+    .section-head p { margin:6px 0 0; color:var(--muted); }
+    .panel { background:var(--panel); border:1px solid var(--border); border-radius:var(--radius); padding:20px; margin-bottom:20px; }
+    .settings-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .field label { display:block; color:var(--muted); font-size:12px; font-weight:700; margin-bottom:7px; }
+    .field.full { grid-column:1/-1; }
+    .table-wrap { overflow:auto; border:1px solid var(--border); border-radius:14px; }
+    .admin-table { width:100%; border-collapse:collapse; min-width:760px; }
+    .admin-table th,.admin-table td { padding:12px 14px; border-bottom:1px solid var(--border); text-align:left; vertical-align:middle; }
+    .admin-table th { color:var(--muted); font-size:11px; text-transform:uppercase; letter-spacing:.6px; background:var(--panel-2); position:sticky; top:0; }
+    .admin-table tr:last-child td { border-bottom:0; }
+    .admin-table tbody tr:hover { background:rgba(255,255,255,.015); }
+    .mini-actions { display:flex; gap:7px; flex-wrap:wrap; }
+    .btn-small { padding:7px 10px; border-radius:9px; font-size:12px; }
+    .pill { display:inline-flex; padding:5px 8px; border-radius:999px; border:1px solid var(--border); font-size:11px; font-weight:700; }
+    .pill.on { color:var(--success); background:rgba(50,213,131,.08); }
+    .pill.off { color:var(--muted); }
+    .data-toolbar { display:flex; gap:10px; margin-bottom:14px; }
+    .data-toolbar .input { flex:1; }
+    .modal-backdrop { position:fixed; inset:0; z-index:1500; display:flex; align-items:center; justify-content:center; padding:20px; background:rgba(0,0,0,.7); backdrop-filter:blur(8px); opacity:0; visibility:hidden; transition:opacity .22s ease,visibility .22s; }
+    .modal-backdrop.show { opacity:1; visibility:visible; }
+    .modal-card { width:min(760px,100%); max-height:88vh; overflow:auto; background:var(--panel); border:1px solid var(--border); border-radius:20px; padding:22px; transform:translateY(10px) scale(.985); transition:transform .25s ease; box-shadow:0 25px 80px rgba(0,0,0,.45); }
+    .modal-backdrop.show .modal-card { transform:none; }
+    .modal-head { display:flex; justify-content:space-between; gap:15px; align-items:center; margin-bottom:18px; }
+    .modal-head h3 { margin:0; }
+    .modal-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
+    .modal-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:18px; }
+    .muted { color:var(--muted); }
+    .danger-text { color:#ff8178; }
+    .section-message { padding:18px; border:1px dashed var(--border); border-radius:12px; color:var(--muted); text-align:center; }
+    @media(max-width:700px){ .settings-grid,.modal-grid{grid-template-columns:1fr}.field.full{grid-column:auto}.section-head,.data-toolbar{align-items:stretch;flex-direction:column}.table-wrap{margin-left:-4px;margin-right:-4px} }
+
     /* =========================
        MOBILE
     ========================= */
@@ -1160,21 +1202,12 @@
         Kris<span>Vane</span>
       </div>
 
-      <div class="nav-item active">
-        Заказы
-      </div>
-
-      <div class="nav-item">
-        Товары
-      </div>
-
-      <div class="nav-item">
-        Категории
-      </div>
-
-      <div class="nav-item">
-        Покупатели
-      </div>
+      <div class="nav-item active" data-view="orders" onclick="switchAdminView('orders')">Заказы</div>
+      <div class="nav-item" data-view="products" onclick="switchAdminView('products')">Товары</div>
+      <div class="nav-item" data-view="categories" onclick="switchAdminView('categories')">Категории</div>
+      <div class="nav-item" data-view="customers" onclick="switchAdminView('customers')">Покупатели</div>
+      <div class="nav-separator"></div>
+      <div class="nav-item" data-view="settings" onclick="switchAdminView('settings')">Настройки</div>
 
     </aside>
 
@@ -1185,13 +1218,8 @@
 
         <div class="title">
 
-          <h1>
-            Заказы
-          </h1>
-
-          <p>
-            Управление заказами KrisVane
-          </p>
+          <h1 id="pageTitle">Заказы</h1>
+          <p id="pageSubtitle">Управление заказами KrisVane</p>
 
         </div>
 
@@ -1202,6 +1230,7 @@
       </div>
 
 
+      <section id="view-orders" class="admin-view active">
       <!-- STATS -->
 
       <section class="stats">
@@ -1272,9 +1301,67 @@
       </section>
 
 
-      <!-- NOVA POSHTA DELIVERY SETTINGS -->
+      <!-- SEARCH -->
 
-      <section class="np-test" id="npTestPanel">
+      <div class="toolbar">
+
+        <input
+          id="searchInput"
+          class="search"
+          type="search"
+          placeholder="Поиск по номеру заказа, имени, телефону или ТТН..."
+        >
+
+        <button
+          class="refresh-btn"
+          onclick="loadOrders()"
+        >
+          Обновить
+        </button>
+
+      </div>
+
+
+      <!-- ORDERS -->
+
+      <div id="ordersContainer">
+
+        <div class="loading">
+          Загружаем заказы...
+        </div>
+
+      </div>
+
+
+      </section>
+
+      <section id="view-products" class="admin-view">
+        <div class="section-head"><div><h2>Товары</h2><p>Каталог, цены, публикация и быстрые изменения.</p></div><button class="btn btn-primary" onclick="openCreateProduct()">+ Добавить товар</button></div>
+        <div class="panel"><div class="data-toolbar"><input id="productSearch" class="input" placeholder="Поиск по товару, SKU, описанию..." oninput="renderProducts()"><button class="btn btn-secondary" onclick="loadProducts()">Обновить</button></div><div id="productsAdminContainer" class="section-message">Откройте раздел — товары загрузятся автоматически.</div></div>
+      </section>
+
+      <section id="view-categories" class="admin-view">
+        <div class="section-head"><div><h2>Категории</h2><p>Категории и подкатегории каталога.</p></div><button class="btn btn-primary" onclick="openCreateCategory()">+ Добавить категорию</button></div>
+        <div class="panel"><div class="data-toolbar"><input id="categorySearch" class="input" placeholder="Поиск категории..." oninput="renderCategories()"><button class="btn btn-secondary" onclick="loadCategories()">Обновить</button></div><div id="categoriesAdminContainer" class="section-message">Категории ещё не загружены.</div></div>
+        <div class="panel"><div class="section-head"><div><h2 style="font-size:18px">Подкатегории</h2><p>Привязка подкатегорий к основным категориям.</p></div><button class="btn btn-secondary" onclick="openCreateSubcategory()">+ Подкатегория</button></div><div id="subcategoriesAdminContainer" class="section-message">Подкатегории ещё не загружены.</div></div>
+      </section>
+
+      <section id="view-customers" class="admin-view">
+        <div class="section-head"><div><h2>Покупатели</h2><p>Профили клиентов и количество их заказов.</p></div><button class="btn btn-secondary" onclick="loadCustomers()">Обновить</button></div>
+        <div class="panel"><div class="data-toolbar"><input id="customerSearch" class="input" placeholder="Поиск по имени или ID..." oninput="renderCustomers()"></div><div id="customersAdminContainer" class="section-message">Покупатели ещё не загружены.</div></div>
+      </section>
+
+      <section id="view-settings" class="admin-view">
+        <div class="section-head"><div><h2>Настройки магазина</h2><p>Отправитель, доставка и параметры посылки KrisVane.</p></div><button id="settingsSaveBtn" class="btn btn-primary" onclick="saveStoreSettings()">Сохранить настройки</button></div>
+        <div class="panel"><div class="settings-grid">
+          <div class="field"><label>Название магазина</label><input id="settingStoreName" class="input" placeholder="KrisVane"></div>
+          <div class="field"><label>Имя отправителя</label><input id="settingSenderName" class="input" placeholder="Имя и фамилия"></div>
+          <div class="field"><label>Телефон отправителя</label><input id="settingSenderPhone" class="input" placeholder="+380..."></div>
+          <div class="field"><label>Перевозчик по умолчанию</label><select id="settingCarrier" class="select"><option value="nova_poshta">Nova Poshta</option><option value="ukrposhta" disabled>Укрпочта — скоро</option><option value="meest" disabled>Meest — скоро</option></select></div>
+          <div class="field"><label>Вес посылки, кг</label><input id="settingWeight" class="input" type="number" min="0.001" step="0.001"></div>
+          <div class="field"><label>Описание содержимого</label><input id="settingDescription" class="input" placeholder="Одяг"></div>
+        </div></div>
+        <section class="np-test" id="npTestPanel">
         <div class="np-test-head">
           <div>
             <div class="np-test-title">Nova Poshta · настройки отправителя</div>
@@ -1313,42 +1400,16 @@
           </div>
         </div>
       </section>
-
-      <!-- SEARCH -->
-
-      <div class="toolbar">
-
-        <input
-          id="searchInput"
-          class="search"
-          type="search"
-          placeholder="Поиск по номеру заказа, имени, телефону или ТТН..."
-        >
-
-        <button
-          class="refresh-btn"
-          onclick="loadOrders()"
-        >
-          Обновить
-        </button>
-
-      </div>
-
-
-      <!-- ORDERS -->
-
-      <div id="ordersContainer">
-
-        <div class="loading">
-          Загружаем заказы...
-        </div>
-
-      </div>
-
+      </section>
     </main>
 
   </div>
 
+
+
+  <div id="adminModal" class="modal-backdrop" onclick="if(event.target===this)closeAdminModal()">
+    <div class="modal-card"><div class="modal-head"><h3 id="adminModalTitle">Редактирование</h3><button class="btn btn-secondary btn-small" onclick="closeAdminModal()">Закрыть</button></div><div id="adminModalBody"></div></div>
+  </div>
 
   <!-- TOAST -->
 
@@ -1380,6 +1441,12 @@
 
 
     let allOrders = [];
+    let adminProducts = [];
+    let adminCategories = [];
+    let adminSubcategories = [];
+    let adminCustomers = [];
+    let adminSettings = null;
+    const loadedAdminViews = new Set(["orders"]);
 
 
     /* =========================================
@@ -3239,6 +3306,66 @@
     }
 
 
+
+    /* =========================================
+       ADMIN NAVIGATION / SETTINGS / DATA
+    ========================================= */
+    const ADMIN_VIEW_META = {
+      orders:["Заказы","Управление заказами KrisVane"],
+      products:["Товары","Каталог и остатки KrisVane"],
+      categories:["Категории","Структура каталога KrisVane"],
+      customers:["Покупатели","Клиенты KrisVane"],
+      settings:["Настройки","Магазин, отправитель и доставка"]
+    };
+
+    async function switchAdminView(name) {
+      if (!ADMIN_VIEW_META[name]) name="orders";
+      document.querySelectorAll(".admin-view").forEach(v=>v.classList.toggle("active",v.id===`view-${name}`));
+      document.querySelectorAll(".nav-item[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view===name));
+      document.getElementById("pageTitle").textContent=ADMIN_VIEW_META[name][0];
+      document.getElementById("pageSubtitle").textContent=ADMIN_VIEW_META[name][1];
+      try { sessionStorage.setItem("krisvaneAdminView",name); } catch(_) {}
+      if (loadedAdminViews.has(name)) return;
+      loadedAdminViews.add(name);
+      if(name==="products") await loadProducts();
+      if(name==="categories") await loadCategories();
+      if(name==="customers") await loadCustomers();
+      if(name==="settings") await loadStoreSettingsForm();
+    }
+
+    function humanValue(v){ if(v===null||v===undefined||v==="")return "—"; if(typeof v==="boolean")return v?"Да":"Нет"; return String(v); }
+    function isSystemField(k){ return ["id","created_at","updated_at","user_id"].includes(k); }
+    function closeAdminModal(){ document.getElementById("adminModal").classList.remove("show"); }
+    function openAdminModal(title,html){ document.getElementById("adminModalTitle").textContent=title; document.getElementById("adminModalBody").innerHTML=html; document.getElementById("adminModal").classList.add("show"); }
+    function editableFields(obj){ return Object.keys(obj||{}).filter(k=>!isSystemField(k) && !Array.isArray(obj[k]) && (obj[k]===null || ["string","number","boolean"].includes(typeof obj[k]))); }
+    function fieldHtml(k,v){ const label=k.replaceAll("_"," "); if(typeof v==="boolean") return `<div class="field"><label>${escapeHtml(label)}</label><select class="select modal-field" data-key="${escapeHtml(k)}"><option value="true" ${v?'selected':''}>Да</option><option value="false" ${!v?'selected':''}>Нет</option></select></div>`; const type=typeof v==="number"?"number":"text"; return `<div class="field"><label>${escapeHtml(label)}</label><input class="input modal-field" data-key="${escapeHtml(k)}" type="${type}" value="${escapeHtml(v??'')}"></div>`; }
+    function collectModalPayload(template){ const out={}; document.querySelectorAll("#adminModal .modal-field").forEach(el=>{ const k=el.dataset.key; const original=template?.[k]; if(typeof original==="boolean") out[k]=el.value==="true"; else if(typeof original==="number") out[k]=el.value===""?null:Number(el.value); else out[k]=el.value===""?null:el.value; }); return out; }
+
+    async function loadProducts(){ const box=document.getElementById("productsAdminContainer"); box.innerHTML='<div class="loading">Загружаем товары…</div>'; const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false}); if(error){box.innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`;return;} adminProducts=data||[]; renderProducts(); }
+    function renderProducts(){ const box=document.getElementById("productsAdminContainer"); const q=(document.getElementById("productSearch")?.value||"").toLowerCase(); const rows=adminProducts.filter(p=>JSON.stringify(p).toLowerCase().includes(q)); if(!rows.length){box.innerHTML='<div class="empty">Товары не найдены.</div>';return;} box.innerHTML=`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Товар</th><th>Цена</th><th>Публикация</th><th>NEW</th><th>Featured</th><th>Действия</th></tr></thead><tbody>${rows.map(p=>`<tr><td><strong>${escapeHtml(p.name??p.title??`#${p.id}`)}</strong><div class="muted">${escapeHtml(p.slug??p.sku??'')}</div></td><td>${p.price!=null?money(p.price):'—'}${p.old_price!=null?`<div class="muted">старая: ${money(p.old_price)}</div>`:''}</td><td><span class="pill ${p.is_published?'on':'off'}">${p.is_published?'Опубликован':'Скрыт'}</span></td><td>${humanValue(p.is_new)}</td><td>${humanValue(p.is_featured)}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="editDataRow('products',${JSON.stringify(String(p.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="deleteDataRow('products',${JSON.stringify(String(p.id))},'товар')">Удалить</button></div></td></tr>`).join('')}</tbody></table></div>`; }
+    function openCreateProduct(){ const template=adminProducts[0]; if(!template){showToast("Для безопасного создания нужен хотя бы один товар-шаблон в таблице.","error");return;} openCreateFromTemplate("products",template,"Новый товар"); }
+
+    async function loadCategories(){ const [c,sb]=await Promise.all([supabaseClient.from("categories").select("*").order("created_at",{ascending:false}),supabaseClient.from("subcategories").select("*").order("created_at",{ascending:false})]); const box=document.getElementById("categoriesAdminContainer"), sub=document.getElementById("subcategoriesAdminContainer"); if(c.error){box.innerHTML=`<div class="empty">${escapeHtml(c.error.message)}</div>`;} else {adminCategories=c.data||[];renderCategories();} if(sb.error){sub.innerHTML=`<div class="empty">${escapeHtml(sb.error.message)}</div>`;} else {adminSubcategories=sb.data||[];renderSubcategories();} }
+    function renderCategories(){ const box=document.getElementById("categoriesAdminContainer"); const q=(document.getElementById("categorySearch")?.value||"").toLowerCase(); const rows=adminCategories.filter(x=>JSON.stringify(x).toLowerCase().includes(q)); box.innerHTML=rows.length?`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Категория</th><th>Slug</th><th>Статус</th><th>Действия</th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${escapeHtml(x.name??`#${x.id}`)}</strong></td><td>${escapeHtml(x.slug??'—')}</td><td>${x.is_active===undefined?'—':`<span class="pill ${x.is_active?'on':'off'}">${x.is_active?'Активна':'Скрыта'}</span>`}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="editDataRow('categories',${JSON.stringify(String(x.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="deleteDataRow('categories',${JSON.stringify(String(x.id))},'категорию')">Удалить</button></div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Категории не найдены.</div>'; }
+    function renderSubcategories(){ const box=document.getElementById("subcategoriesAdminContainer"); const rows=adminSubcategories; box.innerHTML=rows.length?`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Подкатегория</th><th>Категория</th><th>Slug</th><th>Действия</th></tr></thead><tbody>${rows.map(x=>{const c=adminCategories.find(c=>String(c.id)===String(x.category_id));return `<tr><td><strong>${escapeHtml(x.name??`#${x.id}`)}</strong></td><td>${escapeHtml(c?.name??x.category_id??'—')}</td><td>${escapeHtml(x.slug??'—')}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="editDataRow('subcategories',${JSON.stringify(String(x.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="deleteDataRow('subcategories',${JSON.stringify(String(x.id))},'подкатегорию')">Удалить</button></div></td></tr>`}).join('')}</tbody></table></div>`:'<div class="empty">Подкатегорий нет.</div>'; }
+    function openCreateCategory(){ const t=adminCategories[0]; if(!t){showToast("Для безопасного создания нужен существующий шаблон категории.","error");return;} openCreateFromTemplate("categories",t,"Новая категория"); }
+    function openCreateSubcategory(){ const t=adminSubcategories[0]; if(!t){showToast("Для безопасного создания нужен существующий шаблон подкатегории.","error");return;} openCreateFromTemplate("subcategories",t,"Новая подкатегория"); }
+
+    async function loadCustomers(){ const box=document.getElementById("customersAdminContainer"); box.innerHTML='<div class="loading">Загружаем покупателей…</div>'; const [p,o]=await Promise.all([supabaseClient.from("profiles").select("id, full_name, role, created_at"),supabaseClient.from("orders").select("id,user_id,total,status")]); if(p.error){box.innerHTML=`<div class="empty">${escapeHtml(p.error.message)}<br><span class="muted">Если администратору пока не разрешён SELECT всех profiles, этот раздел потребует отдельной RLS-политики.</span></div>`;return;} const orders=o.data||[]; adminCustomers=(p.data||[]).filter(x=>x.role!=="admin").map(x=>{const mine=orders.filter(or=>or.user_id===x.id);return {...x,orders_count:mine.length,spent:mine.filter(or=>or.status==="delivered").reduce((a,b)=>a+Number(b.total||0),0)};}); renderCustomers(); }
+    function renderCustomers(){ const box=document.getElementById("customersAdminContainer"); const q=(document.getElementById("customerSearch")?.value||"").toLowerCase(); const rows=adminCustomers.filter(x=>JSON.stringify(x).toLowerCase().includes(q)); box.innerHTML=rows.length?`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Покупатель</th><th>Заказов</th><th>Получено на сумму</th><th>Регистрация</th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${escapeHtml(x.full_name||'Без имени')}</strong><div class="muted">${escapeHtml(x.id)}</div></td><td>${x.orders_count}</td><td>${money(x.spent)}</td><td>${dateTime(x.created_at)}</td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Покупатели не найдены.</div>'; }
+
+    function findAdminRow(table,id){ const map={products:adminProducts,categories:adminCategories,subcategories:adminSubcategories}; return (map[table]||[]).find(x=>String(x.id)===String(id)); }
+    function editDataRow(table,id){ const row=findAdminRow(table,id); if(!row)return; const fields=editableFields(row); openAdminModal("Редактирование",`<div class="modal-grid">${fields.map(k=>fieldHtml(k,row[k])).join('')}</div><div class="modal-actions"><button class="btn btn-primary" onclick="saveDataRow('${table}',${JSON.stringify(String(id))})">Сохранить</button></div>`); }
+    async function saveDataRow(table,id){ const row=findAdminRow(table,id); const payload=collectModalPayload(row); const {error}=await supabaseClient.from(table).update(payload).eq("id",id); if(error){showToast(error.message,"error");return;} closeAdminModal();showToast("Изменения сохранены."); if(table==="products")await loadProducts();else await loadCategories(); }
+    function openCreateFromTemplate(table,template,title){ const blank={}; editableFields(template).forEach(k=>{ if(["slug","name","title","description","sku"].includes(k))blank[k]=""; else if(typeof template[k]==="boolean")blank[k]=template[k]; else if(typeof template[k]==="number")blank[k]=0; else blank[k]=null; }); openAdminModal(title,`<div class="modal-grid">${editableFields(blank).map(k=>fieldHtml(k,blank[k])).join('')}</div><div class="modal-actions"><button class="btn btn-primary" onclick="createDataRow('${table}')">Создать</button></div>`); window.adminCreateTemplate=blank; }
+    async function createDataRow(table){ const payload=collectModalPayload(window.adminCreateTemplate||{}); const {error}=await supabaseClient.from(table).insert(payload); if(error){showToast(error.message,"error");return;} closeAdminModal();showToast("Создано."); if(table==="products")await loadProducts();else await loadCategories(); }
+    async function deleteDataRow(table,id,label){ if(!confirm(`Удалить ${label}? Это действие нельзя отменить.`))return; const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error){showToast(error.message,"error");return;} showToast("Удалено."); if(table==="products")await loadProducts();else await loadCategories(); }
+
+    async function loadStoreSettingsForm(){ const {data,error}=await supabaseClient.from("store_settings").select("*").limit(1).single(); if(error){showToast(error.message,"error");return;} adminSettings=data; document.getElementById("settingStoreName").value=data.store_name??"KrisVane"; document.getElementById("settingSenderName").value=data.sender_name??""; document.getElementById("settingSenderPhone").value=data.sender_phone??""; document.getElementById("settingCarrier").value=data.default_carrier??"nova_poshta"; document.getElementById("settingWeight").value=data.parcel_weight??0.5; document.getElementById("settingDescription").value=data.parcel_description??"Одяг"; await loadNpSavedSettings(); }
+    async function saveStoreSettings(){ if(!adminSettings) await loadStoreSettingsForm(); if(!adminSettings)return; const weight=Number(document.getElementById("settingWeight").value); if(!(weight>0)){showToast("Вес посылки должен быть больше нуля.","error");return;} const btn=document.getElementById("settingsSaveBtn");btn.disabled=true;btn.textContent="Сохраняем…"; const payload={store_name:document.getElementById("settingStoreName").value.trim()||"KrisVane",sender_name:document.getElementById("settingSenderName").value.trim()||null,sender_phone:document.getElementById("settingSenderPhone").value.trim()||null,default_carrier:document.getElementById("settingCarrier").value,parcel_weight:weight,parcel_description:document.getElementById("settingDescription").value.trim()||"Одяг",updated_at:new Date().toISOString()}; const {error}=await supabaseClient.from("store_settings").update(payload).eq("id",adminSettings.id); btn.disabled=false;btn.textContent="Сохранить настройки"; if(error){showToast(error.message,"error");return;} adminSettings={...adminSettings,...payload};showToast("Настройки KrisVane сохранены."); }
+
+    document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAdminModal();});
+
     /* =========================================
        NOVA POSHTA DELIVERY SETTINGS
     ========================================= */
@@ -3550,10 +3677,10 @@
       }
 
 
-      await Promise.all([
-        loadOrders(),
-        loadNpSavedSettings()
-      ]);
+      await loadOrders();
+      let initialView = "orders";
+      try { initialView = sessionStorage.getItem("krisvaneAdminView") || "orders"; } catch (_) {}
+      await switchAdminView(initialView);
 
     }
 
