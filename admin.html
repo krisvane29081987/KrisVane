@@ -4118,5 +4118,46 @@ const kv4Apply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs()){
 setTimeout(kv4EnhanceSettings,220);
 </script>
 
+
+<style id="kv4-style">
+/* v4: glow back into the top-right corner + density semantics */
+body::after{right:-27vw!important;top:-24vh!important;width:58vw!important;height:68vh!important;transform-origin:100% 0!important}
+html[data-density="comfortable"] .settings-grid{grid-template-columns:1fr!important;gap:18px!important}
+html[data-density="compact"] .settings-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:14px!important}
+html[data-density="comfortable"] .np-saved{grid-template-columns:1fr!important}
+html[data-density="compact"] .np-saved{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+@media(max-width:800px){html[data-density="compact"] .settings-grid,html[data-density="compact"] .np-saved{grid-template-columns:1fr!important}}
+</style>
+<script id="kv4-script">
+const KV4={
+ uk:{orders:'Замовлення',products:'Товари',categories:'Категорії',customers:'Покупці',settings:'Налаштування',ordersDesc:'Керування замовленнями KrisVane',productsDesc:'Каталог і залишки KrisVane',categoriesDesc:'Категорії та підкатегорії каталогу.',customersDesc:'Профілі клієнтів і кількість їхніх замовлень.',productsTitle:'Товари',categoriesTitle:'Категорії',subcategoriesTitle:'Підкатегорії',customersTitle:'Покупці',searchProducts:'Пошук за назвою, артикулом або описом…',searchCategory:'Пошук категорії…',searchCustomer:'Пошук за ім’ям або ID…',addCategory:'+ Додати категорію',addSubcategory:'+ Підкатегорія',theme:'Тема',language:'Мова адмін-панелі',density:'Щільність інтерфейсу',animations:'Анімації',remember:'Запам’ятовувати відкриту вкладку',confirmDelete:'Підтверджувати видалення',textSize:'Розмір тексту',glow:'Ефект сяйва',normal:'Звичайна',compact:'Компактна',small:'Малий',large:'Великий',off:'Вимкнено',soft:'М’яке',strong:'Яскраве',reset:'Скинути оформлення',interface:'Інтерфейс',instant:'Ці параметри зберігаються на цьому пристрої та застосовуються одразу.',store:'Налаштування магазину'},
+ ru:{orders:'Заказы',products:'Товары',categories:'Категории',customers:'Покупатели',settings:'Настройки',ordersDesc:'Управление заказами KrisVane',productsDesc:'Каталог и остатки KrisVane',categoriesDesc:'Категории и подкатегории каталога.',customersDesc:'Профили клиентов и количество их заказов.',productsTitle:'Товары',categoriesTitle:'Категории',subcategoriesTitle:'Подкатегории',customersTitle:'Покупатели',searchProducts:'Поиск по названию, артикулу или описанию…',searchCategory:'Поиск категории…',searchCustomer:'Поиск по имени или ID…',addCategory:'+ Добавить категорию',addSubcategory:'+ Подкатегория',theme:'Тема',language:'Язык админ-панели',density:'Плотность интерфейса',animations:'Анимации',remember:'Запоминать открытую вкладку',confirmDelete:'Подтверждать удаление',textSize:'Размер текста',glow:'Эффект свечения',normal:'Обычная',compact:'Компактная',small:'Мелкий',large:'Крупный',off:'Выключено',soft:'Мягкое',strong:'Яркое',reset:'Сбросить оформление',interface:'Интерфейс',instant:'Эти параметры сохраняются на этом устройстве и применяются сразу.',store:'Настройки магазина'},
+ en:{orders:'Orders',products:'Products',categories:'Categories',customers:'Customers',settings:'Settings',ordersDesc:'Manage KrisVane orders',productsDesc:'KrisVane catalog and stock',categoriesDesc:'Catalog categories and subcategories.',customersDesc:'Customer profiles and their order counts.',productsTitle:'Products',categoriesTitle:'Categories',subcategoriesTitle:'Subcategories',customersTitle:'Customers',searchProducts:'Search by name, SKU or description…',searchCategory:'Search categories…',searchCustomer:'Search by name or ID…',addCategory:'+ Add category',addSubcategory:'+ Subcategory',theme:'Theme',language:'Admin language',density:'Interface density',animations:'Animations',remember:'Remember open tab',confirmDelete:'Confirm deletion',textSize:'Text size',glow:'Glow effect',normal:'Normal',compact:'Compact',small:'Small',large:'Large',off:'Off',soft:'Soft',strong:'Strong',reset:'Reset appearance',interface:'Interface',instant:'These settings are saved on this device and applied instantly.',store:'Store settings'},
+ be:{orders:'Заказы',products:'Тавары',categories:'Катэгорыі',customers:'Пакупнікі',settings:'Налады',ordersDesc:'Кіраванне заказамі KrisVane',productsDesc:'Каталог і рэшткі KrisVane',categoriesDesc:'Катэгорыі і падкатэгорыі каталога.',customersDesc:'Профілі кліентаў і колькасць іх заказаў.',productsTitle:'Тавары',categoriesTitle:'Катэгорыі',subcategoriesTitle:'Падкатэгорыі',customersTitle:'Пакупнікі',searchProducts:'Пошук па назве, артыкуле або апісанні…',searchCategory:'Пошук катэгорыі…',searchCustomer:'Пошук па імені або ID…',addCategory:'+ Дадаць катэгорыю',addSubcategory:'+ Падкатэгорыя',theme:'Тэма',language:'Мова адмін-панэлі',density:'Шчыльнасць інтэрфейсу',animations:'Анімацыі',remember:'Запамінаць адкрытую ўкладку',confirmDelete:'Пацвярджаць выдаленне',textSize:'Памер тэксту',glow:'Эфект ззяння',normal:'Звычайная',compact:'Кампактная',small:'Малы',large:'Вялікі',off:'Выключана',soft:'Мяккае',strong:'Яркае',reset:'Скінуць афармленне',interface:'Інтэрфейс',instant:'Гэтыя параметры захоўваюцца на гэтай прыладзе і прымяняюцца адразу.',store:'Налады крамы'},
+ zh:{orders:'订单',products:'商品',categories:'分类',customers:'客户',settings:'设置',ordersDesc:'管理 KrisVane 订单',productsDesc:'KrisVane 商品目录与库存',categoriesDesc:'商品分类与子分类。',customersDesc:'客户资料及订单数量。',productsTitle:'商品',categoriesTitle:'分类',subcategoriesTitle:'子分类',customersTitle:'客户',searchProducts:'按名称、货号或描述搜索…',searchCategory:'搜索分类…',searchCustomer:'按姓名或 ID 搜索…',addCategory:'+ 添加分类',addSubcategory:'+ 子分类',theme:'主题',language:'管理界面语言',density:'界面密度',animations:'动画',remember:'记住当前标签页',confirmDelete:'删除前确认',textSize:'文字大小',glow:'光晕效果',normal:'标准',compact:'紧凑',small:'小',large:'大',off:'关闭',soft:'柔和',strong:'明亮',reset:'重置外观',interface:'界面',instant:'这些设置保存在此设备并立即生效。',store:'商店设置'}
+};
+function kv4L(){const l=getUiPrefs().language||'uk';return KV4[l]||KV4.uk}
+function kv4Set(el,text){if(el&&text!=null)el.textContent=text}
+function kv4Translate(){
+ const t=kv4L();
+ const nav={orders:'orders',products:'products',categories:'categories',customers:'customers',settings:'settings'};
+ document.querySelectorAll('.nav-item[data-view]').forEach(el=>kv4Set(el,t[nav[el.dataset.view]]));
+ const V=(id)=>document.getElementById(id);
+ const setView=(id,title,desc)=>{const v=V(id);if(!v)return;kv4Set(v.querySelector('.section-head h2'),title);kv4Set(v.querySelector('.section-head p'),desc)};
+ setView('view-products',t.productsTitle,t.productsDesc);setView('view-categories',t.categoriesTitle,t.categoriesDesc);setView('view-customers',t.customersTitle,t.customersDesc);
+ const cat=V('view-categories');if(cat){const hs=cat.querySelectorAll('.section-head h2');if(hs[1])kv4Set(hs[1],t.subcategoriesTitle);const bs=cat.querySelectorAll('.section-head button');if(bs[0])kv4Set(bs[0],t.addCategory);if(bs[1])kv4Set(bs[1],t.addSubcategory)}
+ if(V('productSearch'))V('productSearch').placeholder=t.searchProducts;if(V('categorySearch'))V('categorySearch').placeholder=t.searchCategory;if(V('customerSearch'))V('customerSearch').placeholder=t.searchCustomer;
+ const s=V('view-settings');if(s){const top=s.querySelector(':scope > .section-head h2');kv4Set(top,t.store);const panels=s.querySelectorAll('.panel');if(panels[1]){const h=panels[1].querySelector('.section-head h2'),p=panels[1].querySelector('.section-head p'),b=panels[1].querySelector('.section-head button');kv4Set(h,t.interface);kv4Set(p,t.instant);kv4Set(b,t.reset)}
+ const labels=[['uiTheme','theme'],['uiLanguage','language'],['uiDensity','density'],['uiMotion','animations'],['uiRememberTab','remember'],['uiConfirmDelete','confirmDelete'],['uiFontScale','textSize'],['uiGlow','glow']];labels.forEach(([id,k])=>{const e=V(id);const lab=e?.closest('.field')?.querySelector('label');kv4Set(lab,t[k])});
+ const density=V('uiDensity');if(density){[...density.options].forEach(o=>o.textContent=o.value==='compact'?t.compact:t.normal)}
+ const glow=V('uiGlow');if(glow){[...glow.options].forEach(o=>o.textContent=o.value==='off'?t.off:o.value==='soft'?t.soft:o.value==='strong'?t.strong:t.normal)}
+ }
+}
+// Prevent the old partial language table from overwriting the five-language UI.
+window.applyAdminLanguage=function(){kv4Translate()};
+const kv4OldApply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs()){kv4OldApply(p);setTimeout(kv4Translate,35)};
+document.addEventListener('DOMContentLoaded',()=>setTimeout(kv4Translate,100));setTimeout(kv4Translate,150);
+</script>
+
 </body>
 </html>
