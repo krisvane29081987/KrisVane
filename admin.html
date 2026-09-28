@@ -4201,5 +4201,46 @@ const kv5OldSwitch=window.switchAdminView;window.switchAdminView=async function(
 setTimeout(()=>kv5TranslateNode(document.body),50);setTimeout(()=>kv5TranslateNode(document.body),300);
 </script>
 
+
+<style id="kv6-optional-style">
+  .kv-optional{opacity:.52;font-weight:500;font-size:.88em;margin-left:.35em}
+</style>
+<script id="kv6-points-1-2">
+/* Points 1–2 only: targeted translations + optional old-price note. No DOM observer. */
+const KV6={
+ uk:{ordersSearch:'Пошук за номером замовлення, ім’ям, телефоном або ТТН…',details:'Докладніше',customersEmpty:'Покупців не знайдено.',npNote:'Знайдіть населений пункт, виберіть відділення або поштомат і збережіть його як точку відправлення KrisVane. Пошук відділень працює миттєво за номером, вулицею та адресою.',searchCity:'Почніть вводити місто, наприклад Київ',findCity:'Знайти місто',min2:'Введіть щонайменше 2 символи.',warehouses:'Відділення / поштомати',warehousePh:'№ відділення, вулиця або адреса…',allPoints:'Усі пункти',branches:'Відділення',postomats:'Поштомати',optional:'необов’язково',pending:'Новий',confirmed:'Підтверджено',processing:'Обробляється',ready_to_ship:'Готовий до відправлення',shipped:'Відправлено',in_transit:'У дорозі',arrived:'Прибуло у відділення',delivered:'Отримано',cancelled:'Скасовано',returned:'Повернення'},
+ ru:{ordersSearch:'Поиск по номеру заказа, имени, телефону или ТТН…',details:'Подробнее',customersEmpty:'Покупатели не найдены.',npNote:'Найдите населённый пункт, выберите отделение или почтомат и сохраните его как точку отправки KrisVane. Поиск отделений работает мгновенно по номеру, улице и адресу.',searchCity:'Начните вводить город, например Киев',findCity:'Найти город',min2:'Введите минимум 2 символа.',warehouses:'Отделения / почтоматы',warehousePh:'№ отделения, улица или адрес…',allPoints:'Все пункты',branches:'Отделения',postomats:'Почтоматы',optional:'необязательно',pending:'Новый',confirmed:'Подтверждён',processing:'Обрабатывается',ready_to_ship:'Готов к отправке',shipped:'Отправлен',in_transit:'В пути',arrived:'Прибыл в отделение',delivered:'Получен',cancelled:'Отменён',returned:'Возврат'},
+ en:{ordersSearch:'Search by order number, name, phone or tracking number…',details:'Details',customersEmpty:'No customers found.',npNote:'Find a city, choose a branch or parcel locker, and save it as the KrisVane dispatch point. Branch search works instantly by number, street, or address.',searchCity:'Start typing a city, e.g. Kyiv',findCity:'Find city',min2:'Enter at least 2 characters.',warehouses:'Branches / parcel lockers',warehousePh:'Branch number, street or address…',allPoints:'All points',branches:'Branches',postomats:'Parcel lockers',optional:'optional',pending:'New',confirmed:'Confirmed',processing:'Processing',ready_to_ship:'Ready to ship',shipped:'Shipped',in_transit:'In transit',arrived:'Arrived at branch',delivered:'Delivered',cancelled:'Cancelled',returned:'Returned'},
+ be:{ordersSearch:'Пошук па нумары заказу, імені, тэлефоне або ТТН…',details:'Падрабязней',customersEmpty:'Пакупнікі не знойдзены.',npNote:'Знайдзіце населены пункт, выберыце аддзяленне або паштамат і захавайце яго як пункт адпраўкі KrisVane. Пошук аддзяленняў працуе імгненна па нумары, вуліцы і адрасе.',searchCity:'Пачніце ўводзіць горад, напрыклад Кіеў',findCity:'Знайсці горад',min2:'Увядзіце мінімум 2 сімвалы.',warehouses:'Аддзяленні / паштаматы',warehousePh:'№ аддзялення, вуліца або адрас…',allPoints:'Усе пункты',branches:'Аддзяленні',postomats:'Паштаматы',optional:'неабавязкова',pending:'Новы',confirmed:'Пацверджаны',processing:'Апрацоўваецца',ready_to_ship:'Гатовы да адпраўкі',shipped:'Адпраўлены',in_transit:'У дарозе',arrived:'Прыбыў у аддзяленне',delivered:'Атрыманы',cancelled:'Скасаваны',returned:'Вяртанне'},
+ zh:{ordersSearch:'按订单号、姓名、电话或运单号搜索…',details:'详情',customersEmpty:'未找到客户。',npNote:'查找城市，选择网点或自提柜，并将其保存为 KrisVane 发件点。可按编号、街道或地址即时搜索网点。',searchCity:'输入城市，例如 Kyiv',findCity:'查找城市',min2:'请至少输入 2 个字符。',warehouses:'网点 / 自提柜',warehousePh:'网点编号、街道或地址…',allPoints:'全部网点',branches:'网点',postomats:'自提柜',optional:'可选',pending:'新订单',confirmed:'已确认',processing:'处理中',ready_to_ship:'待发货',shipped:'已发货',in_transit:'运输中',arrived:'已到网点',delivered:'已签收',cancelled:'已取消',returned:'退货'}
+};
+function kv6t(){const l=(getUiPrefs().language||'uk');return KV6[l]||KV6.uk}
+const KV6_STATUS_RU={'Новый':'pending','Подтверждён':'confirmed','Обрабатывается':'processing','Готов к отправке':'ready_to_ship','Отправлен':'shipped','В пути':'in_transit','Прибыл в отделение':'arrived','Получен':'delivered','Отменён':'cancelled','Возврат':'returned'};
+function kv6TranslateTargeted(){
+ const t=kv6t();
+ const orderSearch=document.querySelector('#view-orders input[placeholder*="ТТН"],#view-orders input[type="search"],#view-orders .search-input'); if(orderSearch) orderSearch.placeholder=t.ordersSearch;
+ document.querySelectorAll('#view-orders .details-btn span:first-child').forEach(x=>x.textContent=t.details);
+ document.querySelectorAll('#view-orders .status').forEach(x=>{const code=[...x.classList].find(c=>KV6[c]); if(code&&t[code])x.textContent=t[code]; else {const k=KV6_STATUS_RU[x.textContent.trim()];if(k)x.textContent=t[k]}});
+ const cc=document.getElementById('customersAdminContainer'); if(cc&&cc.querySelector('.empty')) cc.querySelector('.empty').textContent=t.customersEmpty;
+ const np=document.getElementById('npTestPanel'); if(np){
+   const note=np.querySelector('.np-test-note'); if(note)note.textContent=t.npNote;
+   const city=document.getElementById('npCityQuery');if(city)city.placeholder=t.searchCity;
+   const btn=document.getElementById('npSearchBtn');if(btn)btn.textContent=t.findCity;
+   const st=document.getElementById('npStatus');if(st&&(/минимум 2|at least 2|мінімум 2|щонайменше 2|至少/.test(st.textContent)))st.textContent=t.min2;
+   const wh=np.querySelector('#npWarehouses .detail-title');if(wh)wh.textContent=t.warehouses;
+   const wq=document.getElementById('npWarehouseQuery');if(wq)wq.placeholder=t.warehousePh;
+   const wt=document.getElementById('npWarehouseType');if(wt){const m={all:'allPoints',branch:'branches',postomat:'postomats'};[...wt.options].forEach(o=>{if(m[o.value])o.textContent=t[m[o.value]]})}
+ }
+ // Old price: keep the actual field name and add a subtle translated “optional”.
+ const old=document.getElementById('productOldPrice')||document.querySelector('[name="old_price"]')||document.getElementById('oldPrice');
+ if(old){const lab=old.closest('.field')?.querySelector('label');if(lab){let opt=lab.querySelector('.kv-optional');if(!opt){opt=document.createElement('span');opt.className='kv-optional';lab.appendChild(opt)}opt.textContent=`(${t.optional})`;}}
+}
+const kv6OldApply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs()){const r=kv6OldApply(p);setTimeout(kv6TranslateTargeted,40);return r};
+const kv6OldSwitch=window.switchAdminView;window.switchAdminView=async function(name){const r=await kv6OldSwitch(name);setTimeout(kv6TranslateTargeted,50);return r};
+if(typeof window.renderCustomers==='function'){const f=window.renderCustomers;window.renderCustomers=function(...a){const r=f.apply(this,a);setTimeout(kv6TranslateTargeted,0);return r}}
+if(typeof window.renderOrders==='function'){const f=window.renderOrders;window.renderOrders=function(...a){const r=f.apply(this,a);setTimeout(kv6TranslateTargeted,0);return r}}
+setTimeout(kv6TranslateTargeted,120);setTimeout(kv6TranslateTargeted,500);
+</script>
+
 </body>
 </html>
