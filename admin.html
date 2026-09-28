@@ -4328,6 +4328,7 @@ function kv7ConditionLabel(v){return (KV7_CONDITIONS[kv7Lang()]||KV7_CONDITIONS.
 function kv7SizesForCategory(cat){
   if(cat==='Одежда') return KV7_CLOTHING_SIZES;
   if(cat==='Обувь') return KV7_SHOE_SIZES;
+  if(cat==='Костюмы') return KV10_SUIT_SIZES;
   return [];
 }
 function kv7RenderSizes(animate=true){
@@ -4696,6 +4697,109 @@ setTimeout(()=>{
  if(modal)kv102Observer.observe(modal,{childList:true,subtree:true});
  kv102RenderSuitSizes();
 },150);
+</script>
+
+
+<style>
+/* v11 — real multi-photo preview */
+#kvPhotoPreview.kv-image-preview{
+  display:flex!important;flex-wrap:wrap;gap:12px;margin-top:14px;align-items:flex-start;
+  grid-template-columns:none!important;
+}
+#kvPhotoPreview .kv-photo-card{
+  position:relative;flex:0 0 132px;width:132px;height:164px;border:1px solid var(--border);
+  border-radius:14px;overflow:hidden;background:color-mix(in srgb,var(--panel2) 88%,#000);
+  animation:kv11PhotoIn .34s cubic-bezier(.2,.8,.2,1);
+}
+#kvPhotoPreview .kv-photo-card img{
+  width:100%!important;height:100%!important;aspect-ratio:auto!important;object-fit:contain!important;
+  border:0!important;border-radius:0!important;display:block;background:rgba(0,0,0,.16);
+}
+#kvPhotoPreview .kv-photo-remove{
+  position:absolute;z-index:10;top:7px;right:7px;width:30px;height:30px;padding:0;
+  display:grid;place-items:center;border-radius:50%;border:1px solid rgba(255,255,255,.34);
+  background:rgba(8,10,15,.84);color:white;font-size:20px;font-weight:800;line-height:1;
+  cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.4);backdrop-filter:blur(7px);
+  transition:transform .2s ease,background .2s ease;
+}
+#kvPhotoPreview .kv-photo-remove:hover{transform:scale(1.1) rotate(8deg);background:rgba(190,40,55,.94)}
+#kvPhotoPreview .kv-photo-card.kv-photo-out{animation:kv11PhotoOut .4s cubic-bezier(.55,0,.8,.25) forwards}
+@keyframes kv11PhotoIn{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes kv11PhotoOut{0%{opacity:1;transform:none}50%{opacity:.55;transform:translateY(-5px) rotate(2deg) scale(.95)}100%{opacity:0;transform:translateY(16px) rotate(5deg) scale(.76)}}
+</style>
+<script>
+/* v11 — append photos across repeated file selections; remove before upload */
+let kv11PhotoSeq=0;
+let kv11Photos=[];
+
+function kv11SyncPhotoInput(){
+  const input=document.getElementById('kvPhotos');
+  if(!input)return;
+  try{
+    const dt=new DataTransfer();
+    kv11Photos.forEach(x=>dt.items.add(x.file));
+    input.files=dt.files;
+  }catch(_){}
+  /* Keep the original uploader's source array in sync. */
+  if(typeof kv2Photos!=='undefined'){
+    kv2Photos.length=0;
+    kv11Photos.forEach(x=>kv2Photos.push(x.file));
+  }
+}
+function kv11RenderPhotos(){
+  const box=document.getElementById('kvPhotoPreview');
+  if(!box)return;
+  box.innerHTML=kv11Photos.map(x=>`
+    <div class="kv-photo-card" data-photo-id="${x.id}">
+      <img src="${x.url}" alt="">
+      <button type="button" class="kv-photo-remove" data-remove-photo="${x.id}" aria-label="Remove">×</button>
+    </div>`).join('');
+}
+function kv11AddPhotos(input){
+  const incoming=[...(input.files||[])];
+  for(const file of incoming){
+    const id='p'+Date.now().toString(36)+(++kv11PhotoSeq);
+    kv11Photos.push({id,file,url:URL.createObjectURL(file)});
+  }
+  kv11SyncPhotoInput();
+  kv11RenderPhotos();
+  if(incoming.length && typeof kv2MarkDirty==='function')kv2MarkDirty();
+}
+/* Override the function already called by onchange in the actual form. */
+window.kv2PreviewPhotos=kv11AddPhotos;
+
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-remove-photo]');
+  if(!btn)return;
+  e.preventDefault();e.stopPropagation();
+  const id=btn.dataset.removePhoto;
+  const card=btn.closest('.kv-photo-card');
+  card?.classList.add('kv-photo-out');
+  setTimeout(()=>{
+    const item=kv11Photos.find(x=>x.id===id);
+    if(item)URL.revokeObjectURL(item.url);
+    kv11Photos=kv11Photos.filter(x=>x.id!==id);
+    kv11SyncPhotoInput();
+    kv11RenderPhotos();
+    if(typeof kv2MarkDirty==='function')kv2MarkDirty();
+  },380);
+},true);
+
+/* Reset temporary photos each time a fresh Add Product modal opens. */
+const kv11OpenCreate=window.openCreateProduct;
+window.openCreateProduct=async function(){
+  kv11Photos.forEach(x=>URL.revokeObjectURL(x.url));
+  kv11Photos=[];
+  if(typeof kv2Photos!=='undefined')kv2Photos.length=0;
+  await kv11OpenCreate();
+  setTimeout(()=>{
+    const input=document.getElementById('kvPhotos');
+    if(input) input.value='';
+    kv11RenderPhotos();
+    /* v7 now knows that Костюмы has sizes, so render it through the native size section. */
+    if(typeof kv7RenderSizes==='function')kv7RenderSizes(false);
+  },40);
+};
 </script>
 
 </body>
