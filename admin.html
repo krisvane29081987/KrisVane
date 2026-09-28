@@ -530,13 +530,7 @@
       font-size: 15px;
 
       transition:
-        transform 0.35s
-        cubic-bezier(
-          0.22,
-          1,
-          0.36,
-          1
-        );
+        transform 1s cubic-bezier(0.45, 0.02, 0.18, 1);
     }
 
     .order.open
@@ -558,15 +552,9 @@
       visibility: hidden;
 
       transition:
-        grid-template-rows 0.48s
-          cubic-bezier(
-            0.22,
-            1,
-            0.36,
-            1
-          ),
-        opacity 0.32s ease,
-        visibility 0s linear 0.48s;
+        grid-template-rows 1s cubic-bezier(0.45, 0.02, 0.18, 1),
+        opacity 0.72s ease,
+        visibility 0s linear 1s;
     }
 
     .order.open
@@ -578,14 +566,8 @@
       visibility: visible;
 
       transition:
-        grid-template-rows 0.48s
-          cubic-bezier(
-            0.22,
-            1,
-            0.36,
-            1
-          ),
-        opacity 0.35s ease 0.06s,
+        grid-template-rows 1s cubic-bezier(0.45, 0.02, 0.18, 1),
+        opacity 0.78s ease 0.10s,
         visibility 0s linear 0s;
     }
 
@@ -606,15 +588,9 @@
       opacity: 0;
 
       transition:
-        transform 0.42s
-          cubic-bezier(
-            0.22,
-            1,
-            0.36,
-            1
-          ),
-        opacity 0.3s ease,
-        padding 0.42s ease;
+        transform 0.92s cubic-bezier(0.45, 0.02, 0.18, 1),
+        opacity 0.68s ease,
+        padding 0.92s cubic-bezier(0.45, 0.02, 0.18, 1);
     }
 
     .order.open
@@ -948,6 +924,29 @@
     }
 
     /* =========================
+       NOVA POSHTA TEST
+    ========================= */
+
+    .np-test {
+      margin-bottom: 25px;
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+    }
+
+    .np-test-head { display:flex; justify-content:space-between; gap:14px; align-items:flex-start; margin-bottom:16px; }
+    .np-test-title { font-size:17px; font-weight:800; }
+    .np-test-note { color:var(--muted); font-size:13px; margin-top:5px; line-height:1.5; }
+    .np-test-row { display:grid; grid-template-columns:1fr auto; gap:10px; }
+    .np-results { display:grid; gap:8px; margin-top:12px; }
+    .np-result { width:100%; text-align:left; border:1px solid var(--border); background:var(--panel-2); color:var(--text); border-radius:11px; padding:11px 13px; }
+    .np-result:hover { border-color:rgba(109,93,252,.58); background:var(--panel-3); }
+    .np-result small { display:block; color:var(--muted); margin-top:4px; }
+    .np-status { min-height:20px; color:var(--muted); font-size:13px; margin-top:10px; }
+    .np-warehouses { margin-top:16px; }
+
+    /* =========================
        MOBILE
     ========================= */
 
@@ -1253,6 +1252,27 @@
 
       </section>
 
+
+      <!-- TEMPORARY NOVA POSHTA LOCATION TEST -->
+
+      <section class="np-test" id="npTestPanel">
+        <div class="np-test-head">
+          <div>
+            <div class="np-test-title">Тест Nova Poshta API</div>
+            <div class="np-test-note">Проверяем защищённую Edge Function из текущей авторизованной админ-сессии. После проверки этот блок превратим в настройки доставки.</div>
+          </div>
+        </div>
+        <div class="np-test-row">
+          <input id="npCityQuery" class="input" value="Київ" placeholder="Введите город">
+          <button class="btn btn-primary" id="npSearchBtn" type="button" onclick="testNpCities()">Найти город</button>
+        </div>
+        <div id="npCityResults" class="np-results"></div>
+        <div id="npStatus" class="np-status"></div>
+        <div id="npWarehouses" class="np-warehouses hidden">
+          <div class="detail-title">Отделения / почтоматы</div>
+          <select id="npWarehouseSelect" class="select"></select>
+        </div>
+      </section>
 
       <!-- SEARCH -->
 
@@ -3178,6 +3198,97 @@
 
     }
 
+
+    /* =========================================
+       NOVA POSHTA LOCATION TEST
+    ========================================= */
+
+    async function invokeNpLocations(body) {
+      const { data, error } = await supabaseClient.functions.invoke(
+        "nova-poshta-locations",
+        { body }
+      );
+      if (error) throw error;
+      if (data && data.success === false) throw new Error(data.error || "Nova Poshta API error");
+      return data;
+    }
+
+    function npArray(data) {
+      if (Array.isArray(data)) return data;
+      if (!data || typeof data !== "object") return [];
+      for (const key of ["data", "cities", "results", "items", "warehouses"]) {
+        if (Array.isArray(data[key])) return data[key];
+      }
+      return [];
+    }
+
+    async function testNpCities() {
+      const query = document.getElementById("npCityQuery").value.trim();
+      const status = document.getElementById("npStatus");
+      const results = document.getElementById("npCityResults");
+      const warehouses = document.getElementById("npWarehouses");
+      const btn = document.getElementById("npSearchBtn");
+      if (!query) { showToast("Введите город.", "error"); return; }
+      btn.disabled = true;
+      results.innerHTML = "";
+      warehouses.classList.add("hidden");
+      status.textContent = "Ищем города через nova-poshta-locations…";
+      try {
+        const data = await invokeNpLocations({ action: "searchCities", query });
+        const cities = npArray(data);
+        if (!cities.length) {
+          status.textContent = "Функция ответила, но список городов пуст. Откройте Console — ответ выведен туда.";
+          console.log("nova-poshta-locations searchCities response:", data);
+          return;
+        }
+        status.textContent = `Найдено: ${cities.length}. Выберите город.`;
+        results.innerHTML = cities.slice(0, 15).map((city, index) => {
+          const name = city.present || city.Present || city.name || city.MainDescription || city.mainDescription || "Город";
+          const area = city.area || city.Area || city.AreaDescription || "";
+          const ref = city.ref || city.Ref || city.DeliveryCity || city.deliveryCity || city.cityRef || "";
+          return `<button class="np-result" type="button" data-index="${index}">${escapeHtml(name)}${area ? `<small>${escapeHtml(area)}</small>` : ""}</button>`;
+        }).join("");
+        [...results.querySelectorAll(".np-result")].forEach((el) => {
+          el.addEventListener("click", () => {
+            const city = cities[Number(el.dataset.index)];
+            const ref = city.ref || city.Ref || city.DeliveryCity || city.deliveryCity || city.cityRef || "";
+            const name = city.present || city.Present || city.name || city.MainDescription || city.mainDescription || "Город";
+            if (!ref) { console.log("City without usable ref:", city); showToast("У города не найден Ref. Смотрите Console.", "error"); return; }
+            testNpWarehouses(ref, name);
+          });
+        });
+      } catch (error) {
+        console.error("Nova Poshta city test error:", error);
+        status.textContent = `Ошибка: ${error.message || error}`;
+        showToast(error.message || "Ошибка Nova Poshta", "error");
+      } finally { btn.disabled = false; }
+    }
+
+    async function testNpWarehouses(cityRef, cityName) {
+      const status = document.getElementById("npStatus");
+      const wrap = document.getElementById("npWarehouses");
+      const select = document.getElementById("npWarehouseSelect");
+      status.textContent = `Загружаем отделения: ${cityName}…`;
+      wrap.classList.add("hidden");
+      try {
+        const data = await invokeNpLocations({ action: "getWarehouses", cityRef });
+        const list = npArray(data);
+        console.log("nova-poshta-locations getWarehouses response:", data);
+        if (!list.length) { status.textContent = "Город выбран, но отделения не получены."; return; }
+        select.innerHTML = list.map((w) => {
+          const ref = w.ref || w.Ref || "";
+          const number = w.number || w.Number || "";
+          const description = w.description || w.Description || w.ShortAddress || w.shortAddress || "Отделение";
+          return `<option value="${escapeHtml(ref)}">${escapeHtml(number ? `№${number} — ${description}` : description)}</option>`;
+        }).join("");
+        wrap.classList.remove("hidden");
+        status.textContent = `Готово: получено отделений/почтоматов — ${list.length}.`;
+      } catch (error) {
+        console.error("Nova Poshta warehouse test error:", error);
+        status.textContent = `Ошибка отделений: ${error.message || error}`;
+        showToast(error.message || "Ошибка Nova Poshta", "error");
+      }
+    }
 
     /* =========================================
        START
