@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>KrisVane — System Test</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: #090a0d;
+      color: #fff;
+      font-family: Arial, sans-serif;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .box {
+      width: 420px;
+      max-width: calc(100% - 40px);
+
+      background: #111318;
+      border: 1px solid #252936;
+      border-radius: 20px;
+
+      padding: 28px;
+    }
+
+    h1 {
+      margin-top: 0;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      margin-top: 12px;
+
+      border: 0;
+      border-radius: 12px;
+
+      background: #5865f2;
+      color: white;
+
+      font-size: 15px;
+      font-weight: 700;
+
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: .9;
+    }
+
+    #log {
+      margin-top: 20px;
+
+      background: #08090c;
+      border-radius: 12px;
+
+      padding: 15px;
+
+      white-space: pre-wrap;
+      word-break: break-word;
+
+      font-family: monospace;
+      font-size: 13px;
+      line-height: 1.5;
+
+      min-height: 80px;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="box">
+
+  <h1>KrisVane Test</h1>
+
+  <p>Проверка корзины и оформления заказа.</p>
+
+  <button onclick="checkSession()">
+    1. Проверить авторизацию
+  </button>
+
+  <button onclick="addTestProduct()">
+    2. Добавить 2× M в корзину
+  </button>
+
+  <button onclick="checkout()">
+    3. Оформить тестовый заказ
+  </button>
+
+  <div id="log">Готов к тесту.</div>
+
+</div>
+
+
+<script>
+
+const SUPABASE_URL =
+  'https://cbkomiuylvumquhgrlve.supabase.co';
+
+const SUPABASE_KEY =
+  'sb_publishable_OzfR7L5x3hQF56b4v7KT1g_q9tXF9sG';
+
+const db = supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_KEY
+);
+
+const log = document.getElementById('log');
+
+
+function show(message) {
+  log.textContent = message;
+}
+
+
+// ==========================================
+// 1. ПРОВЕРКА АВТОРИЗАЦИИ
+// ==========================================
+
+async function checkSession() {
+
+  show('Проверяем авторизацию...');
+
+  const {
+    data: { user },
+    error
+  } = await db.auth.getUser();
+
+
+  if (error || !user) {
+
+    show(
+      '❌ Пользователь не авторизован.\n\n' +
+      (error?.message || '')
+    );
+
+    return;
+  }
+
+
+  show(
+    '✅ Авторизация работает\n\n' +
+    'User ID:\n' +
+    user.id +
+    '\n\nEmail:\n' +
+    user.email
+  );
+}
+
+
+// ==========================================
+// 2. ДОБАВЛЕНИЕ ТОВАРА В КОРЗИНУ
+// ==========================================
+
+async function addTestProduct() {
+
+  show('Добавляем товар...');
+
+
+  const {
+    data: { user },
+    error: userError
+  } = await db.auth.getUser();
+
+
+  if (userError || !user) {
+
+    show('❌ Сначала необходимо войти.');
+
+    return;
+  }
+
+
+  // ------------------------------
+  // Получаем тестовый вариант
+  // ------------------------------
+
+  const {
+    data: variant,
+    error: variantError
+  } = await db
+    .from('product_variants')
+    .select('id, name, stock_quantity, reserved_quantity')
+    .eq('sku', 'KV-TEST-001-M')
+    .single();
+
+
+  if (variantError) {
+
+    show(
+      '❌ Не удалось получить вариант:\n' +
+      variantError.message
+    );
+
+    return;
+  }
+
+
+  // ------------------------------
+  // Получаем или создаём корзину
+  // ------------------------------
+
+  let {
+    data: cart,
+    error: cartError
+  } = await db
+    .from('carts')
+    .select('id')
+    .eq('user_id', user.id)
+    .maybeSingle();
+
+
+  if (cartError) {
+
+    show(
+      '❌ Ошибка корзины:\n' +
+      cartError.message
+    );
+
+    return;
+  }
+
+
+  if (!cart) {
+
+    const {
+      data: newCart,
+      error: createError
+    } = await db
+      .from('carts')
+      .insert({
+        user_id: user.id
+      })
+      .select('id')
+      .single();
+
+
+    if (createError) {
+
+      show(
+        '❌ Не удалось создать корзину:\n' +
+        createError.message
+      );
+
+      return;
+    }
+
+
+    cart = newCart;
+  }
+
+
+  // ------------------------------
+  // Добавляем 2 штуки
+  // ------------------------------
+
+  const {
+    error: itemError
+  } = await db
+    .from('cart_items')
+    .upsert(
+      {
+        cart_id: cart.id,
+        variant_id: variant.id,
+        quantity: 2
+      },
+      {
+        onConflict: 'cart_id,variant_id'
+      }
+    );
+
+
+  if (itemError) {
+
+    show(
+      '❌ Не удалось добавить товар:\n' +
+      itemError.message
+    );
+
+    return;
+  }
+
+
+  show(
+    '✅ Товар добавлен в корзину!\n\n' +
+    'Вариант: ' + variant.name +
+    '\nКоличество: 2' +
+    '\nНа складе: ' + variant.stock_quantity +
+    '\nВ резерве сейчас: ' + variant.reserved_quantity
+  );
+}
+
+
+// ==========================================
+// 3. CHECKOUT
+// ==========================================
+
+async function checkout() {
+
+  show('Оформляем заказ...');
+
+
+  const {
+    data,
+    error
+  } = await db.rpc(
+    'checkout_cart',
+    {
+      p_recipient_name: 'Ivan Test',
+      p_phone: '+380000000000',
+
+      p_delivery_method: 'test',
+      p_carrier: 'test',
+
+      p_carrier_city_ref: null,
+      p_carrier_branch_ref: null,
+
+      p_delivery_city: 'Test City',
+      p_delivery_branch: 'Test Branch',
+      p_delivery_address: null,
+
+      p_delivery_comment:
+        'Автоматический тест KrisVane'
+    }
+  );
+
+
+  if (error) {
+
+    show(
+      '❌ CHECKOUT ERROR\n\n' +
+      error.message
+    );
+
+    return;
+  }
+
+
+  show(
+    '🔥 ЗАКАЗ УСПЕШНО СОЗДАН!\n\n' +
+    'Order ID: ' + data +
+    '\n\nТеперь проверяем базу...'
+  );
+}
+
+</script>
+
+</body>
+</html>
