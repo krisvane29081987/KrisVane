@@ -1,0 +1,1601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>KrisVane — Админ-панель</title>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg: #0b0c0f;
+      --panel: #12141a;
+      --panel-2: #181b22;
+      --border: #252936;
+
+      --text: #f4f5f7;
+      --muted: #9298a6;
+
+      --accent: #6d5dfc;
+      --accent-2: #3b82f6;
+
+      --success: #32d583;
+      --warning: #fdb022;
+      --danger: #f04438;
+
+      --radius: 18px;
+    }
+
+    body {
+      margin: 0;
+
+      font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+
+      background:
+        radial-gradient(
+          circle at top right,
+          rgba(109, 93, 252, 0.12),
+          transparent 30%
+        ),
+        var(--bg);
+
+      color: var(--text);
+
+      min-height: 100vh;
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* =========================
+       LOGIN / ERROR
+    ========================= */
+
+    .center-screen {
+      min-height: 100vh;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      padding: 25px;
+    }
+
+    .message-card {
+      width: 100%;
+      max-width: 500px;
+
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+
+      padding: 30px;
+
+      text-align: center;
+    }
+
+    .message-card h1 {
+      margin-top: 0;
+    }
+
+    .message-card p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* =========================
+       LAYOUT
+    ========================= */
+
+    .app {
+      display: grid;
+
+      grid-template-columns: 240px 1fr;
+
+      min-height: 100vh;
+    }
+
+    /* =========================
+       SIDEBAR
+    ========================= */
+
+    .sidebar {
+      border-right: 1px solid var(--border);
+
+      background: rgba(12, 13, 17, 0.92);
+
+      padding: 24px 18px;
+
+      position: sticky;
+      top: 0;
+
+      height: 100vh;
+    }
+
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+
+      letter-spacing: -0.5px;
+
+      margin-bottom: 35px;
+    }
+
+    .logo span {
+      color: var(--accent);
+    }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+
+      padding: 12px 14px;
+
+      margin-bottom: 7px;
+
+      border-radius: 12px;
+
+      color: var(--muted);
+
+      transition: 0.2s;
+
+      user-select: none;
+    }
+
+    .nav-item:hover {
+      background: var(--panel-2);
+      color: var(--text);
+    }
+
+    .nav-item.active {
+      background:
+        linear-gradient(
+          135deg,
+          rgba(109, 93, 252, 0.22),
+          rgba(59, 130, 246, 0.12)
+        );
+
+      color: white;
+    }
+
+    /* =========================
+       MAIN
+    ========================= */
+
+    .main {
+      padding: 30px;
+
+      width: 100%;
+      max-width: 1500px;
+
+      margin: 0 auto;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 20px;
+
+      margin-bottom: 30px;
+    }
+
+    .title h1 {
+      margin: 0;
+
+      font-size: 30px;
+    }
+
+    .title p {
+      margin: 7px 0 0;
+
+      color: var(--muted);
+    }
+
+    .admin-badge {
+      padding: 8px 12px;
+
+      border-radius: 999px;
+
+      background: rgba(109, 93, 252, 0.15);
+
+      color: #b8b0ff;
+
+      border: 1px solid rgba(109, 93, 252, 0.25);
+
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    /* =========================
+       STATS
+    ========================= */
+
+    .stats {
+      display: grid;
+
+      grid-template-columns:
+        repeat(4, minmax(0, 1fr));
+
+      gap: 15px;
+
+      margin-bottom: 25px;
+    }
+
+    .stat {
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+
+      border-radius: var(--radius);
+
+      padding: 20px;
+    }
+
+    .stat-label {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-bottom: 10px;
+    }
+
+    .stat-value {
+      font-size: 27px;
+      font-weight: 800;
+    }
+
+    /* =========================
+       ORDERS
+    ========================= */
+
+    .orders {
+      display: flex;
+      flex-direction: column;
+
+      gap: 15px;
+    }
+
+    .order {
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+
+      border-radius: var(--radius);
+
+      overflow: hidden;
+
+      transition:
+        transform 0.2s,
+        border-color 0.2s;
+    }
+
+    .order:hover {
+      border-color: #353a49;
+    }
+
+    .order-header {
+      padding: 20px;
+
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+
+      cursor: pointer;
+    }
+
+    .order-main-info {
+      display: flex;
+      align-items: center;
+
+      gap: 18px;
+
+      min-width: 0;
+    }
+
+    .order-number {
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .order-date {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-top: 4px;
+    }
+
+    .order-right {
+      display: flex;
+      align-items: center;
+
+      gap: 15px;
+    }
+
+    .order-price {
+      font-weight: 800;
+
+      white-space: nowrap;
+    }
+
+    .status {
+      padding: 7px 11px;
+
+      border-radius: 999px;
+
+      font-size: 12px;
+      font-weight: 700;
+
+      white-space: nowrap;
+
+      background: rgba(255,255,255,0.06);
+
+      border: 1px solid var(--border);
+    }
+
+    .status.pending {
+      color: var(--warning);
+    }
+
+    .status.confirmed,
+    .status.processing,
+    .status.ready_to_ship {
+      color: #78a9ff;
+    }
+
+    .status.shipped,
+    .status.in_transit,
+    .status.arrived {
+      color: #b3a7ff;
+    }
+
+    .status.delivered {
+      color: var(--success);
+    }
+
+    .status.cancelled,
+    .status.returned {
+      color: var(--danger);
+    }
+
+    /* =========================
+       ORDER DETAILS
+    ========================= */
+
+    .order-details {
+      display: none;
+
+      border-top: 1px solid var(--border);
+
+      padding: 22px;
+    }
+
+    .order.open .order-details {
+      display: block;
+    }
+
+    .details-grid {
+      display: grid;
+
+      grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+      gap: 18px;
+    }
+
+    .detail-box {
+      background: var(--panel-2);
+
+      border: 1px solid var(--border);
+
+      border-radius: 14px;
+
+      padding: 17px;
+    }
+
+    .detail-title {
+      color: var(--muted);
+
+      text-transform: uppercase;
+
+      font-size: 11px;
+      font-weight: 800;
+
+      letter-spacing: 0.8px;
+
+      margin-bottom: 13px;
+    }
+
+    .detail-line {
+      margin: 7px 0;
+
+      line-height: 1.45;
+    }
+
+    .detail-line span {
+      color: var(--muted);
+    }
+
+    /* =========================
+       ITEMS
+    ========================= */
+
+    .items {
+      margin-top: 20px;
+    }
+
+    .item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      gap: 15px;
+
+      padding: 13px 0;
+
+      border-bottom: 1px solid var(--border);
+    }
+
+    .item:last-child {
+      border-bottom: 0;
+    }
+
+    .item-name {
+      font-weight: 700;
+    }
+
+    .item-variant {
+      color: var(--muted);
+
+      font-size: 13px;
+
+      margin-top: 3px;
+    }
+
+    /* =========================
+       HISTORY
+    ========================= */
+
+    .history {
+      margin-top: 20px;
+    }
+
+    .history-row {
+      display: grid;
+
+      grid-template-columns:
+        160px 160px 1fr;
+
+      gap: 15px;
+
+      padding: 10px 0;
+
+      border-bottom: 1px solid var(--border);
+
+      font-size: 13px;
+    }
+
+    .history-date {
+      color: var(--muted);
+    }
+
+    /* =========================
+       EMPTY / LOADING
+    ========================= */
+
+    .loading,
+    .empty {
+      background: var(--panel);
+
+      border: 1px solid var(--border);
+
+      border-radius: var(--radius);
+
+      padding: 35px;
+
+      text-align: center;
+
+      color: var(--muted);
+    }
+
+    /* =========================
+       MOBILE
+    ========================= */
+
+    @media (max-width: 900px) {
+
+      .app {
+        display: block;
+      }
+
+      .sidebar {
+        position: static;
+
+        height: auto;
+
+        border-right: 0;
+        border-bottom: 1px solid var(--border);
+
+        padding: 16px 20px;
+      }
+
+      .logo {
+        margin-bottom: 12px;
+      }
+
+      .nav-item {
+        display: inline-flex;
+
+        margin: 0;
+      }
+
+      .main {
+        padding: 20px;
+      }
+
+      .stats {
+        grid-template-columns:
+          repeat(2, minmax(0, 1fr));
+      }
+
+      .details-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .history-row {
+        grid-template-columns: 1fr;
+
+        gap: 3px;
+      }
+    }
+
+    @media (max-width: 600px) {
+
+      .topbar {
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+      .stats {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .order-header {
+        align-items: flex-start;
+
+        flex-direction: column;
+      }
+
+      .order-right {
+        width: 100%;
+
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Проверка доступа -->
+
+  <div id="loadingScreen" class="center-screen">
+
+    <div class="message-card">
+
+      <h1>KrisVane</h1>
+
+      <p>
+        Проверяем доступ к панели администратора...
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <div id="accessDenied" class="center-screen hidden">
+
+    <div class="message-card">
+
+      <h1>Нет доступа</h1>
+
+      <p>
+        Эта страница доступна только администратору KrisVane.
+      </p>
+
+    </div>
+
+  </div>
+
+
+  <!-- Админка -->
+
+  <div id="adminApp" class="app hidden">
+
+    <aside class="sidebar">
+
+      <div class="logo">
+        Kris<span>Vane</span>
+      </div>
+
+      <div class="nav-item active">
+        Заказы
+      </div>
+
+      <div class="nav-item">
+        Товары
+      </div>
+
+      <div class="nav-item">
+        Категории
+      </div>
+
+      <div class="nav-item">
+        Покупатели
+      </div>
+
+    </aside>
+
+
+    <main class="main">
+
+      <div class="topbar">
+
+        <div class="title">
+
+          <h1>Заказы</h1>
+
+          <p>
+            Управление заказами KrisVane
+          </p>
+
+        </div>
+
+        <div class="admin-badge">
+          ADMIN
+        </div>
+
+      </div>
+
+
+      <section class="stats">
+
+        <div class="stat">
+
+          <div class="stat-label">
+            Всего заказов
+          </div>
+
+          <div
+            class="stat-value"
+            id="statTotal"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="stat-label">
+            Новые
+          </div>
+
+          <div
+            class="stat-value"
+            id="statPending"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="stat-label">
+            В пути
+          </div>
+
+          <div
+            class="stat-value"
+            id="statShipping"
+          >
+            —
+          </div>
+
+        </div>
+
+
+        <div class="stat">
+
+          <div class="stat-label">
+            Получены
+          </div>
+
+          <div
+            class="stat-value"
+            id="statDelivered"
+          >
+            —
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <div id="ordersContainer">
+
+        <div class="loading">
+          Загружаем заказы...
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+
+  <script>
+
+    /* =========================================
+       SUPABASE
+    ========================================= */
+
+    const SUPABASE_URL =
+      "https://cbkomiuylvumquhgrlve.supabase.co";
+
+    const SUPABASE_KEY =
+      "sb_publishable_OzfR7L5x3hQF56b4v7KT1g_q9tXF9sG";
+
+
+    const supabaseClient =
+      supabase.createClient(
+        SUPABASE_URL,
+        SUPABASE_KEY
+      );
+
+
+    /* =========================================
+       STATUS NAMES
+    ========================================= */
+
+    const STATUS_NAMES = {
+
+      pending:
+        "Новый",
+
+      confirmed:
+        "Подтверждён",
+
+      processing:
+        "Обрабатывается",
+
+      ready_to_ship:
+        "Готов к отправке",
+
+      shipped:
+        "Отправлен",
+
+      in_transit:
+        "В пути",
+
+      arrived:
+        "Прибыл в отделение",
+
+      delivered:
+        "Получен",
+
+      cancelled:
+        "Отменён",
+
+      returned:
+        "Возврат"
+
+    };
+
+
+    /* =========================================
+       HELPERS
+    ========================================= */
+
+    function escapeHtml(value) {
+
+      if (value === null || value === undefined) {
+        return "";
+      }
+
+      return String(value)
+
+        .replaceAll("&", "&amp;")
+
+        .replaceAll("<", "&lt;")
+
+        .replaceAll(">", "&gt;")
+
+        .replaceAll('"', "&quot;")
+
+        .replaceAll("'", "&#039;");
+
+    }
+
+
+    function money(value) {
+
+      const number =
+        Number(value || 0);
+
+      return new Intl.NumberFormat(
+        "uk-UA",
+        {
+          style: "currency",
+          currency: "UAH",
+          maximumFractionDigits: 2
+        }
+      ).format(number);
+
+    }
+
+
+    function dateTime(value) {
+
+      if (!value) {
+        return "—";
+      }
+
+      return new Intl.DateTimeFormat(
+        "ru-UA",
+        {
+          dateStyle: "medium",
+          timeStyle: "short"
+        }
+      ).format(
+        new Date(value)
+      );
+
+    }
+
+
+    /* =========================================
+       AUTH
+    ========================================= */
+
+    async function checkAccess() {
+
+      const {
+        data: {
+          user
+        },
+        error
+      } =
+        await supabaseClient.auth.getUser();
+
+
+      if (error || !user) {
+
+        showDenied();
+
+        return false;
+
+      }
+
+
+      const {
+        data: profile,
+        error: profileError
+      } =
+        await supabaseClient
+
+          .from("profiles")
+
+          .select(
+            "id, full_name, role"
+          )
+
+          .eq(
+            "id",
+            user.id
+          )
+
+          .single();
+
+
+      if (
+        profileError ||
+        !profile ||
+        profile.role !== "admin"
+      ) {
+
+        showDenied();
+
+        return false;
+
+      }
+
+
+      document
+        .getElementById("loadingScreen")
+        .classList
+        .add("hidden");
+
+
+      document
+        .getElementById("adminApp")
+        .classList
+        .remove("hidden");
+
+
+      return true;
+
+    }
+
+
+    function showDenied() {
+
+      document
+        .getElementById("loadingScreen")
+        .classList
+        .add("hidden");
+
+
+      document
+        .getElementById("adminApp")
+        .classList
+        .add("hidden");
+
+
+      document
+        .getElementById("accessDenied")
+        .classList
+        .remove("hidden");
+
+    }
+
+
+    /* =========================================
+       LOAD ORDERS
+    ========================================= */
+
+    async function loadOrders() {
+
+      const container =
+        document.getElementById(
+          "ordersContainer"
+        );
+
+
+      const {
+        data: orders,
+        error
+      } =
+        await supabaseClient
+
+          .from("orders")
+
+          .select(`
+            *,
+            order_items (
+              id,
+              product_name,
+              variant_name,
+              sku,
+              unit_price,
+              quantity,
+              line_total
+            ),
+            order_status_history (
+              id,
+              status,
+              message,
+              source,
+              created_at
+            )
+          `)
+
+          .order(
+            "created_at",
+            {
+              ascending: false
+            }
+          );
+
+
+      if (error) {
+
+        console.error(error);
+
+        container.innerHTML = `
+          <div class="empty">
+            Ошибка загрузки заказов:
+            ${escapeHtml(error.message)}
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      renderStats(
+        orders || []
+      );
+
+
+      if (
+        !orders ||
+        orders.length === 0
+      ) {
+
+        container.innerHTML = `
+          <div class="empty">
+            Заказов пока нет.
+          </div>
+        `;
+
+        return;
+
+      }
+
+
+      container.innerHTML = `
+        <div class="orders">
+
+          ${orders
+            .map(renderOrder)
+            .join("")}
+
+        </div>
+      `;
+
+    }
+
+
+    /* =========================================
+       STATS
+    ========================================= */
+
+    function renderStats(orders) {
+
+      const total =
+        orders.length;
+
+
+      const pending =
+        orders.filter(
+          order =>
+            order.status === "pending"
+        ).length;
+
+
+      const shippingStatuses =
+        [
+          "shipped",
+          "in_transit",
+          "arrived"
+        ];
+
+
+      const shipping =
+        orders.filter(
+          order =>
+            shippingStatuses.includes(
+              order.status
+            )
+        ).length;
+
+
+      const delivered =
+        orders.filter(
+          order =>
+            order.status === "delivered"
+        ).length;
+
+
+      document.getElementById(
+        "statTotal"
+      ).textContent =
+        total;
+
+
+      document.getElementById(
+        "statPending"
+      ).textContent =
+        pending;
+
+
+      document.getElementById(
+        "statShipping"
+      ).textContent =
+        shipping;
+
+
+      document.getElementById(
+        "statDelivered"
+      ).textContent =
+        delivered;
+
+    }
+
+
+    /* =========================================
+       RENDER ORDER
+    ========================================= */
+
+    function renderOrder(order) {
+
+      const items =
+        Array.isArray(order.order_items)
+          ? order.order_items
+          : [];
+
+
+      const history =
+        Array.isArray(
+          order.order_status_history
+        )
+          ? [...order.order_status_history]
+          : [];
+
+
+      history.sort(
+        (a, b) =>
+          new Date(a.created_at) -
+          new Date(b.created_at)
+      );
+
+
+      const statusName =
+        STATUS_NAMES[order.status]
+        || order.status;
+
+
+      return `
+
+        <article
+          class="order"
+          id="order-${order.id}"
+        >
+
+          <div
+            class="order-header"
+            onclick="toggleOrder(${order.id})"
+          >
+
+            <div class="order-main-info">
+
+              <div>
+
+                <div class="order-number">
+                  ${escapeHtml(
+                    order.order_number
+                  )}
+                </div>
+
+                <div class="order-date">
+                  ${dateTime(
+                    order.created_at
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="order-right">
+
+              <div class="order-price">
+                ${money(order.total)}
+              </div>
+
+              <div
+                class="status
+                ${escapeHtml(order.status)}"
+              >
+                ${escapeHtml(statusName)}
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div class="order-details">
+
+            <div class="details-grid">
+
+              <div class="detail-box">
+
+                <div class="detail-title">
+                  Покупатель
+                </div>
+
+                <div class="detail-line">
+                  <span>Имя:</span>
+                  ${escapeHtml(
+                    order.recipient_name
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>Телефон:</span>
+                  ${escapeHtml(
+                    order.phone
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>Комментарий:</span>
+                  ${escapeHtml(
+                    order.delivery_comment
+                  ) || "—"}
+                </div>
+
+              </div>
+
+
+              <div class="detail-box">
+
+                <div class="detail-title">
+                  Доставка
+                </div>
+
+                <div class="detail-line">
+                  <span>Способ:</span>
+                  ${escapeHtml(
+                    order.delivery_method
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>Город:</span>
+                  ${escapeHtml(
+                    order.delivery_city
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>Отделение:</span>
+                  ${escapeHtml(
+                    order.delivery_branch
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>Адрес:</span>
+                  ${escapeHtml(
+                    order.delivery_address
+                  ) || "—"}
+                </div>
+
+              </div>
+
+
+              <div class="detail-box">
+
+                <div class="detail-title">
+                  Отправление
+                </div>
+
+                <div class="detail-line">
+                  <span>Перевозчик:</span>
+                  ${escapeHtml(
+                    order.carrier
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>ТТН:</span>
+                  ${escapeHtml(
+                    order.tracking_number
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>
+                    Последняя проверка:
+                  </span>
+
+                  ${dateTime(
+                    order.tracking_last_checked_at
+                  )}
+                </div>
+
+                <div class="detail-line">
+                  <span>
+                    Статус перевозчика:
+                  </span>
+
+                  ${escapeHtml(
+                    order.tracking_last_status_text
+                  ) || "—"}
+                </div>
+
+                ${
+                  order.tracking_last_error
+                    ? `
+                      <div class="detail-line">
+                        <span>Ошибка:</span>
+                        ${escapeHtml(
+                          order.tracking_last_error
+                        )}
+                      </div>
+                    `
+                    : ""
+                }
+
+              </div>
+
+
+              <div class="detail-box">
+
+                <div class="detail-title">
+                  Оплата
+                </div>
+
+                <div class="detail-line">
+                  <span>Статус:</span>
+                  ${escapeHtml(
+                    order.payment_status
+                  )}
+                </div>
+
+                <div class="detail-line">
+                  <span>Метод:</span>
+                  ${escapeHtml(
+                    order.payment_method
+                  ) || "—"}
+                </div>
+
+                <div class="detail-line">
+                  <span>Товары:</span>
+                  ${money(
+                    order.subtotal
+                  )}
+                </div>
+
+                <div class="detail-line">
+                  <span>Доставка:</span>
+                  ${money(
+                    order.delivery_price
+                  )}
+                </div>
+
+                <div class="detail-line">
+                  <span>Скидка:</span>
+                  ${money(
+                    order.discount_amount
+                  )}
+                </div>
+
+                <div class="detail-line">
+
+                  <strong>
+                    Итого:
+                    ${money(order.total)}
+                  </strong>
+
+                </div>
+
+              </div>
+
+            </div>
+
+
+            <div class="items">
+
+              <div class="detail-title">
+                Товары
+              </div>
+
+              ${
+                items.length
+                  ? items
+                    .map(
+                      item => `
+                        <div class="item">
+
+                          <div>
+
+                            <div class="item-name">
+                              ${escapeHtml(
+                                item.product_name
+                              )}
+                            </div>
+
+                            <div class="item-variant">
+
+                              ${
+                                escapeHtml(
+                                  item.variant_name
+                                ) || "Без варианта"
+                              }
+
+                              ${
+                                item.sku
+                                  ? ` · SKU:
+                                     ${escapeHtml(
+                                       item.sku
+                                     )}`
+                                  : ""
+                              }
+
+                            </div>
+
+                          </div>
+
+
+                          <div>
+
+                            ${item.quantity}
+                            ×
+                            ${money(
+                              item.unit_price
+                            )}
+
+                            =
+                            <strong>
+                              ${money(
+                                item.line_total
+                              )}
+                            </strong>
+
+                          </div>
+
+                        </div>
+                      `
+                    )
+                    .join("")
+                  : `
+                    <div class="empty">
+                      Нет позиций заказа.
+                    </div>
+                  `
+              }
+
+            </div>
+
+
+            <div class="history">
+
+              <div class="detail-title">
+                История заказа
+              </div>
+
+              ${
+                history.length
+                  ? history
+                    .map(
+                      row => `
+                        <div class="history-row">
+
+                          <div class="history-date">
+                            ${dateTime(
+                              row.created_at
+                            )}
+                          </div>
+
+                          <div>
+                            ${
+                              escapeHtml(
+                                STATUS_NAMES[
+                                  row.status
+                                ]
+                              )
+                              ||
+                              escapeHtml(
+                                row.status
+                              )
+                            }
+                          </div>
+
+                          <div>
+                            ${escapeHtml(
+                              row.message
+                            ) || "—"}
+                          </div>
+
+                        </div>
+                      `
+                    )
+                    .join("")
+                  : `
+                    <div class="empty">
+                      История отсутствует.
+                    </div>
+                  `
+              }
+
+            </div>
+
+          </div>
+
+        </article>
+
+      `;
+
+    }
+
+
+    /* =========================================
+       UI
+    ========================================= */
+
+    function toggleOrder(id) {
+
+      const element =
+        document.getElementById(
+          `order-${id}`
+        );
+
+
+      if (!element) {
+        return;
+      }
+
+
+      element.classList.toggle(
+        "open"
+      );
+
+    }
+
+
+    /* =========================================
+       START
+    ========================================= */
+
+    async function start() {
+
+      const allowed =
+        await checkAccess();
+
+
+      if (!allowed) {
+        return;
+      }
+
+
+      await loadOrders();
+
+    }
+
+
+    start();
+
+  </script>
+
+</body>
+</html>
