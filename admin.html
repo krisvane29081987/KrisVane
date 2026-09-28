@@ -4192,12 +4192,10 @@ function kv5TranslateNode(root=document.body){
  // select options and enhanced setting buttons
  const optionMap={uiDensity:{comfortable:'normal',compact:'compact'},uiFontScale:{small:'small',normal:'normal',large:'large'},uiGlow:{off:'off',soft:'soft',normal:'normal',strong:'strong'},uiMotion:{full:'full',reduced:'simplified',none:'none'}};
  for(const [id,map] of Object.entries(optionMap)){const s=document.getElementById(id);if(!s)continue;[...s.options].forEach(o=>{if(map[o.value])o.textContent=kv5Text(map[o.value])})}
- if(typeof kv4EnhanceSettings==='function')setTimeout(kv4EnhanceSettings,0);
 }
 // Translate dynamic taxonomy labels using the existing stable taxonomy dictionary.
 const kv5OldTax=window.kv4Tax;window.kv4Tax=function(v){return kv5OldTax?kv5OldTax(v):v};
-// Run after every existing renderer without replacing interactive elements.
-let kv5Timer;const kv5Obs=new MutationObserver(ms=>{if(ms.some(m=>[...m.addedNodes].some(n=>n.nodeType===1||n.nodeType===3))){clearTimeout(kv5Timer);kv5Timer=setTimeout(()=>kv5TranslateNode(document.body),15)}});kv5Obs.observe(document.body,{childList:true,subtree:true,characterData:false});
+// No MutationObserver here: it caused re-render/translation feedback loops and broke interactive controls.
 const kv5OldApply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs()){kv5OldApply(p);setTimeout(()=>kv5TranslateNode(document.body),20)};
 const kv5OldSwitch=window.switchAdminView;window.switchAdminView=async function(name){const r=await kv5OldSwitch(name);setTimeout(()=>kv5TranslateNode(document.body),20);return r};
 setTimeout(()=>kv5TranslateNode(document.body),50);setTimeout(()=>kv5TranslateNode(document.body),300);
