@@ -4451,5 +4451,74 @@ document.addEventListener('click',()=>setTimeout(kv7TranslateOrderStatuses,80),f
 setTimeout(kv7TranslateOrderStatuses,220);
 </script>
 
+
+<style>
+.kv-old-price-wrap{position:relative}
+.kv-old-price-optional{
+ position:absolute;right:14px;top:50%;transform:translateY(-50%);
+ color:var(--muted);opacity:.55;font-size:.86em;pointer-events:none;
+}
+.kv-old-price-wrap input{padding-right:150px}
+@media(max-width:560px){
+ .kv-old-price-optional{font-size:.78em;right:10px}
+ .kv-old-price-wrap input{padding-right:120px}
+}
+</style>
+<script>
+/* KrisVane v8: translated optional marker inside old-price field + Bags & Backpacks */
+const KV8={
+ uk:{optional:'Необов’язково',bags:'Сумки та рюкзаки'},
+ ru:{optional:'Необязательно',bags:'Сумки и рюкзаки'},
+ en:{optional:'Optional',bags:'Bags & backpacks'},
+ be:{optional:'Неабавязкова',bags:'Сумкі і заплечнікі'},
+ zh:{optional:'可选',bags:'包袋与背包'}
+};
+function kv8Lang(){return getUiPrefs().language||'uk'}
+function kv8Txt(k){return (KV8[kv8Lang()]||KV8.uk)[k]||k}
+function kv8PatchOldPrice(){
+ const input=document.getElementById('kvOldPrice');
+ if(!input)return;
+ let wrap=input.parentElement;
+ if(!wrap.classList.contains('kv-old-price-wrap')){
+   wrap.classList.add('kv-old-price-wrap');
+   const s=document.createElement('span');
+   s.className='kv-old-price-optional';
+   wrap.appendChild(s);
+ }
+ const s=wrap.querySelector('.kv-old-price-optional');
+ if(s)s.textContent=kv8Txt('optional');
+}
+function kv8PatchBags(){
+ document.querySelectorAll('[data-value="Сумки и багаж"],[data-category="Сумки и багаж"],.kv-option,.kv-cat-option,.kv-category-option').forEach(el=>{
+   const raw=(el.dataset.value||el.dataset.category||el.textContent||'').trim();
+   if(['Сумки и багаж','Сумки та багаж','Bags & luggage','Сумкі і багаж','箱包与行李'].includes(raw)){
+     if(el.dataset.value==='Сумки и багаж')el.dataset.value='Сумки и Рюкзаки';
+     if(el.dataset.category==='Сумки и багаж')el.dataset.category='Сумки и Рюкзаки';
+     const check=el.querySelector('.kv-check');
+     el.childNodes.forEach(n=>{if(n.nodeType===3&&n.textContent.trim())n.textContent=kv8Txt('bags')+' '});
+     if(!check && el.children.length===0)el.textContent=kv8Txt('bags');
+   }
+ });
+ // Current taxonomy is rendered from a Russian stable key; rename its visible translation without breaking selection.
+ document.querySelectorAll('button').forEach(el=>{
+   const t=el.textContent.trim().replace(/✓$/,'').trim();
+   if(['Сумки и багаж','Сумки та багаж','Bags & luggage','Сумкі і багаж','箱包与行李','Сумки и Рюкзаки'].includes(t)){
+     const hasCheck=el.textContent.includes('✓');
+     el.textContent=kv8Txt('bags')+(hasCheck?' ✓':'');
+   }
+ });
+}
+function kv8Apply(){
+ kv8PatchOldPrice();
+ kv8PatchBags();
+}
+const kv8Open=window.openCreateProduct;
+window.openCreateProduct=async function(){await kv8Open();setTimeout(kv8Apply,40)}
+const kv8Ui=window.applyUiPrefs;
+window.applyUiPrefs=function(p=getUiPrefs()){kv8Ui(p);setTimeout(kv8Apply,90)}
+document.addEventListener('click',()=>setTimeout(kv8Apply,60),false);
+setTimeout(kv8Apply,250);
+</script>
+
 </body>
 </html>
