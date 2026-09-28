@@ -4517,12 +4517,12 @@ setTimeout(kv8Apply,250);
 
 
 <style>
-/* v9 image preview removal */
-#kvImagePreviewList{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:12px}
-.kv-image-preview{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:14px;aspect-ratio:1;background:var(--panel-2,#11151d);animation:kvImgIn .38s cubic-bezier(.2,.8,.2,1)}
-.kv-image-preview img{width:100%;height:100%;object-fit:cover;display:block}
-.kv-image-remove{position:absolute;right:7px;top:7px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.24);background:rgba(8,10,15,.72);color:#fff;font-size:19px;line-height:1;cursor:pointer;backdrop-filter:blur(8px);transition:transform .2s ease,background .2s ease}
-.kv-image-remove:hover{transform:scale(1.08) rotate(5deg);background:rgba(180,35,50,.82)}
+/* v10 image preview removal */
+#kvImagePreviewList{display:flex;flex-wrap:wrap;gap:12px;margin-top:12px;align-items:flex-start}
+.kv-image-preview{position:relative;flex:0 0 132px;width:132px;height:164px;overflow:hidden;border:1px solid var(--border);border-radius:14px;background:var(--panel-2,#11151d);animation:kvImgIn .38s cubic-bezier(.2,.8,.2,1)}
+.kv-image-preview img{width:100%;height:100%;object-fit:contain;display:block;background:rgba(0,0,0,.18)}
+.kv-image-remove{position:absolute;z-index:5;right:7px;top:7px;width:30px;height:30px;display:grid;place-items:center;padding:0;border-radius:50%;border:1px solid rgba(255,255,255,.32);background:rgba(8,10,15,.82);color:#fff;font-size:20px;font-weight:700;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(0,0,0,.35);backdrop-filter:blur(8px);transition:transform .2s ease,background .2s ease}
+.kv-image-remove:hover{transform:scale(1.09) rotate(7deg);background:rgba(190,40,55,.92)}
 .kv-image-preview.kv-removing{animation:kvImgOut .42s cubic-bezier(.55,0,.8,.25) forwards}
 @keyframes kvImgIn{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:none}}
 @keyframes kvImgOut{0%{opacity:1;transform:none}45%{opacity:.65;transform:translateY(-5px) rotate(1.5deg) scale(.96)}100%{opacity:0;transform:translateY(18px) rotate(4deg) scale(.78)}}
@@ -4538,7 +4538,7 @@ function kv9Suit(){return KV9_SUITS[kv9Lang()]||KV9_SUITS.uk}
 // Add Suits to the category taxonomy as a real selectable category.
 if(typeof KV2_TAXONOMY==='object' && !KV2_TAXONOMY['Костюмы']){
   KV2_TAXONOMY['Костюмы']=[
-    'Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'
+    'Классические костюмы','Повседневные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'
   ];
 }
 if(typeof KV2_TAX_I18N==='object'){
@@ -4607,6 +4607,53 @@ window.openCreateProduct=async function(){
   await kv9Open();
   setTimeout(()=>{kv9BindImages();kv9RenderImages()},30);
 };
+</script>
+
+
+<script>
+/* KrisVane v10: suit sizing + localized suit subcategories */
+const KV10_SUIT_SIZES=[
+  'XXS • 38–40',
+  'XS • 40–42',
+  'S • 44–46',
+  'M • 46–48',
+  'L • 48–50',
+  'XL • 52–54',
+  'XXL • 56–58',
+  'XXXL • 60–62'
+];
+const KV10_SUIT_SUBS={
+ uk:['Класичні костюми','Повсякденні костюми','Брючні костюми','Костюми зі спідницею','Костюми-трійки','Комплекти'],
+ ru:['Классические костюмы','Повседневные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'],
+ en:['Classic suits','Casual suits','Trouser suits','Skirt suits','Three-piece suits','Sets'],
+ be:['Класічныя касцюмы','Паўсядзённыя касцюмы','Штановыя касцюмы','Касцюмы са спадніцай','Касцюмы-тройкі','Камплекты'],
+ zh:['经典套装','休闲套装','裤装套装','裙装套装','三件套','组合套装']
+};
+if(typeof KV2_TAX_I18N==='object'){
+ const keys=['Классические костюмы','Повседневные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'];
+ Object.entries(KV10_SUIT_SUBS).forEach(([lang,vals])=>{
+   KV2_TAX_I18N[lang]=KV2_TAX_I18N[lang]||{};
+   keys.forEach((k,i)=>KV2_TAX_I18N[lang][k]=vals[i]);
+ });
+}
+
+function kv10IsSuit(){
+ const cat=document.getElementById('kvCategoryCustom');
+ const val=(cat?.dataset.value||cat?.value||cat?.textContent||'').trim();
+ return val==='Костюмы'||val==='Костюми'||val==='Suits'||val==='Касцюмы'||val==='套装';
+}
+function kv10ApplySuitSizes(){
+ if(!kv10IsSuit())return false;
+ const wrap=document.getElementById('kvSizeChoices'); if(!wrap)return false;
+ wrap.innerHTML=KV10_SUIT_SIZES.map(s=>`<button type="button" class="kv-size-chip" data-size="${s}">${s}</button>`).join('');
+ return true;
+}
+/* Run after category interactions/rendering, without touching the existing order animation. */
+document.addEventListener('click',e=>{
+ if(e.target.closest('#kvCategoryCustom,[data-tax-category],.kv-tax-option')){
+   setTimeout(()=>kv10ApplySuitSizes(),60);
+ }
+},true);
 </script>
 
 </body>
