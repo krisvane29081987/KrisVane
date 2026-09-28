@@ -3433,7 +3433,7 @@ html[data-motion="none"] *,html[data-motion="none"] *::before,html[data-motion="
       document.querySelectorAll(".nav-item[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view===name));
       document.getElementById("pageTitle").textContent=ADMIN_VIEW_META[name][0];
       document.getElementById("pageSubtitle").textContent=ADMIN_VIEW_META[name][1];
-      try { if(getUiPrefs().rememberTab!=="no") sessionStorage.setItem("krisvaneAdminView",name); else sessionStorage.removeItem("krisvaneAdminView"); } catch(_) {}
+      try { if(getUiPrefs().rememberTab!=="no") localStorage.setItem("krisvaneAdminView",name); else localStorage.removeItem("krisvaneAdminView"); } catch(_) {}
       if (loadedAdminViews.has(name)) return;
       loadedAdminViews.add(name);
       if(name==="products") await loadProducts();
@@ -3487,11 +3487,11 @@ html[data-motion="none"] *,html[data-motion="none"] *::before,html[data-motion="
     async function deleteDataRow(table,id,label){ if(getUiPrefs().confirmDelete!=="no" && !confirm(`Удалить ${label}? Это действие нельзя отменить.`))return; const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error){showToast(error.message,"error");return;} showToast("Удалено."); if(table==="products")await loadProducts();else await loadCategories(); }
 
     const UI_PREF_KEY="krisvaneAdminUiPrefs";
-    const UI_DEFAULTS={theme:"violet",language:"ru",density:"comfortable",motion:"full",rememberTab:"yes",confirmDelete:"yes"};
+    const UI_DEFAULTS={theme:"violet",language:"ru",density:"comfortable",motion:"full",rememberTab:"yes",confirmDelete:"yes",fontScale:"normal",glow:"normal"};
     function getUiPrefs(){ try{return {...UI_DEFAULTS,...JSON.parse(localStorage.getItem(UI_PREF_KEY)||"{}")};}catch(_){return {...UI_DEFAULTS};} }
     function applyUiPrefs(p=getUiPrefs()){ document.documentElement.dataset.theme=p.theme; document.documentElement.dataset.density=p.density; document.documentElement.dataset.motion=p.motion; document.documentElement.lang=p.language; applyAdminLanguage(p.language); }
-    function fillUiPrefs(){ const p=getUiPrefs(); [["uiTheme","theme"],["uiLanguage","language"],["uiDensity","density"],["uiMotion","motion"],["uiRememberTab","rememberTab"],["uiConfirmDelete","confirmDelete"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=p[k];}); }
-    function previewUiPreferences(){ const p={...getUiPrefs(),theme:document.getElementById("uiTheme")?.value||"violet",language:document.getElementById("uiLanguage")?.value||"ru",density:document.getElementById("uiDensity")?.value||"comfortable",motion:document.getElementById("uiMotion")?.value||"full"}; applyUiPrefs(p); }
+    function fillUiPrefs(){ const p=getUiPrefs(); [["uiTheme","theme"],["uiLanguage","language"],["uiDensity","density"],["uiMotion","motion"],["uiRememberTab","rememberTab"],["uiConfirmDelete","confirmDelete"],["uiFontScale","fontScale"],["uiGlow","glow"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=p[k];}); }
+    function previewUiPreferences(){ const p={...getUiPrefs(),theme:document.getElementById("uiTheme")?.value||"violet",language:document.getElementById("uiLanguage")?.value||"ru",density:document.getElementById("uiDensity")?.value||"comfortable",motion:document.getElementById("uiMotion")?.value||"full",rememberTab:document.getElementById("uiRememberTab")?.value||getUiPrefs().rememberTab||"yes",confirmDelete:document.getElementById("uiConfirmDelete")?.value||getUiPrefs().confirmDelete||"yes",fontScale:document.getElementById("uiFontScale")?.value||getUiPrefs().fontScale||"normal",glow:document.getElementById("uiGlow")?.value||getUiPrefs().glow||"normal"}; localStorage.setItem(UI_PREF_KEY,JSON.stringify(p)); applyUiPrefs(p); }
     function saveUiPreferences(){ const p={theme:document.getElementById("uiTheme")?.value||"violet",language:document.getElementById("uiLanguage")?.value||"ru",density:document.getElementById("uiDensity")?.value||"comfortable",motion:document.getElementById("uiMotion")?.value||"full",rememberTab:document.getElementById("uiRememberTab")?.value||"yes",confirmDelete:document.getElementById("uiConfirmDelete")?.value||"yes"}; localStorage.setItem(UI_PREF_KEY,JSON.stringify(p)); applyUiPrefs(p); }
     function resetUiPreferences(){ localStorage.removeItem(UI_PREF_KEY); applyUiPrefs(UI_DEFAULTS); fillUiPrefs(); showToast("Оформление сброшено."); }
     const ADMIN_LANG={
@@ -3821,7 +3821,7 @@ html[data-motion="none"] *,html[data-motion="none"] *::before,html[data-motion="
 
       await loadOrders();
       let initialView = "orders";
-      try { initialView = sessionStorage.getItem("krisvaneAdminView") || "orders"; } catch (_) {}
+      try { initialView = getUiPrefs().rememberTab!=="no" ? (localStorage.getItem("krisvaneAdminView") || "orders") : "orders"; } catch (_) {}
       await switchAdminView(initialView);
 
     }
@@ -3899,9 +3899,7 @@ const _renderProducts=window.renderProducts; window.renderProducts=function(){_r
 window.openCreateProduct=async function(){if(!adminCategories.length||!adminSubcategories.length)await loadCategories();const template=adminProducts[0];if(!template){showToast('Нужен хотя бы один товар-шаблон в таблице.','error');return;}window.adminCreateTemplate=template;const blank={...template};for(const k of editableFields(blank)){if(typeof blank[k]==='boolean')blank[k]=['is_published'].includes(k);else if(typeof blank[k]==='number')blank[k]=0;else blank[k]=''};const fields=editableFields(blank).map(k=>fieldHtml(k,blank[k])).join('');openAdminModal(kvT('productAdd'),`<div class="product-studio"><div class="studio-note">После создания откройте товар — появятся вкладки «${kvT('variants')}» и «${kvT('images')}» с реальным сохранением в Supabase.</div><div class="form-grid">${fields}</div>${kvBrandDatalist()}<div style="margin-top:14px"><strong>${kvT('catalog')}</strong><div class="taxonomy-box" style="margin-top:8px">${kvTaxonomyHtml()}</div></div><button class="btn btn-primary" style="margin-top:14px" onclick="createDataRow('products')">${kvT('addProduct').replace('+ ','')}</button></div>`);const brand=document.querySelector('#adminModal .modal-field[data-key="brand"]');if(brand)brand.setAttribute('list','kvBrands')};
 
 // UI preference extension
-const _getUiPrefs=window.getUiPrefs; window.getUiPrefs=function(){return {..._getUiPrefs(),fontScale:JSON.parse(localStorage.getItem('krisvaneAdminUiPrefs')||'{}').fontScale||'normal',glow:JSON.parse(localStorage.getItem('krisvaneAdminUiPrefs')||'{}').glow||'normal'}};
 const _applyUiPrefs=window.applyUiPrefs; window.applyUiPrefs=function(p=getUiPrefs()){_applyUiPrefs(p);document.documentElement.dataset.fontScale=p.fontScale||'normal';document.documentElement.dataset.glow=p.glow||'normal';document.documentElement.dir=p.language==='ar'?'rtl':'ltr';setTimeout(kvTranslateDom,0)};
-const _fillUiPrefs=window.fillUiPrefs; window.fillUiPrefs=function(){_fillUiPrefs();const p=getUiPrefs();if(document.getElementById('uiFontScale'))document.getElementById('uiFontScale').value=p.fontScale;if(document.getElementById('uiGlow'))document.getElementById('uiGlow').value=p.glow};
 window.previewUiPreferences=function(){const p={...getUiPrefs(),theme:document.getElementById('uiTheme')?.value||'violet',language:document.getElementById('uiLanguage')?.value||'ru',density:document.getElementById('uiDensity')?.value||'comfortable',motion:document.getElementById('uiMotion')?.value||'full',fontScale:document.getElementById('uiFontScale')?.value||'normal',glow:document.getElementById('uiGlow')?.value||'normal'};applyUiPrefs(p)};
 window.saveUiPreferences=function(){const p={theme:document.getElementById('uiTheme')?.value||'violet',language:document.getElementById('uiLanguage')?.value||'ru',density:document.getElementById('uiDensity')?.value||'comfortable',motion:document.getElementById('uiMotion')?.value||'full',rememberTab:document.getElementById('uiRememberTab')?.value||'yes',confirmDelete:document.getElementById('uiConfirmDelete')?.value||'yes',fontScale:document.getElementById('uiFontScale')?.value||'normal',glow:document.getElementById('uiGlow')?.value||'normal'};localStorage.setItem('krisvaneAdminUiPrefs',JSON.stringify(p));applyUiPrefs(p)};
 
@@ -4061,7 +4059,7 @@ window.kv2FilterBrands=function(q){const box=document.getElementById('kvBrandOpt
 
 // Keep interface changes immediately saved after every selection, including translated rerenders.
 const _kv3Apply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs()){_kv3Apply(p);setTimeout(kv3TranslateStatic,10)};
-setTimeout(()=>{kv3TranslateStatic();previewUiPreferences()},180);
+setTimeout(()=>{const p=getUiPrefs();applyUiPrefs(p);fillUiPrefs();kv3TranslateStatic()},180);
 
 
 /* ===== KrisVane QA rebuild 3 ===== */
@@ -5264,127 +5262,6 @@ window.openCreateProduct=async function(){
 </script>
 
 
-
-<script>
-/* v19 — persistence integrated with the admin's real localStorage/settings model.
-   We preserve the app's own settings keys, restore the active tab only when
-   "remember open tab" is enabled, and restore scroll after that tab renders. */
-(function(){
-  const NS='krisvane.admin.v19.';
-  const TABKEY=NS+'activeTab';
-  const SCROLLKEY=NS+'scroll';
-  const MODALSCROLL=NS+'modalScroll';
-
-  function boolish(v){
-    if(v===true||v===1) return true;
-    const s=String(v??'').toLowerCase();
-    return ['1','true','yes','да','on','remember'].includes(s);
-  }
-
-  function rememberEnabled(){
-    // First: actual control currently rendered.
-    const candidates=[
-      '#rememberTab','#rememberOpenTab','#remember_open_tab',
-      '[name="rememberTab"]','[name="remember_open_tab"]',
-      '[data-setting="rememberTab"]','[data-setting="remember-open-tab"]'
-    ];
-    for(const sel of candidates){
-      const el=document.querySelector(sel);
-      if(!el) continue;
-      if(el.type==='checkbox') return el.checked;
-      return boolish(el.value);
-    }
-    // Second: inspect existing app settings stored by previous code.
-    for(let i=0;i<localStorage.length;i++){
-      const k=localStorage.key(i);
-      if(!k || !/remember.*tab|tab.*remember|открыт.*вклад/i.test(k)) continue;
-      let v=localStorage.getItem(k);
-      try{
-        const o=JSON.parse(v);
-        if(typeof o==='object'&&o){
-          for(const [kk,vv] of Object.entries(o))
-            if(/remember.*tab|tab.*remember/i.test(kk)) return boolish(vv);
-        }
-      }catch{}
-      if(boolish(v)) return true;
-    }
-    return false;
-  }
-
-  function tabId(el){
-    return el?.dataset?.tab || el?.dataset?.page || el?.getAttribute?.('data-target') ||
-           el?.getAttribute?.('href') || el?.id || el?.textContent?.trim() || '';
-  }
-
-  function findTab(id){
-    if(!id) return null;
-    const nodes=[...document.querySelectorAll(
-      '[data-tab],[data-page],[data-target],.nav-item,.sidebar a,.sidebar button,nav a,nav button'
-    )];
-    return nodes.find(x=>tabId(x)===id) || null;
-  }
-
-  // Save navigation using the SAME click the user makes; do not synthesize settings changes.
-  document.addEventListener('click',e=>{
-    const el=e.target.closest?.(
-      '[data-tab],[data-page],[data-target],.nav-item,.sidebar a,.sidebar button,nav a,nav button'
-    );
-    if(!el) return;
-    const id=tabId(el);
-    if(id && rememberEnabled()) localStorage.setItem(TABKEY,id);
-  },true);
-
-  let st;
-  addEventListener('scroll',()=>{
-    clearTimeout(st);
-    st=setTimeout(()=>{
-      if(rememberEnabled()) localStorage.setItem(SCROLLKEY,String(scrollY));
-    },100);
-  },{passive:true});
-
-  document.addEventListener('scroll',e=>{
-    const m=e.target?.closest?.('.modal,.modal-card,.modal-content,[role="dialog"]');
-    if(m && rememberEnabled()) localStorage.setItem(MODALSCROLL,String(m.scrollTop));
-  },true);
-
-  // On unload, save the currently active navigation element as a final reliable snapshot.
-  addEventListener('pagehide',()=>{
-    if(!rememberEnabled()) return;
-    const active=document.querySelector(
-      '.nav-item.active,.sidebar .active,[data-tab].active,[data-page].active,nav .active'
-    );
-    const id=tabId(active);
-    if(id) localStorage.setItem(TABKEY,id);
-    localStorage.setItem(SCROLLKEY,String(scrollY));
-  });
-
-  // Restore only AFTER auth + admin render. Click the real nav item so all existing loaders run.
-  addEventListener('load',()=>{
-    setTimeout(()=>{
-      if(!rememberEnabled()) return;
-      const id=localStorage.getItem(TABKEY);
-      const target=findTab(id);
-      if(target && !target.classList.contains('active')) target.click();
-
-      setTimeout(()=>{
-        const y=Number(localStorage.getItem(SCROLLKEY)||0);
-        if(Number.isFinite(y)) window.scrollTo(0,y);
-      },350);
-    },1400);
-  });
-
-  // If user turns remembering off, immediately stop carrying old location forward.
-  document.addEventListener('change',e=>{
-    const el=e.target;
-    const marker=(el.id+' '+el.name+' '+(el.dataset?.setting||'')).toLowerCase();
-    if(/remember.*tab|tab.*remember/.test(marker) && !rememberEnabled()){
-      localStorage.removeItem(TABKEY);
-      localStorage.removeItem(SCROLLKEY);
-      localStorage.removeItem(MODALSCROLL);
-    }
-  },true);
-})();
-</script>
 
 </body>
 </html>
