@@ -5264,99 +5264,125 @@ window.openCreateProduct=async function(){
 </script>
 
 
-<script>
-/* v18 — persistent admin state.
-   UI preferences + current tab + scroll positions + unfinished product draft survive reload/browser/device restart
-   on the same browser profile. No cache of auth secrets or Supabase responses. */
-(function(){
-  const KEY='krisvane.admin.persist.v18';
-  const safeParse=(s,d={})=>{try{return JSON.parse(s)||d}catch{return d}};
-  const load=()=>safeParse(localStorage.getItem(KEY),{});
-  const save=(p)=>{const s={...load(),...p};localStorage.setItem(KEY,JSON.stringify(s));return s};
-  const qs=(s,r=document)=>r.querySelector(s);
-  const qsa=(s,r=document)=>[...r.querySelectorAll(s)];
 
-  // Save tab + page/modal scroll without touching existing navigation logic.
-  document.addEventListener('click',e=>{
-    const nav=e.target.closest('[data-tab], [data-page], .nav-item, .sidebar a, .sidebar button');
-    if(nav){
-      const id=nav.dataset.tab||nav.dataset.page||nav.getAttribute('href')||nav.textContent.trim();
-      save({lastNav:id, pageY:window.scrollY});
+<script>
+/* v19 — persistence integrated with the admin's real localStorage/settings model.
+   We preserve the app's own settings keys, restore the active tab only when
+   "remember open tab" is enabled, and restore scroll after that tab renders. */
+(function(){
+  const NS='krisvane.admin.v19.';
+  const TABKEY=NS+'activeTab';
+  const SCROLLKEY=NS+'scroll';
+  const MODALSCROLL=NS+'modalScroll';
+
+  function boolish(v){
+    if(v===true||v===1) return true;
+    const s=String(v??'').toLowerCase();
+    return ['1','true','yes','да','on','remember'].includes(s);
+  }
+
+  function rememberEnabled(){
+    // First: actual control currently rendered.
+    const candidates=[
+      '#rememberTab','#rememberOpenTab','#remember_open_tab',
+      '[name="rememberTab"]','[name="remember_open_tab"]',
+      '[data-setting="rememberTab"]','[data-setting="remember-open-tab"]'
+    ];
+    for(const sel of candidates){
+      const el=document.querySelector(sel);
+      if(!el) continue;
+      if(el.type==='checkbox') return el.checked;
+      return boolish(el.value);
     }
+    // Second: inspect existing app settings stored by previous code.
+    for(let i=0;i<localStorage.length;i++){
+      const k=localStorage.key(i);
+      if(!k || !/remember.*tab|tab.*remember|открыт.*вклад/i.test(k)) continue;
+      let v=localStorage.getItem(k);
+      try{
+        const o=JSON.parse(v);
+        if(typeof o==='object'&&o){
+          for(const [kk,vv] of Object.entries(o))
+            if(/remember.*tab|tab.*remember/i.test(kk)) return boolish(vv);
+        }
+      }catch{}
+      if(boolish(v)) return true;
+    }
+    return false;
+  }
+
+  function tabId(el){
+    return el?.dataset?.tab || el?.dataset?.page || el?.getAttribute?.('data-target') ||
+           el?.getAttribute?.('href') || el?.id || el?.textContent?.trim() || '';
+  }
+
+  function findTab(id){
+    if(!id) return null;
+    const nodes=[...document.querySelectorAll(
+      '[data-tab],[data-page],[data-target],.nav-item,.sidebar a,.sidebar button,nav a,nav button'
+    )];
+    return nodes.find(x=>tabId(x)===id) || null;
+  }
+
+  // Save navigation using the SAME click the user makes; do not synthesize settings changes.
+  document.addEventListener('click',e=>{
+    const el=e.target.closest?.(
+      '[data-tab],[data-page],[data-target],.nav-item,.sidebar a,.sidebar button,nav a,nav button'
+    );
+    if(!el) return;
+    const id=tabId(el);
+    if(id && rememberEnabled()) localStorage.setItem(TABKEY,id);
   },true);
 
-  let scrollTimer;
+  let st;
   addEventListener('scroll',()=>{
-    clearTimeout(scrollTimer);
-    scrollTimer=setTimeout(()=>save({pageY:window.scrollY}),120);
+    clearTimeout(st);
+    st=setTimeout(()=>{
+      if(rememberEnabled()) localStorage.setItem(SCROLLKEY,String(scrollY));
+    },100);
   },{passive:true});
 
   document.addEventListener('scroll',e=>{
-    const m=e.target.closest?.('.modal, .modal-card, .dialog, [role="dialog"]');
-    if(m) save({modalY:m.scrollTop});
+    const m=e.target?.closest?.('.modal,.modal-card,.modal-content,[role="dialog"]');
+    if(m && rememberEnabled()) localStorage.setItem(MODALSCROLL,String(m.scrollTop));
   },true);
 
-  // Persist every settings control automatically. Existing handlers still remain authoritative.
-  document.addEventListener('change',e=>{
-    const el=e.target;
-    if(!el.matches('select,input,textarea')) return;
-    const settings=el.closest('[data-page="settings"], #settingsPage, #settings, .settings-page');
-    if(!settings) return;
-    const id=el.id||el.name;
-    if(!id) return;
-    const st=load(), prefs={...(st.prefs||{})};
-    prefs[id]=el.type==='checkbox'?el.checked:el.value;
-    save({prefs});
-  },true);
-
-  function restorePrefs(){
-    const prefs=load().prefs||{};
-    for(const [id,val] of Object.entries(prefs)){
-      const el=document.getElementById(id)||document.querySelector(`[name="${CSS.escape(id)}"]`);
-      if(!el) continue;
-      if(el.type==='checkbox') el.checked=!!val; else el.value=val;
-      el.dispatchEvent(new Event('change',{bubbles:true}));
-    }
-  }
-
-  // Draft of add-product form: text/select values + selected sizes/category state.
-  // File inputs cannot legally be restored by browsers after restart.
-  function snapshotDraft(){
-    const modal=qs('#kv2CreateModal, #createProductModal, .product-create-modal');
-    if(!modal || getComputedStyle(modal).display==='none') return;
-    const fields={};
-    qsa('input:not([type=file]):not([type=password]),textarea,select',modal).forEach(el=>{
-      const k=el.id||el.name;
-      if(k) fields[k]=el.type==='checkbox'?el.checked:el.value;
-    });
-    let state=null;
-    try{
-      if(typeof kv2CreateState!=='undefined') state=JSON.parse(JSON.stringify(kv2CreateState));
-    }catch{}
-    save({productDraft:{fields,state,at:Date.now()}});
-  }
-  document.addEventListener('input',e=>{
-    if(e.target.closest?.('#kv2CreateModal, #createProductModal, .product-create-modal')) snapshotDraft();
-  },true);
-  document.addEventListener('change',e=>{
-    if(e.target.closest?.('#kv2CreateModal, #createProductModal, .product-create-modal')) setTimeout(snapshotDraft,0);
-  },true);
-
-  // Restore scroll only after the app/auth has had time to render.
-  addEventListener('load',()=>{
-    setTimeout(()=>{
-      restorePrefs();
-      const s=load();
-      if(Number.isFinite(s.pageY)) scrollTo({top:s.pageY,behavior:'instant'});
-    },900);
+  // On unload, save the currently active navigation element as a final reliable snapshot.
+  addEventListener('pagehide',()=>{
+    if(!rememberEnabled()) return;
+    const active=document.querySelector(
+      '.nav-item.active,.sidebar .active,[data-tab].active,[data-page].active,nav .active'
+    );
+    const id=tabId(active);
+    if(id) localStorage.setItem(TABKEY,id);
+    localStorage.setItem(SCROLLKEY,String(scrollY));
   });
 
-  // Expose tiny helpers for future client-side work, without overriding current admin code.
-  window.KrisVanePersist={
-    load, save,
-    clear(){localStorage.removeItem(KEY)},
-    draft(){return load().productDraft||null}
-  };
+  // Restore only AFTER auth + admin render. Click the real nav item so all existing loaders run.
+  addEventListener('load',()=>{
+    setTimeout(()=>{
+      if(!rememberEnabled()) return;
+      const id=localStorage.getItem(TABKEY);
+      const target=findTab(id);
+      if(target && !target.classList.contains('active')) target.click();
+
+      setTimeout(()=>{
+        const y=Number(localStorage.getItem(SCROLLKEY)||0);
+        if(Number.isFinite(y)) window.scrollTo(0,y);
+      },350);
+    },1400);
+  });
+
+  // If user turns remembering off, immediately stop carrying old location forward.
+  document.addEventListener('change',e=>{
+    const el=e.target;
+    const marker=(el.id+' '+el.name+' '+(el.dataset?.setting||'')).toLowerCase();
+    if(/remember.*tab|tab.*remember/.test(marker) && !rememberEnabled()){
+      localStorage.removeItem(TABKEY);
+      localStorage.removeItem(SCROLLKEY);
+      localStorage.removeItem(MODALSCROLL);
+    }
+  },true);
 })();
 </script>
 
