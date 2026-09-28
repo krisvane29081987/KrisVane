@@ -101,6 +101,10 @@
     4. Вернуть заказ №1 на склад
   </button>
 
+  <button onclick="testOrderStatus()">
+    5. Проверить управление статусом
+  </button>
+
   <div id="log">Готов к тесту.</div>
 
 </div>
@@ -185,6 +189,8 @@ async function addTestProduct() {
   }
 
 
+  // Получаем тестовый вариант
+
   const {
     data: variant,
     error: variantError
@@ -205,6 +211,8 @@ async function addTestProduct() {
     return;
   }
 
+
+  // Получаем или создаём корзину
 
   let {
     data: cart,
@@ -255,6 +263,8 @@ async function addTestProduct() {
     cart = newCart;
   }
 
+
+  // Добавляем две штуки
 
   const {
     error: itemError
@@ -352,7 +362,7 @@ async function checkout() {
 
 async function returnOrderToStock() {
 
-  show('Проверяем права администратора...');
+  show('Возвращаем заказ №1 на склад...');
 
 
   const {
@@ -363,20 +373,13 @@ async function returnOrderToStock() {
 
   if (userError || !user) {
 
-    show(
-      '❌ Пользователь не авторизован.\n\n' +
-      (userError?.message || '')
-    );
+    show('❌ Сначала необходимо войти.');
 
     return;
   }
 
 
-  show('Возвращаем товар заказа №1 на склад...');
-
-
   const {
-    data,
     error
   } = await db.rpc(
     'admin_return_order_to_stock',
@@ -402,6 +405,60 @@ async function returnOrderToStock() {
     'Order ID: 1\n' +
     'Пользователь: ' + user.email +
     '\n\nТеперь проверяем остаток товара в базе.'
+  );
+}
+
+
+// ==========================================
+// 5. ПРОВЕРКА БЕЗОПАСНОЙ СМЕНЫ СТАТУСА
+// ==========================================
+
+async function testOrderStatus() {
+
+  show('Проверяем безопасное управление статусом...');
+
+
+  const {
+    data: { user },
+    error: userError
+  } = await db.auth.getUser();
+
+
+  if (userError || !user) {
+
+    show('❌ Сначала необходимо войти.');
+
+    return;
+  }
+
+
+  const {
+    error
+  } = await db.rpc(
+    'admin_set_order_status',
+    {
+      p_order_id: 1,
+      p_new_status: 'processing'
+    }
+  );
+
+
+  if (error) {
+
+    show(
+      '🔒 ПЕРЕХОД ОТКЛОНЁН\n\n' +
+      error.message +
+      '\n\nЕсли заказ №1 имеет статус returned — это правильный результат.'
+    );
+
+    return;
+  }
+
+
+  show(
+    '✅ СТАТУС УСПЕШНО ИЗМЕНЁН!\n\n' +
+    'Order ID: 1\n' +
+    'Новый статус: processing'
   );
 }
 
