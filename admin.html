@@ -3974,5 +3974,90 @@ setTimeout(()=>{const p=getUiPrefs();if(!['uk','ru','en','be','zh'].includes(p.l
 
 </script>
 
+
+<style id="kv3-style">
+/* ===== KrisVane interaction/i18n QA patch 3 ===== */
+.kv-option,.kv-size{position:relative;transition:background-color .28s ease,border-color .28s ease,box-shadow .28s ease,transform .18s ease}
+.kv-option:active,.kv-size:active{transform:scale(.97)}
+.kv-option.kv-single-selected{padding-right:34px;border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,var(--panel))}
+.kv-option.kv-single-selected::after{content:'✓';position:absolute;right:11px;top:50%;transform:translateY(-50%) scale(1);color:var(--accent);font-weight:900;animation:kvCheckIn .34s cubic-bezier(.2,.9,.25,1.35)}
+@keyframes kvCheckIn{from{opacity:0;transform:translateY(-50%) scale(.25) rotate(-35deg)}to{opacity:1;transform:translateY(-50%) scale(1) rotate(0)}}
+.kv-size.selected{border-color:var(--accent)!important;background:color-mix(in srgb,var(--accent) 22%,var(--panel))!important;box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent),0 0 18px color-mix(in srgb,var(--accent) 13%,transparent)!important}
+.kv-bool .kv-option.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--panel))}
+html[data-motion="none"] .kv-option,html[data-motion="none"] .kv-size,html[data-motion="none"] .kv-choice-body,html[data-motion="none"] .kv-choice-arrow{transition:none!important;animation:none!important}
+</style>
+<script id="kv3-script">
+// Stop the old translation observer: rewriting text nodes continuously could replace a button between mousedown and click.
+try{kvObserver.disconnect()}catch(_){ }
+
+// Product taxonomy requested for this store: no Sport / Children in Add Product.
+try{delete KV2_TAXONOMY['Спорт'];delete KV2_TAXONOMY['Детское']}catch(_){ }
+
+const KV3={
+ uk:{choose:'Оберіть',yes:'Так',no:'Ні',catalog:'Каталог',basics:'Основне',photoHint:'PNG, JPG, WEBP · можна вибрати кілька файлів',descPh:'Коротко опишіть товар…',firstCategory:'Спочатку оберіть категорію',sizeHint:'Оберіть потрібні розміри. Залишок для кожного розміру можна уточнити після створення товару.',customBrand:'Свій бренд',senderSave:'Зберегти дані відправника',storeDesc:'Магазин, відправник, доставка та зовнішній вигляд адмін-панелі.',reset:'Скинути оформлення',instant:'Ці параметри зберігаються на цьому пристрої та застосовуються одразу.',storeName:'Назва магазину',senderName:'Ім’я відправника',senderPhone:'Телефон відправника',carrier:'Перевізник за замовчуванням',remember:'Запам’ятовувати відкриту вкладку',confirmDelete:'Підтверджувати видалення',safer:'Так · безпечніше',senderTitle:'Nova Poshta · налаштування відправника',savedCity:'Збережене місто',senderPoint:'Точка відправлення',searchCity:'Почніть вводити місто, наприклад Київ',productsNotFound:'Товарів не знайдено.',actions:'Дії',edit:'Змінити',delete:'Видалити',hidden:'Приховано',required:'Заповніть назву, артикул і ціну.',needCat:'Оберіть категорію.',created:'Товар створено.'},
+ ru:{choose:'Выберите',yes:'Да',no:'Нет',catalog:'Каталог',basics:'Основное',photoHint:'PNG, JPG, WEBP · можно выбрать несколько файлов',descPh:'Кратко опишите товар…',firstCategory:'Сначала выберите категорию',sizeHint:'Выберите нужные размеры. Остаток для каждого размера можно уточнить после создания товара.',customBrand:'Свой бренд',senderSave:'Сохранить данные отправителя',storeDesc:'Магазин, отправитель, доставка и внешний вид админ-панели.',reset:'Сбросить оформление',instant:'Эти параметры сохраняются на этом устройстве и применяются сразу.',storeName:'Название магазина',senderName:'Имя отправителя',senderPhone:'Телефон отправителя',carrier:'Перевозчик по умолчанию',remember:'Запоминать открытую вкладку',confirmDelete:'Подтверждать удаление',safer:'Да · безопаснее',senderTitle:'Nova Poshta · настройки отправителя',savedCity:'Сохранённый город',senderPoint:'Точка отправки',searchCity:'Начните вводить город, например Київ',productsNotFound:'Товары не найдены.',actions:'Действия',edit:'Изменить',delete:'Удалить',hidden:'Скрыт',required:'Заполните название, артикул и цену.',needCat:'Выберите категорию.',created:'Товар создан.'},
+ en:{choose:'Choose',yes:'Yes',no:'No',catalog:'Catalog',basics:'Basics',photoHint:'PNG, JPG, WEBP · select multiple files',descPh:'Briefly describe the product…',firstCategory:'Choose a category first',sizeHint:'Choose the required sizes. Stock for each size can be adjusted after creating the product.',customBrand:'Custom brand',senderSave:'Save sender details',storeDesc:'Store, sender, delivery and admin appearance.',reset:'Reset appearance',instant:'These settings are saved on this device and applied instantly.',storeName:'Store name',senderName:'Sender name',senderPhone:'Sender phone',carrier:'Default carrier',remember:'Remember open tab',confirmDelete:'Confirm deletion',safer:'Yes · safer',senderTitle:'Nova Poshta · sender settings',savedCity:'Saved city',senderPoint:'Dispatch point',searchCity:'Start typing a city, e.g. Kyiv',productsNotFound:'No products found.',actions:'Actions',edit:'Edit',delete:'Delete',hidden:'Hidden',required:'Enter product name, SKU and price.',needCat:'Choose a category.',created:'Product created.'},
+ be:{choose:'Выберыце',yes:'Так',no:'Не',catalog:'Каталог',basics:'Асноўнае',photoHint:'PNG, JPG, WEBP · можна выбраць некалькі файлаў',descPh:'Коратка апішыце тавар…',firstCategory:'Спачатку выберыце катэгорыю',sizeHint:'Выберыце патрэбныя памеры. Рэшту для кожнага памеру можна ўдакладніць пасля стварэння тавару.',customBrand:'Свой брэнд',senderSave:'Захаваць даныя адпраўніка',storeDesc:'Крама, адпраўнік, дастаўка і выгляд адмін-панэлі.',reset:'Скінуць афармленне',instant:'Гэтыя параметры захоўваюцца на гэтай прыладзе і прымяняюцца адразу.',storeName:'Назва крамы',senderName:'Імя адпраўніка',senderPhone:'Тэлефон адпраўніка',carrier:'Перавозчык па змаўчанні',remember:'Запамінаць адкрытую ўкладку',confirmDelete:'Пацвярджаць выдаленне',safer:'Так · бяспечней',senderTitle:'Nova Poshta · налады адпраўніка',savedCity:'Захаваны горад',senderPoint:'Пункт адпраўкі',searchCity:'Пачніце ўводзіць горад, напрыклад Кіеў',productsNotFound:'Тавары не знойдзены.',actions:'Дзеянні',edit:'Змяніць',delete:'Выдаліць',hidden:'Схаваны',required:'Запоўніце назву, артыкул і цану.',needCat:'Выберыце катэгорыю.',created:'Тавар створаны.'},
+ zh:{choose:'选择',yes:'是',no:'否',catalog:'分类',basics:'基本信息',photoHint:'PNG、JPG、WEBP · 可选择多个文件',descPh:'简要描述商品…',firstCategory:'请先选择分类',sizeHint:'选择需要的尺码。创建商品后可调整每个尺码的库存。',customBrand:'自定义品牌',senderSave:'保存发件人信息',storeDesc:'商店、发件人、配送与管理界面外观。',reset:'重置外观',instant:'这些设置保存在此设备并立即生效。',storeName:'商店名称',senderName:'发件人姓名',senderPhone:'发件人电话',carrier:'默认承运商',remember:'记住当前标签页',confirmDelete:'删除前确认',safer:'是 · 更安全',senderTitle:'Nova Poshta · 发件人设置',savedCity:'已保存城市',senderPoint:'发货点',searchCity:'输入城市，例如 Kyiv',productsNotFound:'未找到商品。',actions:'操作',edit:'编辑',delete:'删除',hidden:'隐藏',required:'请填写商品名称、货号和价格。',needCat:'请选择分类。',created:'商品已创建。'}
+};
+function kv3(k){const l=getUiPrefs().language||'uk';return KV3[l]?.[k]||KV3.uk[k]||k}
+
+const KV3_STATIC={
+ 'Магазин, отправитель, доставка и внешний вид админ-панели.':'storeDesc','Сбросить оформление':'reset','Эти параметры сохраняются на этом устройстве и применяются сразу.':'instant','Название магазина':'storeName','Имя отправителя':'senderName','Телефон отправителя':'senderPhone','Перевозчик по умолчанию':'carrier','Запоминать открытую вкладку':'remember','Подтверждать удаление':'confirmDelete','Да · безопаснее':'safer','Nova Poshta · настройки отправителя':'senderTitle','Сохранённый город':'savedCity','Точка отправки':'senderPoint'
+};
+function kv3TranslateStatic(){
+ kv2TranslateAll();
+ document.querySelectorAll('body *').forEach(el=>{if(el.children.length===0){const raw=(el.dataset.kv3base||el.textContent||'').trim();if(KV3_STATIC[raw]){el.dataset.kv3base=raw;el.textContent=kv3(KV3_STATIC[raw])}}});
+ const city=document.getElementById('npCityQuery');if(city)city.placeholder=kv3('searchCity');
+ const btn=document.getElementById('settingsSaveBtn');if(btn)btn.textContent=kv3('senderSave');
+}
+
+// Persist every interface preference immediately. The sender button is no longer needed for UI settings.
+window.previewUiPreferences=function(){
+ const p={...getUiPrefs(),theme:uiTheme?.value||'violet',language:uiLanguage?.value||'uk',density:uiDensity?.value||'comfortable',motion:uiMotion?.value||'full',rememberTab:uiRememberTab?.value||'yes',confirmDelete:uiConfirmDelete?.value||'yes',fontScale:uiFontScale?.value||'normal',glow:uiGlow?.value||'normal'};
+ localStorage.setItem(UI_PREF_KEY,JSON.stringify(p));applyUiPrefs(p);setTimeout(kv3TranslateStatic,0);
+};
+['uiRememberTab','uiConfirmDelete'].forEach(id=>document.getElementById(id)?.addEventListener('change',previewUiPreferences));
+
+// Robust delegated interaction: no inline-handler race with translation.
+document.addEventListener('click',e=>{
+ const modal=document.getElementById('kvCreateProduct');if(!modal)return;
+ const size=e.target.closest('.kv-size');if(size){e.preventDefault();const s=(size.textContent||'').trim();kv2ToggleSize(s,size);return}
+ const opt=e.target.closest('.kv-option');if(!opt)return;
+ const choice=opt.closest('.kv-choice');if(!choice)return;
+ e.preventDefault();e.stopPropagation();
+ const val=(opt.dataset.value||opt.textContent||'').trim().replace(/^\+\s*/, '');
+ if(choice.id==='kvCategoryChoice')kv2ChooseCategory(val);
+ else if(choice.id==='kvSubcategoryChoice')kv2ChooseSubcategory(val);
+ else if(choice.id==='kvBrandChoice'){const custom=opt.classList.contains('kv-custom-brand');kv2ChooseBrand(custom?(document.getElementById('kvBrandSearch')?.value.trim()||'KrisVane'):val)}
+},true);
+
+function kv3MarkSingle(choiceId,value){const root=document.getElementById(choiceId);if(!root)return;root.querySelectorAll('.kv-option').forEach(x=>x.classList.toggle('kv-single-selected',(x.dataset.value||x.textContent||'').trim()===value))}
+const _kv3Cat=kv2ChooseCategory;window.kv2ChooseCategory=function(v){_kv3Cat(v);kv3MarkSingle('kvCategoryChoice',v);setTimeout(()=>document.getElementById('kvSubcategoryChoice')?.classList.add('open'),220)};
+const _kv3Sub=kv2ChooseSubcategory;window.kv2ChooseSubcategory=function(v){_kv3Sub(v);kv3MarkSingle('kvSubcategoryChoice',v)};
+const _kv3Brand=kv2ChooseBrand;window.kv2ChooseBrand=function(v){_kv3Brand(v);kv3MarkSingle('kvBrandChoice',v)};
+
+function kv3BoolChoice(id,label,value){return kv2Choice(id,label,id+'Value',`<div class="kv-options kv-bool"><button type="button" class="kv-option ${value?'selected':''}" data-value="true">${kv3('yes')}</button><button type="button" class="kv-option ${!value?'selected':''}" data-value="false">${kv3('no')}</button></div>`)}
+function kv3ChooseBool(choiceId,inputId,val){document.getElementById(inputId).value=String(val);document.getElementById(choiceId+'Value').textContent=val?kv3('yes'):kv3('no');const root=document.getElementById(choiceId);root.querySelectorAll('.kv-option').forEach(x=>x.classList.toggle('selected',x.dataset.value===String(val)));kv2MarkDirty();setTimeout(()=>root.classList.remove('open'),110)}
+document.addEventListener('click',e=>{const o=e.target.closest('.kv-bool .kv-option');if(!o)return;const c=o.closest('.kv-choice');if(c?.id==='kvPublishedChoice')kv3ChooseBool(c.id,'kvPublished',o.dataset.value==='true');if(c?.id==='kvNewChoice')kv3ChooseBool(c.id,'kvNew',o.dataset.value==='true')},true);
+
+// Rebuild create form with the same backend save logic, but with reliable interactive controls.
+window.openCreateProduct=async function(){
+ if(!adminCategories.length)await loadCategories();kv2Dirty=false;kv2Photos=[];kv2CreateState={category:'',subcategory:'',brand:'KrisVane',sizes:new Set()};
+ const catOpts=Object.keys(KV2_TAXONOMY).map(x=>`<button type="button" class="kv-option" data-value="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('');
+ const brandOpts=`<input id="kvBrandSearch" class="input kv-search" placeholder="Nike, Adidas, KrisVane…" oninput="kv2FilterBrands(this.value)"><div id="kvBrandOptions" class="kv-options">${KV2_BRANDS.map(x=>`<button type="button" class="kv-option" data-value="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('')}</div>`;
+ openAdminModal(kv2('add'),`<div class="product-studio" id="kvCreateProduct" oninput="kv2MarkDirty()"><div style="display:flex;align-items:center;gap:10px"><div class="studio-note" style="flex:1">${getUiPrefs().language==='en'?'Main product data first. KrisVane creates technical fields automatically.':getUiPrefs().language==='zh'?'先填写主要商品信息，技术字段由 KrisVane 自动创建。':getUiPrefs().language==='be'?'Спачатку асноўныя даныя. Тэхнічныя палі KrisVane створыць аўтаматычна.':getUiPrefs().language==='ru'?'Сначала — основные данные. Технические поля KrisVane создаст автоматически.':'Основні дані — зверху. Технічні поля KrisVane створить автоматично.'}</div><span id="kvUnsaved" class="kv-unsaved" hidden>●</span></div><div class="kv-product-section"><h4>${kv2('photos')}</h4><div class="kv-image-picker"><input id="kvPhotos" type="file" accept="image/*" multiple onchange="kv2PreviewPhotos(this)"><div class="kv-hint">${kv3('photoHint')}</div><div id="kvPhotoPreview" class="kv-image-preview"></div></div></div><div class="kv-product-section"><h4>${kv3('basics')}</h4><div class="form-grid">${kv2Field(kv2('name'),'kvName','KrisVane Oversize Hoodie')}${kv2Field(kv2('sku'),'kvSku','KV-HOODIE-BLK')}${kv2Field(kv2('price'),'kvPrice','1999','number','min="0" step="0.01"')}${kv2Field(kv2('oldPrice'),'kvOldPrice','2399','number','min="0" step="0.01"')}<div class="field full"><label>${kv2('description')}</label><textarea id="kvDescription" class="input kv-create-input" rows="4" placeholder="${kv3('descPh')}" oninput="kv2MarkDirty()"></textarea></div></div></div><div class="kv-product-section"><h4>${kv3('catalog')}</h4><div class="form-grid">${kv2Choice('kvCategoryChoice',kv2('category'),'kvCategoryValue',`<div class="kv-options">${catOpts}</div>`)}${kv2Choice('kvSubcategoryChoice',kv2('subcategory'),'kvSubcategoryValue',`<div id="kvSubcategoryOptions" class="kv-options"><span class="muted">${kv3('firstCategory')}</span></div>`)}${kv2Choice('kvBrandChoice',kv2('brand'),'kvBrandValue',brandOpts)}<input id="kvBrand" type="hidden" value="KrisVane"><input id="kvPublished" type="hidden" value="true">${kv3BoolChoice('kvPublishedChoice',kv2('published'),true)}<input id="kvNew" type="hidden" value="false">${kv3BoolChoice('kvNewChoice',kv2('newLabel'),false)}</div></div><div class="kv-product-section"><h4>${kv2('sizes')}</h4><div class="kv-size-grid">${KV2_SIZES.map(x=>`<button type="button" class="kv-size">${escapeHtml(x)}</button>`).join('')}</div><div class="kv-hint">${kv3('sizeHint')}</div></div><div class="kv-form-actions"><button type="button" class="btn btn-secondary" onclick="closeAdminModal()">${kv2('close')}</button><button type="button" class="btn btn-primary" id="kvCreateBtn" onclick="kv2CreateProduct()">${kv2('add')}</button></div></div>`);
+ document.getElementById('kvBrandValue').textContent='KrisVane';kv3MarkSingle('kvBrandChoice','KrisVane');kv2Dirty=false;document.getElementById('kvUnsaved').hidden=true;
+};
+
+// Subcategory and brand rerenders use data-value so delegated clicks stay reliable.
+window.kv2RenderSubcategories=function(){const box=document.getElementById('kvSubcategoryOptions');if(!box)return;const arr=KV2_TAXONOMY[kv2CreateState.category]||[];box.innerHTML=arr.map(x=>`<button type="button" class="kv-option" data-value="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('')||`<span class="muted">${kv3('firstCategory')}</span>`};
+window.kv2FilterBrands=function(q){const box=document.getElementById('kvBrandOptions');if(!box)return;const s=String(q||'').toLowerCase();box.innerHTML=KV2_BRANDS.filter(x=>x.toLowerCase().includes(s)).map(x=>`<button type="button" class="kv-option" data-value="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('')+`<button type="button" class="kv-option kv-custom-brand">+ ${escapeHtml(q||kv3('customBrand'))}</button>`};
+
+// Keep interface changes immediately saved after every selection, including translated rerenders.
+const _kv3Apply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs()){_kv3Apply(p);setTimeout(kv3TranslateStatic,10)};
+setTimeout(()=>{kv3TranslateStatic();previewUiPreferences()},180);
+</script>
+
 </body>
 </html>
