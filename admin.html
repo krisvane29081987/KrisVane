@@ -5056,5 +5056,81 @@ window.openCreateProduct=async function(){
 })();
 </script>
 
+
+<style>
+/* v15 — numeric suit sizes, rendered as a permanent second row */
+#kvSuitNumericBlock{margin-top:14px!important}
+#kvSuitNumericBlock .kv-suit-size-title{
+  color:var(--muted);font-size:.84rem;font-weight:700;margin:0 0 8px
+}
+#kvSuitNumericGrid{display:flex;flex-wrap:wrap;gap:8px}
+#kvSuitNumericGrid .kv-suit-num{
+  appearance:none;background:transparent;color:var(--text);
+  border:1px solid var(--border);border-radius:10px;padding:8px 11px;
+  font:inherit;line-height:1;cursor:pointer;transition:.18s ease;
+}
+#kvSuitNumericGrid .kv-suit-num:hover{border-color:var(--accent);transform:translateY(-1px)}
+#kvSuitNumericGrid .kv-suit-num.selected{
+  border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 24%,transparent)
+}
+</style>
+<script>
+/* v15: v14's click-trigger could run before kv2CreateState.category was updated.
+   Observe the actual create state briefly after category changes and render only when needed. */
+(function(){
+  const NUM=['38–40','40–42','42–44','44–46','46–48','48–50',
+             '50–52','52–54','54–56','56–58','58–60','60–62'];
+  let lastCat=null, lastGrid=null;
+
+  function title(){
+    const l=(typeof getUiPrefs==='function'?getUiPrefs().language:'uk')||'uk';
+    return ({uk:'Цифрові розміри',ru:'Цифровые размеры',en:'Numeric sizes',
+             be:'Лічбавыя памеры',zh:'数字尺码'})[l]||'Цифрові розміри';
+  }
+  function sync(force=false){
+    const grid=document.getElementById('kvDynamicSizeGrid');
+    const cat=(window.kv2CreateState?.category||'').trim();
+    if(!grid){ document.getElementById('kvSuitNumericBlock')?.remove(); return; }
+
+    if(cat!=='Костюмы'){
+      document.getElementById('kvSuitNumericBlock')?.remove();
+      lastCat=cat; lastGrid=grid;
+      return;
+    }
+    let block=document.getElementById('kvSuitNumericBlock');
+    if(!force && block && lastCat===cat && lastGrid===grid)return;
+    if(!block){
+      block=document.createElement('div');
+      block.id='kvSuitNumericBlock';
+      grid.insertAdjacentElement('afterend',block);
+    }
+    block.innerHTML='<div class="kv-suit-size-title">'+title()+'</div>'+
+      '<div id="kvSuitNumericGrid">'+NUM.map(s=>
+        '<button type="button" class="kv-suit-num'+
+        (window.kv12SuitNumericSelected?.has(s)?' selected':'')+
+        '" data-v15-num="'+s+'">'+s+'</button>').join('')+'</div>';
+    lastCat=cat; lastGrid=grid;
+  }
+
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-v15-num]');
+    if(!b)return;
+    e.preventDefault(); e.stopPropagation();
+    window.kv12SuitNumericSelected ||= new Set();
+    const s=b.dataset.v15Num;
+    if(window.kv12SuitNumericSelected.has(s))window.kv12SuitNumericSelected.delete(s);
+    else window.kv12SuitNumericSelected.add(s);
+    b.classList.toggle('selected',window.kv12SuitNumericSelected.has(s));
+    if(typeof kv2MarkDirty==='function')kv2MarkDirty();
+  },true);
+
+  // Tiny observer, not a DOM MutationObserver: no feedback loop / no page lag.
+  setInterval(()=>sync(false),180);
+
+  window.kv15SyncSuitNumeric=()=>sync(true);
+})();
+</script>
+
 </body>
 </html>
