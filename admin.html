@@ -33,6 +33,10 @@
       --radius: 18px;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
       margin: 0;
 
@@ -162,7 +166,10 @@
 
       color: var(--muted);
 
-      transition: 0.2s;
+      transition:
+        background 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
 
       user-select: none;
     }
@@ -170,6 +177,8 @@
     .nav-item:hover {
       background: var(--panel-2);
       color: var(--text);
+
+      transform: translateX(2px);
     }
 
     .nav-item.active {
@@ -256,6 +265,15 @@
       border-radius: var(--radius);
 
       padding: 20px;
+
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .stat:hover {
+      transform: translateY(-2px);
+      border-color: #373c4c;
     }
 
     .stat-label {
@@ -298,10 +316,15 @@
       padding: 12px 14px;
 
       outline: none;
+
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
     }
 
     .search:focus {
       border-color: var(--accent);
+      background: var(--panel-2);
     }
 
     .refresh-btn {
@@ -315,11 +338,17 @@
 
       padding: 0 18px;
 
-      transition: 0.2s;
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
     }
 
     .refresh-btn:hover {
       background: var(--panel-2);
+      border-color: #3b4050;
+
+      transform: translateY(-1px);
     }
 
     /* =========================
@@ -343,12 +372,20 @@
       overflow: hidden;
 
       transition:
-        transform 0.2s,
-        border-color 0.2s;
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
     }
 
     .order:hover {
       border-color: #373c4c;
+    }
+
+    .order.open {
+      border-color: rgba(109, 93, 252, 0.28);
+
+      box-shadow:
+        0 15px 45px rgba(0, 0, 0, 0.16);
     }
 
     .order-header {
@@ -361,6 +398,13 @@
       gap: 15px;
 
       cursor: pointer;
+
+      transition:
+        background 0.2s ease;
+    }
+
+    .order-header:hover {
+      background: rgba(255, 255, 255, 0.012);
     }
 
     .order-number {
@@ -380,7 +424,7 @@
       display: flex;
       align-items: center;
 
-      gap: 15px;
+      gap: 12px;
     }
 
     .order-price {
@@ -388,6 +432,10 @@
 
       white-space: nowrap;
     }
+
+    /* =========================
+       STATUS
+    ========================= */
 
     .status {
       padding: 7px 11px;
@@ -430,20 +478,158 @@
     }
 
     /* =========================
-       DETAILS
+       DETAILS BUTTON
     ========================= */
 
+    .details-btn {
+      display: inline-flex;
+      align-items: center;
+
+      gap: 7px;
+
+      border:
+        1px solid
+        rgba(109, 93, 252, 0.34);
+
+      background:
+        rgba(109, 93, 252, 0.11);
+
+      color: #c5c0ff;
+
+      padding: 8px 12px;
+
+      border-radius: 10px;
+
+      font-size: 13px;
+      font-weight: 700;
+
+      white-space: nowrap;
+
+      transition:
+        background 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease,
+        color 0.2s ease;
+    }
+
+    .details-btn:hover {
+      background:
+        rgba(109, 93, 252, 0.2);
+
+      border-color:
+        rgba(109, 93, 252, 0.58);
+
+      color: white;
+
+      transform: translateY(-1px);
+    }
+
+    .details-arrow {
+      display: inline-block;
+
+      font-size: 15px;
+
+      transition:
+        transform 0.35s
+        cubic-bezier(
+          0.22,
+          1,
+          0.36,
+          1
+        );
+    }
+
+    .order.open
+    .details-arrow {
+      transform: rotate(180deg);
+    }
+
+    /* =========================
+       ANIMATED DETAILS
+    ========================= */
+
+    .order-details-wrapper {
+      display: grid;
+
+      grid-template-rows: 0fr;
+
+      opacity: 0;
+
+      visibility: hidden;
+
+      transition:
+        grid-template-rows 0.48s
+          cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+          ),
+        opacity 0.32s ease,
+        visibility 0s linear 0.48s;
+    }
+
+    .order.open
+    .order-details-wrapper {
+      grid-template-rows: 1fr;
+
+      opacity: 1;
+
+      visibility: visible;
+
+      transition:
+        grid-template-rows 0.48s
+          cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+          ),
+        opacity 0.35s ease 0.06s,
+        visibility 0s linear 0s;
+    }
+
+    .order-details-inner {
+      min-height: 0;
+
+      overflow: hidden;
+    }
+
     .order-details {
-      display: none;
+      border-top:
+        1px solid var(--border);
 
-      border-top: 1px solid var(--border);
+      padding: 0 22px;
 
-      padding: 22px;
+      transform: translateY(-12px);
+
+      opacity: 0;
+
+      transition:
+        transform 0.42s
+          cubic-bezier(
+            0.22,
+            1,
+            0.36,
+            1
+          ),
+        opacity 0.3s ease,
+        padding 0.42s ease;
     }
 
-    .order.open .order-details {
-      display: block;
+    .order.open
+    .order-details {
+      padding:
+        22px;
+
+      transform: translateY(0);
+
+      opacity: 1;
     }
+
+    /* =========================
+       DETAIL GRID
+    ========================= */
 
     .details-grid {
       display: grid;
@@ -462,6 +648,14 @@
       border-radius: 14px;
 
       padding: 17px;
+
+      transition:
+        border-color 0.2s ease,
+        transform 0.2s ease;
+    }
+
+    .detail-box:hover {
+      border-color: #353a49;
     }
 
     .detail-title {
@@ -526,13 +720,17 @@
       font-weight: 700;
 
       transition:
-        transform 0.15s,
-        opacity 0.15s,
-        background 0.15s;
+        transform 0.15s ease,
+        opacity 0.15s ease,
+        background 0.15s ease;
     }
 
     .btn:hover {
       transform: translateY(-1px);
+    }
+
+    .btn:active {
+      transform: translateY(0);
     }
 
     .btn:disabled {
@@ -559,11 +757,14 @@
     }
 
     .btn-danger {
-      background: rgba(240, 68, 56, 0.14);
+      background:
+        rgba(240, 68, 56, 0.14);
 
       color: #ff8178;
 
-      border: 1px solid rgba(240, 68, 56, 0.25);
+      border:
+        1px solid
+        rgba(240, 68, 56, 0.25);
     }
 
     .shipping-form {
@@ -592,11 +793,17 @@
       padding: 11px 13px;
 
       outline: none;
+
+      transition:
+        border-color 0.2s ease,
+        background 0.2s ease;
     }
 
     .input:focus,
     .select:focus {
       border-color: var(--accent);
+
+      background: #13151c;
     }
 
     /* =========================
@@ -616,7 +823,8 @@
 
       padding: 13px 0;
 
-      border-bottom: 1px solid var(--border);
+      border-bottom:
+        1px solid var(--border);
     }
 
     .item:last-child {
@@ -653,7 +861,8 @@
 
       padding: 10px 0;
 
-      border-bottom: 1px solid var(--border);
+      border-bottom:
+        1px solid var(--border);
 
       font-size: 13px;
     }
@@ -685,19 +894,26 @@
       border: 1px solid var(--border);
 
       box-shadow:
-        0 15px 50px rgba(0,0,0,0.4);
+        0 15px 50px
+        rgba(0,0,0,0.4);
 
-      transform: translateY(20px);
+      transform:
+        translateY(20px)
+        scale(0.98);
 
       opacity: 0;
 
       pointer-events: none;
 
-      transition: 0.25s;
+      transition:
+        transform 0.25s ease,
+        opacity 0.25s ease;
     }
 
     .toast.show {
-      transform: translateY(0);
+      transform:
+        translateY(0)
+        scale(1);
 
       opacity: 1;
     }
@@ -713,7 +929,7 @@
     }
 
     /* =========================
-       EMPTY
+       EMPTY / LOADING
     ========================= */
 
     .loading,
@@ -735,6 +951,16 @@
        MOBILE
     ========================= */
 
+    @media (max-width: 1000px) {
+
+      .order-right {
+        flex-wrap: wrap;
+
+        justify-content: flex-end;
+      }
+
+    }
+
     @media (max-width: 900px) {
 
       .app {
@@ -747,7 +973,8 @@
         height: auto;
 
         border-right: 0;
-        border-bottom: 1px solid var(--border);
+        border-bottom:
+          1px solid var(--border);
 
         padding: 16px 20px;
       }
@@ -784,9 +1011,10 @@
       .shipping-form {
         grid-template-columns: 1fr;
       }
+
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 650px) {
 
       .topbar {
         align-items: flex-start;
@@ -811,7 +1039,11 @@
       .order-right {
         width: 100%;
 
-        justify-content: space-between;
+        justify-content: flex-start;
+      }
+
+      .details-btn {
+        margin-left: auto;
       }
 
       .stats {
@@ -831,15 +1063,37 @@
 
         max-width: none;
       }
+
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+
+      *,
+      *::before,
+      *::after {
+        scroll-behavior: auto !important;
+
+        transition-duration:
+          0.01ms !important;
+
+        animation-duration:
+          0.01ms !important;
+      }
+
     }
   </style>
 </head>
 
 <body>
 
-  <!-- ACCESS -->
+  <!-- =========================
+       ACCESS
+  ========================== -->
 
-  <div id="loadingScreen" class="center-screen">
+  <div
+    id="loadingScreen"
+    class="center-screen"
+  >
 
     <div class="message-card">
 
@@ -854,14 +1108,18 @@
   </div>
 
 
-  <div id="accessDenied" class="center-screen hidden">
+  <div
+    id="accessDenied"
+    class="center-screen hidden"
+  >
 
     <div class="message-card">
 
       <h1>Нет доступа</h1>
 
       <p>
-        Эта страница доступна только администратору KrisVane.
+        Эта страница доступна только
+        администратору KrisVane.
       </p>
 
     </div>
@@ -869,9 +1127,14 @@
   </div>
 
 
-  <!-- ADMIN -->
+  <!-- =========================
+       ADMIN APP
+  ========================== -->
 
-  <div id="adminApp" class="app hidden">
+  <div
+    id="adminApp"
+    class="app hidden"
+  >
 
     <aside class="sidebar">
 
@@ -904,7 +1167,9 @@
 
         <div class="title">
 
-          <h1>Заказы</h1>
+          <h1>
+            Заказы
+          </h1>
 
           <p>
             Управление заказами KrisVane
@@ -919,9 +1184,12 @@
       </div>
 
 
+      <!-- STATS -->
+
       <section class="stats">
 
         <div class="stat">
+
           <div class="stat-label">
             Всего заказов
           </div>
@@ -932,10 +1200,12 @@
           >
             —
           </div>
+
         </div>
 
 
         <div class="stat">
+
           <div class="stat-label">
             Новые
           </div>
@@ -946,10 +1216,12 @@
           >
             —
           </div>
+
         </div>
 
 
         <div class="stat">
+
           <div class="stat-label">
             В пути
           </div>
@@ -960,10 +1232,12 @@
           >
             —
           </div>
+
         </div>
 
 
         <div class="stat">
+
           <div class="stat-label">
             Получены
           </div>
@@ -974,10 +1248,13 @@
           >
             —
           </div>
+
         </div>
 
       </section>
 
+
+      <!-- SEARCH -->
 
       <div class="toolbar">
 
@@ -998,6 +1275,8 @@
       </div>
 
 
+      <!-- ORDERS -->
+
       <div id="ordersContainer">
 
         <div class="loading">
@@ -1010,6 +1289,8 @@
 
   </div>
 
+
+  <!-- TOAST -->
 
   <div
     id="toast"
@@ -1026,6 +1307,7 @@
     const SUPABASE_URL =
       "https://cbkomiuylvumquhgrlve.supabase.co";
 
+
     const SUPABASE_KEY =
       "sb_publishable_OzfR7L5x3hQF56b4v7KT1g_q9tXF9sG";
 
@@ -1041,7 +1323,7 @@
 
 
     /* =========================================
-       STATUSES
+       STATUS NAMES
     ========================================= */
 
     const STATUS_NAMES = {
@@ -1092,13 +1374,33 @@
         return "";
       }
 
+
       return String(value)
 
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll(
+          "&",
+          "&amp;"
+        )
+
+        .replaceAll(
+          "<",
+          "&lt;"
+        )
+
+        .replaceAll(
+          ">",
+          "&gt;"
+        )
+
+        .replaceAll(
+          '"',
+          "&quot;"
+        )
+
+        .replaceAll(
+          "'",
+          "&#039;"
+        );
 
     }
 
@@ -1125,6 +1427,7 @@
         return "—";
       }
 
+
       return new Intl.DateTimeFormat(
         "ru-UA",
         {
@@ -1144,24 +1447,32 @@
     ) {
 
       const toast =
-        document.getElementById("toast");
+        document.getElementById(
+          "toast"
+        );
+
 
       toast.textContent =
         message;
 
+
       toast.className =
         `toast ${type} show`;
+
 
       clearTimeout(
         window.toastTimer
       );
 
+
       window.toastTimer =
         setTimeout(
           () => {
+
             toast.classList.remove(
               "show"
             );
+
           },
           3500
         );
@@ -1176,10 +1487,14 @@
     async function checkAccess() {
 
       const {
-        data: { user },
+        data: {
+          user
+        },
         error
       } =
-        await supabaseClient.auth.getUser();
+        await supabaseClient
+          .auth
+          .getUser();
 
 
       if (
@@ -1200,7 +1515,9 @@
       } =
         await supabaseClient
 
-          .from("profiles")
+          .from(
+            "profiles"
+          )
 
           .select(
             "id, full_name, role"
@@ -1232,7 +1549,9 @@
           "loadingScreen"
         )
         .classList
-        .add("hidden");
+        .add(
+          "hidden"
+        );
 
 
       document
@@ -1240,7 +1559,9 @@
           "adminApp"
         )
         .classList
-        .remove("hidden");
+        .remove(
+          "hidden"
+        );
 
 
       return true;
@@ -1255,7 +1576,9 @@
           "loadingScreen"
         )
         .classList
-        .add("hidden");
+        .add(
+          "hidden"
+        );
 
 
       document
@@ -1263,7 +1586,9 @@
           "adminApp"
         )
         .classList
-        .add("hidden");
+        .add(
+          "hidden"
+        );
 
 
       document
@@ -1271,7 +1596,9 @@
           "accessDenied"
         )
         .classList
-        .remove("hidden");
+        .remove(
+          "hidden"
+        );
 
     }
 
@@ -1289,9 +1616,11 @@
 
 
       container.innerHTML = `
+
         <div class="loading">
           Загружаем заказы...
         </div>
+
       `;
 
 
@@ -1301,7 +1630,9 @@
       } =
         await supabaseClient
 
-          .from("orders")
+          .from(
+            "orders"
+          )
 
           .select(`
             *,
@@ -1333,16 +1664,25 @@
 
       if (error) {
 
-        console.error(error);
+        console.error(
+          error
+        );
+
 
         container.innerHTML = `
+
           <div class="empty">
+
             Ошибка загрузки:
+
             ${escapeHtml(
               error.message
             )}
+
           </div>
+
         `;
+
 
         return;
 
@@ -1366,10 +1706,12 @@
 
 
     /* =========================================
-       RENDER LIST
+       RENDER ORDERS
     ========================================= */
 
-    function renderOrders(orders) {
+    function renderOrders(
+      orders
+    ) {
 
       const container =
         document.getElementById(
@@ -1377,13 +1719,18 @@
         );
 
 
-      if (!orders.length) {
+      if (
+        !orders.length
+      ) {
 
         container.innerHTML = `
+
           <div class="empty">
             Заказы не найдены.
           </div>
+
         `;
+
 
         return;
 
@@ -1391,13 +1738,17 @@
 
 
       container.innerHTML = `
+
         <div class="orders">
 
           ${orders
-            .map(renderOrder)
+            .map(
+              renderOrder
+            )
             .join("")}
 
         </div>
+
       `;
 
     }
@@ -1407,54 +1758,72 @@
        STATS
     ========================================= */
 
-    function renderStats(orders) {
+    function renderStats(
+      orders
+    ) {
 
-      document.getElementById(
-        "statTotal"
-      ).textContent =
-        orders.length;
-
-
-      document.getElementById(
-        "statPending"
-      ).textContent =
-        orders.filter(
-          x =>
-            x.status === "pending"
-        ).length;
+      document
+        .getElementById(
+          "statTotal"
+        )
+        .textContent =
+          orders.length;
 
 
-      document.getElementById(
-        "statShipping"
-      ).textContent =
-        orders.filter(
-          x =>
-            [
-              "shipped",
-              "in_transit",
-              "arrived"
-            ].includes(
-              x.status
-            )
-        ).length;
+      document
+        .getElementById(
+          "statPending"
+        )
+        .textContent =
+
+          orders.filter(
+            order =>
+              order.status ===
+              "pending"
+          ).length;
 
 
-      document.getElementById(
-        "statDelivered"
-      ).textContent =
-        orders.filter(
-          x =>
-            x.status === "delivered"
-        ).length;
+      document
+        .getElementById(
+          "statShipping"
+        )
+        .textContent =
+
+          orders.filter(
+            order =>
+              [
+                "shipped",
+                "in_transit",
+                "arrived"
+              ]
+              .includes(
+                order.status
+              )
+          ).length;
+
+
+      document
+        .getElementById(
+          "statDelivered"
+        )
+        .textContent =
+
+          orders.filter(
+            order =>
+              order.status ===
+              "delivered"
+          ).length;
 
     }
 
 
     /* =========================================
-       ORDER
+       RENDER ORDER
     ========================================= */
 
-    function renderOrder(order) {
+    function renderOrder(
+      order
+    ) {
 
       const items =
         Array.isArray(
@@ -1468,16 +1837,30 @@
         Array.isArray(
           order.order_status_history
         )
-          ? [...order.order_status_history]
+          ? [
+              ...order.order_status_history
+            ]
           : [];
 
 
       history.sort(
         (a, b) =>
-          new Date(a.created_at)
+          new Date(
+            a.created_at
+          )
           -
-          new Date(b.created_at)
+          new Date(
+            b.created_at
+          )
       );
+
+
+      const statusName =
+        STATUS_NAMES[
+          order.status
+        ]
+        ||
+        order.status;
 
 
       return `
@@ -1487,23 +1870,34 @@
           id="order-${order.id}"
         >
 
+          <!-- HEADER -->
+
           <div
             class="order-header"
-            onclick="toggleOrder(${order.id})"
+            onclick="
+              toggleOrder(
+                ${order.id}
+              )
+            "
           >
 
             <div>
 
               <div class="order-number">
+
                 ${escapeHtml(
                   order.order_number
                 )}
+
               </div>
 
+
               <div class="order-date">
+
                 ${dateTime(
                   order.created_at
                 )}
+
               </div>
 
             </div>
@@ -1512,55 +1906,116 @@
             <div class="order-right">
 
               <div class="order-price">
+
                 ${money(
                   order.total
                 )}
+
               </div>
 
+
               <div
-                class="status
-                ${escapeHtml(
-                  order.status
-                )}"
-              >
-                ${
-                  escapeHtml(
-                    STATUS_NAMES[
-                      order.status
-                    ]
-                  )
-                  ||
-                  escapeHtml(
+                class="
+                  status
+                  ${escapeHtml(
                     order.status
-                  )
-                }
+                  )}
+                "
+              >
+
+                ${escapeHtml(
+                  statusName
+                )}
+
               </div>
+
+
+              <button
+                class="details-btn"
+                id="details-btn-${order.id}"
+                type="button"
+                onclick="
+                  event.stopPropagation();
+
+                  toggleOrder(
+                    ${order.id}
+                  );
+                "
+              >
+
+                <span
+                  id="details-text-${order.id}"
+                >
+                  Подробнее
+                </span>
+
+                <span
+                  class="details-arrow"
+                >
+                  ↓
+                </span>
+
+              </button>
 
             </div>
 
           </div>
 
 
-          <div class="order-details">
+          <!-- ANIMATED DETAILS -->
 
-            <div class="details-grid">
+          <div
+            class="order-details-wrapper"
+          >
 
-              ${renderCustomer(order)}
+            <div
+              class="order-details-inner"
+            >
 
-              ${renderDelivery(order)}
+              <div
+                class="order-details"
+              >
 
-              ${renderTracking(order)}
+                <div
+                  class="details-grid"
+                >
 
-              ${renderPayment(order)}
+                  ${renderCustomer(
+                    order
+                  )}
+
+                  ${renderDelivery(
+                    order
+                  )}
+
+                  ${renderTracking(
+                    order
+                  )}
+
+                  ${renderPayment(
+                    order
+                  )}
+
+                </div>
+
+
+                ${renderActions(
+                  order
+                )}
+
+
+                ${renderItems(
+                  items
+                )}
+
+
+                ${renderHistory(
+                  history
+                )}
+
+              </div>
 
             </div>
-
-
-            ${renderActions(order)}
-
-            ${renderItems(items)}
-
-            ${renderHistory(history)}
 
           </div>
 
@@ -1572,10 +2027,12 @@
 
 
     /* =========================================
-       DETAILS
+       CUSTOMER
     ========================================= */
 
-    function renderCustomer(order) {
+    function renderCustomer(
+      order
+    ) {
 
       return `
 
@@ -1585,25 +2042,43 @@
             Покупатель
           </div>
 
+
           <div class="detail-line">
-            <span>Имя:</span>
+
+            <span>
+              Имя:
+            </span>
+
             ${escapeHtml(
               order.recipient_name
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Телефон:</span>
+
+            <span>
+              Телефон:
+            </span>
+
             ${escapeHtml(
               order.phone
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Комментарий:</span>
+
+            <span>
+              Комментарий:
+            </span>
+
             ${escapeHtml(
               order.delivery_comment
             ) || "—"}
+
           </div>
 
         </div>
@@ -1613,7 +2088,13 @@
     }
 
 
-    function renderDelivery(order) {
+    /* =========================================
+       DELIVERY
+    ========================================= */
+
+    function renderDelivery(
+      order
+    ) {
 
       return `
 
@@ -1623,32 +2104,56 @@
             Доставка
           </div>
 
+
           <div class="detail-line">
-            <span>Способ:</span>
+
+            <span>
+              Способ:
+            </span>
+
             ${escapeHtml(
               order.delivery_method
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Город:</span>
+
+            <span>
+              Город:
+            </span>
+
             ${escapeHtml(
               order.delivery_city
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Отделение:</span>
+
+            <span>
+              Отделение:
+            </span>
+
             ${escapeHtml(
               order.delivery_branch
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Адрес:</span>
+
+            <span>
+              Адрес:
+            </span>
+
             ${escapeHtml(
               order.delivery_address
             ) || "—"}
+
           </div>
 
         </div>
@@ -1658,7 +2163,13 @@
     }
 
 
-    function renderTracking(order) {
+    /* =========================================
+       TRACKING
+    ========================================= */
+
+    function renderTracking(
+      order
+    ) {
 
       return `
 
@@ -1668,18 +2179,30 @@
             Отправление
           </div>
 
+
           <div class="detail-line">
-            <span>Перевозчик:</span>
+
+            <span>
+              Перевозчик:
+            </span>
+
             ${escapeHtml(
               order.carrier
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>ТТН:</span>
+
+            <span>
+              ТТН:
+            </span>
+
             ${escapeHtml(
               order.tracking_number
             ) || "—"}
+
           </div>
 
         </div>
@@ -1689,7 +2212,13 @@
     }
 
 
-    function renderPayment(order) {
+    /* =========================================
+       PAYMENT
+    ========================================= */
+
+    function renderPayment(
+      order
+    ) {
 
       return `
 
@@ -1699,48 +2228,82 @@
             Оплата
           </div>
 
+
           <div class="detail-line">
-            <span>Статус:</span>
+
+            <span>
+              Статус:
+            </span>
+
             ${escapeHtml(
               order.payment_status
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Метод:</span>
+
+            <span>
+              Метод:
+            </span>
+
             ${escapeHtml(
               order.payment_method
             ) || "—"}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Товары:</span>
+
+            <span>
+              Товары:
+            </span>
+
             ${money(
               order.subtotal
             )}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Доставка:</span>
+
+            <span>
+              Доставка:
+            </span>
+
             ${money(
               order.delivery_price
             )}
+
           </div>
 
+
           <div class="detail-line">
-            <span>Скидка:</span>
+
+            <span>
+              Скидка:
+            </span>
+
             ${money(
               order.discount_amount
             )}
+
           </div>
+
 
           <div class="detail-line">
 
             <strong>
+
               Итого:
+
               ${money(
                 order.total
               )}
+
             </strong>
 
           </div>
@@ -1756,13 +2319,16 @@
        ACTIONS
     ========================================= */
 
-    function renderActions(order) {
+    function renderActions(
+      order
+    ) {
 
       let content = "";
 
 
       if (
-        order.status === "pending"
+        order.status ===
+        "pending"
       ) {
 
         content = `
@@ -1770,7 +2336,6 @@
           <button
             class="btn btn-primary"
             onclick="
-              event.stopPropagation();
               setStatus(
                 ${order.id},
                 'confirmed'
@@ -1786,7 +2351,8 @@
 
 
       else if (
-        order.status === "confirmed"
+        order.status ===
+        "confirmed"
       ) {
 
         content = `
@@ -1794,7 +2360,6 @@
           <button
             class="btn btn-primary"
             onclick="
-              event.stopPropagation();
               setStatus(
                 ${order.id},
                 'processing'
@@ -1810,7 +2375,8 @@
 
 
       else if (
-        order.status === "processing"
+        order.status ===
+        "processing"
       ) {
 
         content = `
@@ -1818,7 +2384,6 @@
           <button
             class="btn btn-primary"
             onclick="
-              event.stopPropagation();
               setStatus(
                 ${order.id},
                 'ready_to_ship'
@@ -1840,22 +2405,30 @@
 
         content = `
 
-          <div class="shipping-form">
+          <div
+            class="shipping-form"
+          >
 
             <select
               id="carrier-${order.id}"
               class="select"
             >
 
-              <option value="nova_poshta">
+              <option
+                value="nova_poshta"
+              >
                 Новая Почта
               </option>
 
-              <option value="ukrposhta">
+              <option
+                value="ukrposhta"
+              >
                 Укрпочта
               </option>
 
-              <option value="meest">
+              <option
+                value="meest"
+              >
                 Meest
               </option>
 
@@ -1874,8 +2447,9 @@
             <button
               class="btn btn-primary"
               onclick="
-                event.stopPropagation();
-                shipOrder(${order.id});
+                shipOrder(
+                  ${order.id}
+                );
               "
             >
               Отправить
@@ -1889,7 +2463,8 @@
 
 
       else if (
-        order.status === "delivered"
+        order.status ===
+        "delivered"
       ) {
 
         content = `
@@ -1897,7 +2472,6 @@
           <button
             class="btn btn-danger"
             onclick="
-              event.stopPropagation();
               completeReturn(
                 ${order.id}
               );
@@ -1916,24 +2490,30 @@
           "shipped",
           "in_transit",
           "arrived"
-        ].includes(
+        ]
+        .includes(
           order.status
         )
       ) {
 
         content = `
+
           <div
             style="
               color: var(--muted);
               line-height: 1.6;
             "
           >
+
             Отправление отслеживается
             автоматически.
+
             Следующее изменение статуса
-            будет получено службой
+            будет получено системой
             синхронизации доставки.
+
           </div>
+
         `;
 
       }
@@ -1942,14 +2522,18 @@
       else {
 
         content = `
+
           <div
             style="
               color: var(--muted);
             "
           >
+
             Для этого статуса
             доступных действий нет.
+
           </div>
+
         `;
 
       }
@@ -1963,8 +2547,11 @@
             Управление заказом
           </div>
 
+
           <div class="actions-row">
+
             ${content}
+
           </div>
 
         </div>
@@ -1978,7 +2565,9 @@
        ITEMS
     ========================================= */
 
-    function renderItems(items) {
+    function renderItems(
+      items
+    ) {
 
       return `
 
@@ -1988,10 +2577,13 @@
             Товары
           </div>
 
+
           ${
             items.length
 
-              ? items
+              ?
+
+              items
                 .map(
                   item => `
 
@@ -2000,10 +2592,13 @@
                       <div>
 
                         <div class="item-name">
+
                           ${escapeHtml(
                             item.product_name
                           )}
+
                         </div>
+
 
                         <div class="item-variant">
 
@@ -2015,13 +2610,20 @@
                             "Без варианта"
                           }
 
+
                           ${
                             item.sku
-                              ? ` · SKU:
-                                 ${escapeHtml(
-                                   item.sku
-                                 )}`
-                              : ""
+
+                              ?
+
+                              ` · SKU:
+                              ${escapeHtml(
+                                item.sku
+                              )}`
+
+                              :
+
+                              ""
                           }
 
                         </div>
@@ -2044,9 +2646,11 @@
                         =
 
                         <strong>
+
                           ${money(
                             item.line_total
                           )}
+
                         </strong>
 
                       </div>
@@ -2057,11 +2661,15 @@
                 )
                 .join("")
 
-              : `
-                  <div class="empty">
-                    Нет позиций заказа.
-                  </div>
-                `
+              :
+
+              `
+
+                <div class="empty">
+                  Нет позиций заказа.
+                </div>
+
+              `
           }
 
         </div>
@@ -2075,7 +2683,9 @@
        HISTORY
     ========================================= */
 
-    function renderHistory(history) {
+    function renderHistory(
+      history
+    ) {
 
       return `
 
@@ -2085,20 +2695,30 @@
             История заказа
           </div>
 
+
           ${
             history.length
 
-              ? history
+              ?
+
+              history
                 .map(
                   row => `
 
-                    <div class="history-row">
+                    <div
+                      class="history-row"
+                    >
 
-                      <div class="history-date">
+                      <div
+                        class="history-date"
+                      >
+
                         ${dateTime(
                           row.created_at
                         )}
+
                       </div>
+
 
                       <div>
 
@@ -2116,10 +2736,13 @@
 
                       </div>
 
+
                       <div>
+
                         ${escapeHtml(
                           row.message
                         ) || "—"}
+
                       </div>
 
                     </div>
@@ -2128,11 +2751,15 @@
                 )
                 .join("")
 
-              : `
-                  <div class="empty">
-                    История отсутствует.
-                  </div>
-                `
+              :
+
+              `
+
+                <div class="empty">
+                  История отсутствует.
+                </div>
+
+              `
           }
 
         </div>
@@ -2143,7 +2770,7 @@
 
 
     /* =========================================
-       STATUS RPC
+       SET STATUS
     ========================================= */
 
     async function setStatus(
@@ -2152,8 +2779,11 @@
     ) {
 
       const statusName =
-        STATUS_NAMES[newStatus]
-        || newStatus;
+        STATUS_NAMES[
+          newStatus
+        ]
+        ||
+        newStatus;
 
 
       const confirmed =
@@ -2162,7 +2792,9 @@
         );
 
 
-      if (!confirmed) {
+      if (
+        !confirmed
+      ) {
         return;
       }
 
@@ -2182,14 +2814,20 @@
         );
 
 
-      if (error) {
+      if (
+        error
+      ) {
 
-        console.error(error);
+        console.error(
+          error
+        );
+
 
         showToast(
           error.message,
           "error"
         );
+
 
         return;
 
@@ -2210,7 +2848,9 @@
        SHIP ORDER
     ========================================= */
 
-    async function shipOrder(orderId) {
+    async function shipOrder(
+      orderId
+    ) {
 
       const carrierElement =
         document.getElementById(
@@ -2229,15 +2869,20 @@
 
 
       const tracking =
-        trackingElement.value.trim();
+        trackingElement
+          .value
+          .trim();
 
 
-      if (!tracking) {
+      if (
+        !tracking
+      ) {
 
         showToast(
           "Введите номер ТТН.",
           "error"
         );
+
 
         return;
 
@@ -2260,11 +2905,15 @@
 
       const confirmed =
         confirm(
+
           `Отправить заказ через ${carrierNames[carrier]}?\n\nТТН: ${tracking}`
+
         );
 
 
-      if (!confirmed) {
+      if (
+        !confirmed
+      ) {
         return;
       }
 
@@ -2287,14 +2936,20 @@
         );
 
 
-      if (error) {
+      if (
+        error
+      ) {
 
-        console.error(error);
+        console.error(
+          error
+        );
+
 
         showToast(
           error.message,
           "error"
         );
+
 
         return;
 
@@ -2321,22 +2976,30 @@
 
       const confirmed =
         confirm(
+
           "Оформить возврат?\n\nТовар будет возвращён на склад."
+
         );
 
 
-      if (!confirmed) {
+      if (
+        !confirmed
+      ) {
         return;
       }
 
 
       const secondConfirm =
         confirm(
+
           "Подтвердите возврат товара на склад."
+
         );
 
 
-      if (!secondConfirm) {
+      if (
+        !secondConfirm
+      ) {
         return;
       }
 
@@ -2353,14 +3016,20 @@
         );
 
 
-      if (error) {
+      if (
+        error
+      ) {
 
-        console.error(error);
+        console.error(
+          error
+        );
+
 
         showToast(
           error.message,
           "error"
         );
+
 
         return;
 
@@ -2390,16 +3059,20 @@
         event => {
 
           const query =
-            event.target.value
+            event.target
+              .value
               .trim()
               .toLowerCase();
 
 
-          if (!query) {
+          if (
+            !query
+          ) {
 
             renderOrders(
               allOrders
             );
+
 
             return;
 
@@ -2413,24 +3086,34 @@
                 const haystack = [
 
                   order.order_number,
+
                   order.recipient_name,
+
                   order.phone,
+
                   order.tracking_number,
+
                   order.delivery_city,
+
                   order.delivery_branch
 
                 ]
 
-                  .filter(Boolean)
+                  .filter(
+                    Boolean
+                  )
 
-                  .join(" ")
+                  .join(
+                    " "
+                  )
 
                   .toLowerCase();
 
 
-                return haystack.includes(
-                  query
-                );
+                return haystack
+                  .includes(
+                    query
+                  );
 
               }
             );
@@ -2445,10 +3128,12 @@
 
 
     /* =========================================
-       UI
+       OPEN / CLOSE ORDER
     ========================================= */
 
-    function toggleOrder(id) {
+    function toggleOrder(
+      id
+    ) {
 
       const element =
         document.getElementById(
@@ -2456,14 +3141,40 @@
         );
 
 
-      if (!element) {
+      const text =
+        document.getElementById(
+          `details-text-${id}`
+        );
+
+
+      if (
+        !element
+      ) {
         return;
       }
+
+
+      const isOpening =
+        !element.classList.contains(
+          "open"
+        );
 
 
       element.classList.toggle(
         "open"
       );
+
+
+      if (
+        text
+      ) {
+
+        text.textContent =
+          isOpening
+            ? "Свернуть"
+            : "Подробнее";
+
+      }
 
     }
 
@@ -2478,7 +3189,9 @@
         await checkAccess();
 
 
-      if (!allowed) {
+      if (
+        !allowed
+      ) {
         return;
       }
 
