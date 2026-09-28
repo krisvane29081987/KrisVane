@@ -5132,5 +5132,116 @@ window.openCreateProduct=async function(){
 })();
 </script>
 
+
+<style>
+/* v16 — make selected letter sizes unmistakable */
+#kvDynamicSizeGrid .kv-size.selected{
+  border-color:var(--accent) !important;
+  background:color-mix(in srgb,var(--accent) 24%,var(--panel2)) !important;
+  color:var(--text) !important;
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 42%,transparent) inset !important;
+  transform:translateY(-1px);
+}
+#kvSuitNumericBlock{
+  display:block !important;width:100% !important;margin-top:14px !important;
+  padding-top:12px !important;border-top:1px solid var(--border) !important;
+}
+#kvSuitNumericGrid{display:flex !important;flex-wrap:wrap !important;gap:8px !important}
+</style>
+<script>
+/* v16 — one source of truth for suit category.
+   Important: kv2CreateState is a top-level lexical variable, not window.kv2CreateState. */
+(function(){
+  const NUM=['38–40','40–42','42–44','44–46','46–48','48–50',
+             '50–52','52–54','54–56','56–58','58–60','60–62'];
+
+  function cat(){
+    try{return (kv2CreateState?.category||'').trim()}catch(_){return ''}
+  }
+
+  /* Repair the old v12 detector so it no longer deletes the numeric row. */
+  window.kv12CurrentCategory=function(){ return cat(); };
+
+  function title(){
+    const l=(typeof getUiPrefs==='function'?getUiPrefs().language:'uk')||'uk';
+    return ({uk:'Цифрові розміри',ru:'Цифровые размеры',en:'Numeric sizes',
+             be:'Лічбавыя памеры',zh:'数字尺码'})[l]||'Цифрові розміри';
+  }
+
+  function selectedSet(){
+    if(typeof kv12SuitNumericSelected!=='undefined') return kv12SuitNumericSelected;
+    window.__kv16Nums ||= new Set();
+    return window.__kv16Nums;
+  }
+
+  function render(){
+    let block=document.getElementById('kvSuitNumericBlock');
+    if(cat()!=='Костюмы'){ block?.remove(); return; }
+
+    const letters=document.getElementById('kvDynamicSizeGrid');
+    if(!letters?.parentElement)return;
+
+    if(!block){
+      block=document.createElement('div');
+      block.id='kvSuitNumericBlock';
+    }
+    const set=selectedSet();
+    block.innerHTML=
+      '<div class="kv-suit-size-title">'+title()+'</div>'+
+      '<div id="kvSuitNumericGrid">'+NUM.map(s=>
+        '<button type="button" class="kv-suit-num'+(set.has(s)?' selected':'')+
+        '" data-v16-num="'+s+'">'+s+'</button>').join('')+'</div>';
+    letters.insertAdjacentElement('afterend',block);
+  }
+
+  window.kv16RenderSuitNumeric=render;
+
+  document.addEventListener('click',e=>{
+    const b=e.target.closest('[data-v16-num]');
+    if(!b)return;
+    e.preventDefault(); e.stopPropagation();
+    const set=selectedSet(), s=b.dataset.v16Num;
+    set.has(s)?set.delete(s):set.add(s);
+    b.classList.toggle('selected',set.has(s));
+    try{kv2MarkDirty()}catch(_){}
+  },true);
+
+  /* Category UI updates state inside its own handler; render just after it finishes. */
+  document.addEventListener('click',e=>{
+    if(e.target.closest('#kvCategoryOptions .kv-option,[data-value]')){
+      setTimeout(render,30);
+      setTimeout(render,180);
+    }
+  },false);
+
+  /* Open/create wrappers: render once the original modal is fully built. */
+  const oldOpen=window.openCreateProduct;
+  if(typeof oldOpen==='function'){
+    window.openCreateProduct=async function(){
+      const r=await oldOpen.apply(this,arguments);
+      setTimeout(render,60);
+      setTimeout(render,220);
+      return r;
+    };
+  }
+
+  /* Ensure numeric choices become actual variants before the existing create routine runs. */
+  const oldCreate=window.kv2CreateProduct;
+  if(typeof oldCreate==='function'){
+    window.kv2CreateProduct=async function(){
+      try{
+        if(cat()==='Костюмы'){
+          selectedSet().forEach(s=>kv2CreateState.sizes.add(s));
+        }
+      }catch(_){}
+      return oldCreate.apply(this,arguments);
+    };
+  }
+
+  /* No MutationObserver / no interval: avoids the lag seen in earlier attempts. */
+  setTimeout(render,250);
+})();
+</script>
+
 </body>
 </html>
