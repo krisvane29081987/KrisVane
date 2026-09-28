@@ -3964,7 +3964,12 @@ window.openCreateProduct=async function(){
  kv2ChooseBrand('KrisVane');kv2Dirty=false;document.getElementById('kvUnsaved').hidden=true;
 };
 async function kv2EnsureTaxonomy(catName,subName){let cat=adminCategories.find(x=>(x.name||'').toLowerCase()===catName.toLowerCase());if(!cat){const tpl=adminCategories[0]||{name:'',slug:'',is_active:true,sort_order:0};const payload={};for(const k of editableFields(tpl)){if(k==='name')payload[k]=catName;else if(k==='slug')payload[k]=kv2Slug(catName);else if(k==='is_active')payload[k]=true;else if(k==='sort_order')payload[k]=0}if(!('name'in payload))payload.name=catName;const r=await supabaseClient.from('categories').insert(payload).select('*').single();if(r.error)throw r.error;cat=r.data;adminCategories.push(cat)}let sub=null;if(subName){sub=adminSubcategories.find(x=>String(x.category_id)===String(cat.id)&&(x.name||'').toLowerCase()===subName.toLowerCase());if(!sub){const tpl=adminSubcategories[0]||{name:'',slug:'',category_id:null,is_active:true,sort_order:0};const payload={};for(const k of editableFields(tpl)){if(k==='name')payload[k]=subName;else if(k==='slug')payload[k]=kv2Slug(subName);else if(k==='category_id')payload[k]=cat.id;else if(k==='is_active')payload[k]=true;else if(k==='sort_order')payload[k]=0}payload.category_id=cat.id;if(!('name'in payload))payload.name=subName;const r=await supabaseClient.from('subcategories').insert(payload).select('*').single();if(r.error)throw r.error;sub=r.data;adminSubcategories.push(sub)}}return{cat,sub}}
-async function kv2CreateProduct(){const btn=document.getElementById('kvCreateBtn');const name=document.getElementById('kvName').value.trim(),sku=document.getElementById('kvSku').value.trim(),price=Number(document.getElementById('kvPrice').value);if(!name||!sku||!Number.isFinite(price)||price<0)return showToast('Заполните название, артикул и цену.','error');if(!kv2CreateState.category)return showToast('Выберите категорию.','error');btn.disabled=true;btn.textContent='…';try{const {cat,sub}=await kv2EnsureTaxonomy(kv2CreateState.category,kv2CreateState.subcategory);const tpl=adminProducts[0]||{};const payload={};const set=(k,v)=>{if(k in tpl)payload[k]=v};set('name',name);set('title',name);set('sku',sku);set('slug',kv2Slug(name));set('brand',kv2CreateState.brand);set('description',document.getElementById('kvDescription').value.trim());set('price',price);set('old_price',document.getElementById('kvOldPrice').value?Number(document.getElementById('kvOldPrice').value):null);set('category_id',cat.id);set('subcategory_id',sub?.id||null);set('is_published',document.getElementById('kvPublished').value==='true');set('is_new',document.getElementById('kvNew').value==='true');set('is_featured',false);set('sort_order',0);if(!Object.keys(payload).length)throw new Error('Не удалось определить поля таблицы products.');const pr=await supabaseClient.from('products').insert(payload).select('*').single();if(pr.error)throw pr.error;const product=pr.data;const sizes=[...kv2CreateState.sizes];if(sizes.length){const vr=await supabaseClient.from('product_variants').select('*').limit(1);const vt=vr.data?.[0]||null;for(let i=0;i<sizes.length;i++){const v={product_id:product.id};if(vt){if('variant_name'in vt)v.variant_name=sizes[i];else if('name'in vt)v.name=sizes[i];else if('size'in vt)v.size=sizes[i];if('sku'in vt)v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;if('stock_quantity'in vt)v.stock_quantity=0;if('reserved_quantity'in vt)v.reserved_quantity=0;if('is_active'in vt)v.is_active=true}else{v.variant_name=sizes[i];v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;v.stock_quantity=0;v.reserved_quantity=0}const ir=await supabaseClient.from('product_variants').insert(v);if(ir.error)throw ir.error}}
+async function kv2CreateProduct(){const btn=document.getElementById('kvCreateBtn');const name=document.getElementById('kvName').value.trim(),sku=document.getElementById('kvSku').value.trim(),price=Number(document.getElementById('kvPrice').value);if(!name||!sku||!Number.isFinite(price)||price<0)return showToast('Заполните название, артикул и цену.','error');if(!kv2CreateState.category)return showToast('Выберите категорию.','error');btn.disabled=true;btn.textContent='…';try{const {cat,sub}=await kv2EnsureTaxonomy(kv2CreateState.category,kv2CreateState.subcategory);const tpl=adminProducts[0]||{};const payload={};const set=(k,v)=>{if(k in tpl)payload[k]=v};set('name',name);set('title',name);set('sku',sku);set('slug',kv2Slug(name));set('brand',kv2CreateState.brand);set('description',document.getElementById('kvDescription').value.trim());set('price',price);set('old_price',document.getElementById('kvOldPrice').value?Number(document.getElementById('kvOldPrice').value):null);set('category_id',cat.id);set('subcategory_id',sub?.id||null);set('is_published',document.getElementById('kvPublished').value==='true');const kvCondition=document.getElementById('kvCondition')?.value||'new';
+set('is_new',kvCondition==='new');
+set('condition',kvCondition);
+set('product_condition',kvCondition);
+set('item_condition',kvCondition);
+set('is_featured',false);set('sort_order',0);if(!Object.keys(payload).length)throw new Error('Не удалось определить поля таблицы products.');const pr=await supabaseClient.from('products').insert(payload).select('*').single();if(pr.error)throw pr.error;const product=pr.data;const sizes=[...kv2CreateState.sizes];if(sizes.length){const vr=await supabaseClient.from('product_variants').select('*').limit(1);const vt=vr.data?.[0]||null;for(let i=0;i<sizes.length;i++){const v={product_id:product.id};if(vt){if('variant_name'in vt)v.variant_name=sizes[i];else if('name'in vt)v.name=sizes[i];else if('size'in vt)v.size=sizes[i];if('sku'in vt)v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;if('stock_quantity'in vt)v.stock_quantity=0;if('reserved_quantity'in vt)v.reserved_quantity=0;if('is_active'in vt)v.is_active=true}else{v.variant_name=sizes[i];v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;v.stock_quantity=0;v.reserved_quantity=0}const ir=await supabaseClient.from('product_variants').insert(v);if(ir.error)throw ir.error}}
  if(kv2Photos.length){const ir=await supabaseClient.from('product_images').select('*').limit(1);const it=ir.data?.[0]||null;for(let i=0;i<kv2Photos.length;i++){const f=kv2Photos[i],path=`${product.id}/${Date.now()}-${i}-${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;const up=await supabaseClient.storage.from('products').upload(path,f,{upsert:false});if(up.error)throw up.error;const pub=supabaseClient.storage.from('products').getPublicUrl(path).data.publicUrl;const row={product_id:product.id};if(it){if('image_url'in it)row.image_url=pub;else if('url'in it)row.url=pub;if('sort_order'in it)row.sort_order=i;if('alt_text'in it)row.alt_text=name;if('is_active'in it)row.is_active=true}else{row.image_url=pub;row.sort_order=i}const ins=await supabaseClient.from('product_images').insert(row);if(ins.error)throw ins.error}}
  kv2Dirty=false;showToast('Товар создан.');closeAdminModal();loadedAdminViews.delete('products');await loadProducts()}catch(e){showToast(e.message||String(e),'error')}finally{btn.disabled=false;btn.textContent=kv2('add')}}
 const kv2BaseClose=window.closeAdminModal;window.closeAdminModal=function(force=false){if(!force&&kv2Dirty){if(!confirm(kv2('unsaved')))return}kv2Dirty=false;kv2BaseClose()};
@@ -4240,6 +4245,210 @@ const kv6OldSwitch=window.switchAdminView;window.switchAdminView=async function(
 if(typeof window.renderCustomers==='function'){const f=window.renderCustomers;window.renderCustomers=function(...a){const r=f.apply(this,a);setTimeout(kv6TranslateTargeted,0);return r}}
 if(typeof window.renderOrders==='function'){const f=window.renderOrders;window.renderOrders=function(...a){const r=f.apply(this,a);setTimeout(kv6TranslateTargeted,0);return r}}
 setTimeout(kv6TranslateTargeted,120);setTimeout(kv6TranslateTargeted,500);
+</script>
+
+
+<style>
+/* ===== KrisVane v7: category-aware sizes / condition ===== */
+#kvDynamicSizesSection{
+  overflow:hidden;
+  max-height:0;
+  opacity:0;
+  transform:translateY(-8px);
+  margin-top:0;
+  padding-top:0;
+  padding-bottom:0;
+  border-color:transparent;
+  pointer-events:none;
+  transition:max-height .78s cubic-bezier(.22,.72,.2,1),
+             opacity .42s ease,
+             transform .62s cubic-bezier(.22,.72,.2,1),
+             margin .62s ease,
+             padding .62s ease,
+             border-color .45s ease;
+}
+#kvDynamicSizesSection.kv-visible{
+  max-height:620px;
+  opacity:1;
+  transform:translateY(0);
+  margin-top:28px;
+  padding-top:20px;
+  padding-bottom:20px;
+  border-color:var(--border);
+  pointer-events:auto;
+}
+#kvDynamicSizesSection .kv-size-grid{
+  transition:opacity .35s ease, transform .45s ease;
+}
+#kvDynamicSizesSection.kv-changing .kv-size-grid{
+  opacity:.08;
+  transform:translateY(5px);
+}
+.kv-condition-options .kv-option.selected{
+  background:color-mix(in srgb,var(--accent) 18%,transparent);
+  border-color:color-mix(in srgb,var(--accent) 72%,var(--border));
+}
+.kv-condition-options .kv-option .kv-check{
+  display:inline-block;
+  width:0;
+  overflow:hidden;
+  opacity:0;
+  transform:scale(.4);
+  transition:width .25s ease,opacity .25s ease,transform .32s cubic-bezier(.2,.8,.2,1);
+}
+.kv-condition-options .kv-option.selected .kv-check{
+  width:18px;
+  opacity:1;
+  transform:scale(1);
+}
+</style>
+<script>
+/* ===== KrisVane v7: sizes + condition + final order-status translation ===== */
+const KV7_CLOTHING_SIZES=['XS','S','M','L','XL','XXL'];
+const KV7_SHOE_SIZES=Array.from({length:28},(_,i)=>{
+  const n=35+i*.5;
+  return Number.isInteger(n)?String(n):n.toFixed(1);
+});
+const KV7_CONDITIONS={
+ uk:{new:'Нове',unworn:'Не ношене',like_new:'Як нове',used:'Б/В'},
+ ru:{new:'Новое',unworn:'Не ношенное',like_new:'Как новое',used:'Б/У'},
+ en:{new:'New',unworn:'Unworn',like_new:'Like new',used:'Pre-owned'},
+ be:{new:'Новае',unworn:'Не ношанае',like_new:'Як новае',used:'Б/У'},
+ zh:{new:'全新',unworn:'未穿过',like_new:'近新',used:'二手'}
+};
+const KV7_SIZE_TEXT={
+ uk:{title:'Розміри та залишки',hint:'Оберіть потрібні розміри. Залишок для кожного розміру можна уточнити після створення товару.'},
+ ru:{title:'Размеры и остатки',hint:'Выберите нужные размеры. Остаток для каждого размера можно уточнить после создания товара.'},
+ en:{title:'Sizes & stock',hint:'Choose the required sizes. Stock for each size can be adjusted after creating the product.'},
+ be:{title:'Памеры і рэшткі',hint:'Выберыце патрэбныя памеры. Рэшту для кожнага памеру можна ўдакладніць пасля стварэння тавару.'},
+ zh:{title:'尺码与库存',hint:'请选择所需尺码。创建商品后可调整每个尺码的库存。'}
+};
+function kv7Lang(){return getUiPrefs().language||'uk'}
+function kv7ConditionLabel(v){return (KV7_CONDITIONS[kv7Lang()]||KV7_CONDITIONS.uk)[v]||v}
+function kv7SizesForCategory(cat){
+  if(cat==='Одежда') return KV7_CLOTHING_SIZES;
+  if(cat==='Обувь') return KV7_SHOE_SIZES;
+  return [];
+}
+function kv7RenderSizes(animate=true){
+  const section=document.getElementById('kvDynamicSizesSection');
+  const grid=document.getElementById('kvDynamicSizeGrid');
+  if(!section||!grid)return;
+  const sizes=kv7SizesForCategory(kv2CreateState.category);
+  const valid=new Set(sizes);
+  [...kv2CreateState.sizes].forEach(x=>{if(!valid.has(x))kv2CreateState.sizes.delete(x)});
+  const render=()=>{
+    grid.innerHTML=sizes.map(x=>`<button type="button" class="kv-size ${kv2CreateState.sizes.has(x)?'selected':''}" data-size="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('');
+    const tx=KV7_SIZE_TEXT[kv7Lang()]||KV7_SIZE_TEXT.uk;
+    section.querySelector('h4').textContent=tx.title;
+    const hint=section.querySelector('.kv-hint');if(hint)hint.textContent=tx.hint;
+    section.classList.toggle('kv-visible',sizes.length>0);
+    section.classList.remove('kv-changing');
+  };
+  if(animate&&section.classList.contains('kv-visible')){
+    section.classList.add('kv-changing');
+    setTimeout(render,180);
+  }else render();
+}
+function kv7BuildCondition(){
+  const old=document.getElementById('kvNewChoice');
+  if(!old)return;
+  const field=old.closest('.field');
+  if(!field)return;
+  const lang=kv7Lang(), labels=KV7_CONDITIONS[lang]||KV7_CONDITIONS.uk;
+  field.innerHTML=`
+    <label>${kv2('newLabel')}</label>
+    <input id="kvNew" type="hidden" value="true">
+    <input id="kvCondition" type="hidden" value="new">
+    <div id="kvConditionChoice" class="kv-choice">
+      <button type="button" class="kv-choice-head" onclick="kv2Toggle('kvConditionChoice')">
+        <strong id="kvConditionValue">${escapeHtml(labels.new)}</strong>
+        <span class="kv-choice-arrow">⌄</span>
+      </button>
+      <div class="kv-choice-body"><div class="kv-choice-inner"><div class="kv-choice-content">
+        <div class="kv-options kv-condition-options">
+          ${Object.entries(labels).map(([v,t])=>`<button type="button" class="kv-option ${v==='new'?'selected':''}" data-condition="${v}">${escapeHtml(t)} <span class="kv-check">✓</span></button>`).join('')}
+        </div>
+      </div></div></div>
+    </div>`;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('.kv-condition-options .kv-option');
+  if(!b)return;
+  e.preventDefault();e.stopPropagation();
+  const v=b.dataset.condition||'new';
+  const hidden=document.getElementById('kvCondition');
+  const bool=document.getElementById('kvNew');
+  if(hidden)hidden.value=v;
+  if(bool)bool.value=String(v==='new');
+  const label=document.getElementById('kvConditionValue');if(label)label.textContent=kv7ConditionLabel(v);
+  document.querySelectorAll('.kv-condition-options .kv-option').forEach(x=>x.classList.toggle('selected',x===b));
+  kv2MarkDirty();
+  setTimeout(()=>document.getElementById('kvConditionChoice')?.classList.remove('open'),120);
+},true);
+
+// Extend the existing create-product UI without touching auth/Supabase initialization.
+const kv7OpenCreate=window.openCreateProduct;
+window.openCreateProduct=async function(){
+  await kv7OpenCreate();
+  kv7BuildCondition();
+  const sizeGrid=document.querySelector('#kvCreateProduct .kv-size-grid');
+  const sizeSection=sizeGrid?.closest('.kv-product-section');
+  if(sizeSection){
+    sizeSection.id='kvDynamicSizesSection';
+    sizeGrid.id='kvDynamicSizeGrid';
+    sizeGrid.innerHTML='';
+  }
+  kv7RenderSizes(false);
+};
+
+// Every category change swaps the available size system with the same smooth UI language.
+const kv7ChooseCategory=window.kv2ChooseCategory;
+window.kv2ChooseCategory=function(v){
+  kv7ChooseCategory(v);
+  setTimeout(()=>kv7RenderSizes(true),20);
+};
+
+// Size buttons use stable data values (including half shoe sizes).
+document.addEventListener('click',e=>{
+  const b=e.target.closest('#kvDynamicSizeGrid .kv-size');
+  if(!b)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  const s=b.dataset.size;
+  if(kv2CreateState.sizes.has(s)){kv2CreateState.sizes.delete(s);b.classList.remove('selected')}
+  else{kv2CreateState.sizes.add(s);b.classList.add('selected')}
+  kv2MarkDirty();
+},true);
+
+// Finish the two order status labels that could originate from Ukrainian/Russian base text.
+const KV7_STATUS_BASE={
+ 'Получен':'delivered','Возврат':'returned','Получено':'delivered','Возвращён':'returned',
+ 'Отримано':'delivered','Повернення':'returned','Отриманий':'delivered','Повернено':'returned',
+ 'Атрыманы':'delivered','Вяртанне':'returned','Delivered':'delivered','Returned':'returned'
+};
+function kv7TranslateOrderStatuses(){
+  const dict=(typeof KV6==='object'?(KV6[kv7Lang()]||KV6.uk):null);
+  if(!dict)return;
+  document.querySelectorAll('.status,.status-pill,.order-status,.pill').forEach(el=>{
+    const raw=(el.dataset.kv7statusBase||el.textContent||'').trim();
+    const key=KV7_STATUS_BASE[raw]||el.dataset.status||'';
+    if(key&&dict[key]){el.dataset.kv7statusBase=raw;el.textContent=dict[key]}
+  });
+}
+const kv7Apply=window.applyUiPrefs;
+window.applyUiPrefs=function(p=getUiPrefs()){
+  kv7Apply(p);
+  setTimeout(()=>{
+    kv7TranslateOrderStatuses();
+    if(document.getElementById('kvCreateProduct')){
+      kv7RenderSizes(false);
+      const cond=document.getElementById('kvCondition')?.value||'new';
+      const cv=document.getElementById('kvConditionValue');if(cv)cv.textContent=kv7ConditionLabel(cond);
+    }
+  },70);
+};
+document.addEventListener('click',()=>setTimeout(kv7TranslateOrderStatuses,80),false);
+setTimeout(kv7TranslateOrderStatuses,220);
 </script>
 
 </body>
