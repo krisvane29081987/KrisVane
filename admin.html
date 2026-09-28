@@ -4868,5 +4868,81 @@ window.openCreateProduct=async function(){
 };
 </script>
 
+
+<style>
+/* v13: photo previews always flow side-by-side and wrap to the next row */
+#kvPhotoPreview,
+#kvPhotoPreviewGrid,
+.kv-photo-preview-grid,
+.kv-photo-previews,
+.photo-preview-grid,
+.photo-previews{
+  display:flex !important;
+  flex-direction:row !important;
+  flex-wrap:wrap !important;
+  align-items:flex-start !important;
+  align-content:flex-start !important;
+  gap:10px !important;
+  width:100% !important;
+}
+#kvPhotoPreview > *,
+#kvPhotoPreviewGrid > *,
+.kv-photo-preview-grid > *,
+.kv-photo-previews > *,
+.photo-preview-grid > *,
+.photo-previews > *{
+  flex:0 0 118px !important;
+  width:118px !important;
+  max-width:118px !important;
+}
+
+/* v13: numeric suit sizes are a distinct row BELOW letter sizes */
+#kvSuitNumericBlock{
+  display:block !important;
+  width:100% !important;
+  flex-basis:100% !important;
+  clear:both !important;
+  margin-top:16px !important;
+  padding-top:13px !important;
+  border-top:1px solid var(--border);
+}
+#kvSuitNumericBlock .kv-suit-size-title{
+  margin:0 0 9px !important;
+  font-weight:800;
+  color:var(--accent);
+}
+#kvSuitNumericGrid{
+  display:flex !important;
+  flex-wrap:wrap !important;
+  gap:7px !important;
+  width:100% !important;
+}
+</style>
+<script>
+/* v13: make the two size systems explicit and force the numeric row to render
+   immediately after the native letter-size grid. */
+(function(){
+  const oldRender=window.kv12RenderSuitNumeric;
+  window.kv12RenderSuitNumeric=function(){
+    if(typeof oldRender==='function') oldRender();
+    const block=document.getElementById('kvSuitNumericBlock');
+    if(!block)return;
+    const nativeGrid=document.getElementById('kvDynamicSizeGrid') ||
+                     document.getElementById('kvSizeChoices') ||
+                     document.querySelector('.kv-size-grid');
+    if(nativeGrid && nativeGrid.parentElement){
+      nativeGrid.insertAdjacentElement('afterend',block);
+    }
+    const title=block.querySelector('.kv-suit-size-title');
+    if(title) title.textContent='38–62';
+  };
+  document.addEventListener('click',e=>{
+    if(e.target.closest('button,[role="option"],[data-value]')){
+      setTimeout(()=>window.kv12RenderSuitNumeric?.(),120);
+    }
+  },false);
+})();
+</script>
+
 </body>
 </html>
