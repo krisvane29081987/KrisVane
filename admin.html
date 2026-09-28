@@ -4328,7 +4328,7 @@ function kv7ConditionLabel(v){return (KV7_CONDITIONS[kv7Lang()]||KV7_CONDITIONS.
 function kv7SizesForCategory(cat){
   if(cat==='Одежда') return KV7_CLOTHING_SIZES;
   if(cat==='Обувь') return KV7_SHOE_SIZES;
-  if(cat==='Костюмы') return KV10_SUIT_SIZES;
+  if(cat==='Костюмы') return KV7_CLOTHING_SIZES;
   return [];
 }
 function kv7RenderSizes(animate=true){
@@ -4688,15 +4688,7 @@ document.addEventListener('click',e=>{
     setTimeout(kv102RenderSuitSizes,260);
   }
 },true);
-const kv102Observer=new MutationObserver(()=>{
-  clearTimeout(window.__kv102t);
-  window.__kv102t=setTimeout(kv102RenderSuitSizes,60);
-});
-setTimeout(()=>{
- const modal=document.querySelector('.modal,.kv-modal,[role="dialog"]');
- if(modal)kv102Observer.observe(modal,{childList:true,subtree:true});
- kv102RenderSuitSizes();
-},150);
+/* v12: observer removed — the native size renderer handles category changes. */
 </script>
 
 
@@ -4799,6 +4791,80 @@ window.openCreateProduct=async function(){
     /* v7 now knows that Костюмы has sizes, so render it through the native size section. */
     if(typeof kv7RenderSizes==='function')kv7RenderSizes(false);
   },40);
+};
+</script>
+
+
+<style>
+/* v12 — compact, separate suit numeric sizes */
+#kvSuitNumericBlock{margin-top:12px}
+#kvSuitNumericBlock .kv-suit-size-title{font-weight:800;color:var(--accent);margin:0 0 8px}
+#kvSuitNumericGrid{display:flex;flex-wrap:wrap;gap:7px}
+#kvSuitNumericGrid .kv-suit-num{
+  appearance:none;border:1px solid var(--border);background:var(--panel2);
+  color:var(--text);border-radius:10px;padding:8px 11px;min-width:62px;
+  font:inherit;font-weight:700;cursor:pointer;
+  transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease;
+}
+#kvSuitNumericGrid .kv-suit-num:hover{transform:translateY(-1px);border-color:var(--accent)}
+#kvSuitNumericGrid .kv-suit-num.selected{
+  border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent);
+  box-shadow:0 0 0 1px color-mix(in srgb,var(--accent) 35%,transparent) inset;
+}
+</style>
+<script>
+/* v12 — separate clickable suit letter/numeric sizes, no observers */
+const KV12_SUIT_NUMERIC=['38–40','40–42','42–44','44–46','46–48','48–50','50–52','52–54','54–56','56–58','58–60','60–62'];
+let kv12SuitNumericSelected=new Set();
+
+function kv12CurrentCategory(){
+  return (window.kv2TaxCategory || document.querySelector('#kvCategoryCustom')?.dataset?.value || '').trim();
+}
+function kv12SizeHost(){
+  return document.getElementById('kvDynamicSizeGrid')?.parentElement ||
+         document.getElementById('kvSizeChoices')?.parentElement ||
+         document.querySelector('.kv-size-grid')?.parentElement;
+}
+function kv12RenderSuitNumeric(){
+  const old=document.getElementById('kvSuitNumericBlock');
+  if(kv12CurrentCategory()!=='Костюмы'){ old?.remove(); return; }
+  const host=kv12SizeHost(); if(!host)return;
+  let block=old;
+  if(!block){
+    block=document.createElement('div');
+    block.id='kvSuitNumericBlock';
+    block.innerHTML='<div class="kv-suit-size-title">38–62</div><div id="kvSuitNumericGrid"></div>';
+    host.appendChild(block);
+  }
+  const grid=block.querySelector('#kvSuitNumericGrid');
+  grid.innerHTML=KV12_SUIT_NUMERIC.map(s=>`<button type="button" class="kv-suit-num${kv12SuitNumericSelected.has(s)?' selected':''}" data-suit-num="${s}">${s}</button>`).join('');
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-suit-num]');
+  if(b){
+    e.preventDefault();e.stopPropagation();
+    const s=b.dataset.suitNum;
+    kv12SuitNumericSelected.has(s)?kv12SuitNumericSelected.delete(s):kv12SuitNumericSelected.add(s);
+    b.classList.toggle('selected',kv12SuitNumericSelected.has(s));
+    if(typeof kv2MarkDirty==='function')kv2MarkDirty();
+    return;
+  }
+  /* One-shot refresh after category selection. No MutationObserver, no loop. */
+  if(e.target.closest('button,[role="option"],[data-value]')){
+    setTimeout(()=>{
+      if(typeof kv7RenderSizes==='function')kv7RenderSizes(false);
+      kv12RenderSuitNumeric();
+    },90);
+  }
+},true);
+
+/* Preserve the selected numeric suit values for the create workflow without
+   rewriting the existing letter-size click engine. */
+const kv12OldOpen=window.openCreateProduct;
+window.openCreateProduct=async function(){
+  kv12SuitNumericSelected.clear();
+  await kv12OldOpen();
+  setTimeout(kv12RenderSuitNumeric,100);
 };
 </script>
 
