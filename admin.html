@@ -5263,5 +5263,102 @@ window.openCreateProduct=async function(){
 })();
 </script>
 
+
+<script>
+/* v18 — persistent admin state.
+   UI preferences + current tab + scroll positions + unfinished product draft survive reload/browser/device restart
+   on the same browser profile. No cache of auth secrets or Supabase responses. */
+(function(){
+  const KEY='krisvane.admin.persist.v18';
+  const safeParse=(s,d={})=>{try{return JSON.parse(s)||d}catch{return d}};
+  const load=()=>safeParse(localStorage.getItem(KEY),{});
+  const save=(p)=>{const s={...load(),...p};localStorage.setItem(KEY,JSON.stringify(s));return s};
+  const qs=(s,r=document)=>r.querySelector(s);
+  const qsa=(s,r=document)=>[...r.querySelectorAll(s)];
+
+  // Save tab + page/modal scroll without touching existing navigation logic.
+  document.addEventListener('click',e=>{
+    const nav=e.target.closest('[data-tab], [data-page], .nav-item, .sidebar a, .sidebar button');
+    if(nav){
+      const id=nav.dataset.tab||nav.dataset.page||nav.getAttribute('href')||nav.textContent.trim();
+      save({lastNav:id, pageY:window.scrollY});
+    }
+  },true);
+
+  let scrollTimer;
+  addEventListener('scroll',()=>{
+    clearTimeout(scrollTimer);
+    scrollTimer=setTimeout(()=>save({pageY:window.scrollY}),120);
+  },{passive:true});
+
+  document.addEventListener('scroll',e=>{
+    const m=e.target.closest?.('.modal, .modal-card, .dialog, [role="dialog"]');
+    if(m) save({modalY:m.scrollTop});
+  },true);
+
+  // Persist every settings control automatically. Existing handlers still remain authoritative.
+  document.addEventListener('change',e=>{
+    const el=e.target;
+    if(!el.matches('select,input,textarea')) return;
+    const settings=el.closest('[data-page="settings"], #settingsPage, #settings, .settings-page');
+    if(!settings) return;
+    const id=el.id||el.name;
+    if(!id) return;
+    const st=load(), prefs={...(st.prefs||{})};
+    prefs[id]=el.type==='checkbox'?el.checked:el.value;
+    save({prefs});
+  },true);
+
+  function restorePrefs(){
+    const prefs=load().prefs||{};
+    for(const [id,val] of Object.entries(prefs)){
+      const el=document.getElementById(id)||document.querySelector(`[name="${CSS.escape(id)}"]`);
+      if(!el) continue;
+      if(el.type==='checkbox') el.checked=!!val; else el.value=val;
+      el.dispatchEvent(new Event('change',{bubbles:true}));
+    }
+  }
+
+  // Draft of add-product form: text/select values + selected sizes/category state.
+  // File inputs cannot legally be restored by browsers after restart.
+  function snapshotDraft(){
+    const modal=qs('#kv2CreateModal, #createProductModal, .product-create-modal');
+    if(!modal || getComputedStyle(modal).display==='none') return;
+    const fields={};
+    qsa('input:not([type=file]):not([type=password]),textarea,select',modal).forEach(el=>{
+      const k=el.id||el.name;
+      if(k) fields[k]=el.type==='checkbox'?el.checked:el.value;
+    });
+    let state=null;
+    try{
+      if(typeof kv2CreateState!=='undefined') state=JSON.parse(JSON.stringify(kv2CreateState));
+    }catch{}
+    save({productDraft:{fields,state,at:Date.now()}});
+  }
+  document.addEventListener('input',e=>{
+    if(e.target.closest?.('#kv2CreateModal, #createProductModal, .product-create-modal')) snapshotDraft();
+  },true);
+  document.addEventListener('change',e=>{
+    if(e.target.closest?.('#kv2CreateModal, #createProductModal, .product-create-modal')) setTimeout(snapshotDraft,0);
+  },true);
+
+  // Restore scroll only after the app/auth has had time to render.
+  addEventListener('load',()=>{
+    setTimeout(()=>{
+      restorePrefs();
+      const s=load();
+      if(Number.isFinite(s.pageY)) scrollTo({top:s.pageY,behavior:'instant'});
+    },900);
+  });
+
+  // Expose tiny helpers for future client-side work, without overriding current admin code.
+  window.KrisVanePersist={
+    load, save,
+    clear(){localStorage.removeItem(KEY)},
+    draft(){return load().productDraft||null}
+  };
+})();
+</script>
+
 </body>
 </html>
