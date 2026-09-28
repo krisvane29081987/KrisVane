@@ -33,6 +33,49 @@
       --radius: 18px;
     }
 
+    /* =========================
+       THEMES / APPEARANCE
+    ========================= */
+    html[data-theme="light"] {
+      --bg:#f5f7fb; --panel:#ffffff; --panel-2:#f0f3f8; --panel-3:#e9edf5; --border:#d9deea;
+      --text:#171a22; --muted:#687083; --accent:#6674ff; --accent-2:#8b5cf6;
+    }
+    html[data-theme="graphite"] {
+      --bg:#101113; --panel:#17191d; --panel-2:#1e2126; --panel-3:#252930; --border:#30353e;
+      --text:#f5f6f7; --muted:#9ca3af; --accent:#a8b0bd; --accent-2:#6b7280;
+    }
+    html[data-theme="midnight"] {
+      --bg:#07101f; --panel:#0c1729; --panel-2:#112039; --panel-3:#162845; --border:#22395c;
+      --text:#eef6ff; --muted:#8ea6c7; --accent:#3b82f6; --accent-2:#06b6d4;
+    }
+    html[data-theme="emerald"] {
+      --bg:#07110e; --panel:#0d1915; --panel-2:#12231d; --panel-3:#183027; --border:#24483a;
+      --text:#effcf7; --muted:#8eb5a5; --accent:#10b981; --accent-2:#22c55e;
+    }
+    html[data-theme="rose"] {
+      --bg:#140a10; --panel:#1d1018; --panel-2:#291621; --panel-3:#351c2b; --border:#4b293c;
+      --text:#fff3f8; --muted:#c09aaa; --accent:#ec4899; --accent-2:#f43f5e;
+    }
+    html[data-theme="amber"] {
+      --bg:#151007; --panel:#1d170c; --panel-2:#292011; --panel-3:#352a16; --border:#4b3b20;
+      --text:#fff9ed; --muted:#c3ad82; --accent:#f59e0b; --accent-2:#f97316;
+    }
+    html[data-theme="violet"] {
+      --bg:#0b0c0f; --panel:#12141a; --panel-2:#181b22; --panel-3:#1d2029; --border:#272b37;
+      --text:#f4f5f7; --muted:#9298a6; --accent:#6d5dfc; --accent-2:#3b82f6;
+    }
+    body { --glow-rgb:109,93,252; }
+    html[data-theme="light"] body { --glow-rgb:139,92,246; }
+    html[data-theme="graphite"] body { --glow-rgb:180,190,205; }
+    html[data-theme="midnight"] body { --glow-rgb:59,130,246; }
+    html[data-theme="emerald"] body { --glow-rgb:16,185,129; }
+    html[data-theme="rose"] body { --glow-rgb:236,72,153; }
+    html[data-theme="amber"] body { --glow-rgb:245,158,11; }
+    html[data-theme="violet"] body { --glow-rgb:109,93,252; }
+    html[data-density="compact"] { font-size:14px; }
+    html[data-density="compact"] .panel, html[data-density="compact"] .np-test { padding:14px; }
+    html[data-motion="reduced"] *, html[data-motion="reduced"] *::before, html[data-motion="reduced"] *::after { transition-duration:.12s !important; animation-duration:.12s !important; }
+
     html {
       scroll-behavior: smooth;
     }
@@ -51,7 +94,7 @@
       background:
         radial-gradient(
           circle at top right,
-          rgba(109, 93, 252, 0.12),
+          rgba(var(--glow-rgb), 0.16),
           transparent 30%
         ),
         var(--bg);
@@ -1202,12 +1245,12 @@
         Kris<span>Vane</span>
       </div>
 
-      <div class="nav-item active" data-view="orders" onclick="switchAdminView('orders')">Заказы</div>
-      <div class="nav-item" data-view="products" onclick="switchAdminView('products')">Товары</div>
-      <div class="nav-item" data-view="categories" onclick="switchAdminView('categories')">Категории</div>
-      <div class="nav-item" data-view="customers" onclick="switchAdminView('customers')">Покупатели</div>
+      <div class="nav-item active" data-view="orders" data-i18n="navOrders" onclick="switchAdminView('orders')">Заказы</div>
+      <div class="nav-item" data-view="products" data-i18n="navProducts" onclick="switchAdminView('products')">Товары</div>
+      <div class="nav-item" data-view="categories" data-i18n="navCategories" onclick="switchAdminView('categories')">Категории</div>
+      <div class="nav-item" data-view="customers" data-i18n="navCustomers" onclick="switchAdminView('customers')">Покупатели</div>
       <div class="nav-separator"></div>
-      <div class="nav-item" data-view="settings" onclick="switchAdminView('settings')">Настройки</div>
+      <div class="nav-item" data-view="settings" data-i18n="navSettings" onclick="switchAdminView('settings')">Настройки</div>
 
     </aside>
 
@@ -1337,7 +1380,7 @@
 
       <section id="view-products" class="admin-view">
         <div class="section-head"><div><h2>Товары</h2><p>Каталог, цены, публикация и быстрые изменения.</p></div><button class="btn btn-primary" onclick="openCreateProduct()">+ Добавить товар</button></div>
-        <div class="panel"><div class="data-toolbar"><input id="productSearch" class="input" placeholder="Поиск по товару, SKU, описанию..." oninput="renderProducts()"><button class="btn btn-secondary" onclick="loadProducts()">Обновить</button></div><div id="productsAdminContainer" class="section-message">Откройте раздел — товары загрузятся автоматически.</div></div>
+        <div class="panel"><div class="data-toolbar"><input id="productSearch" class="input" placeholder="Поиск по названию, артикулу или описанию..." oninput="renderProducts()"><button class="btn btn-secondary" onclick="loadProducts()">Обновить</button></div><div id="productsAdminContainer" class="section-message">Откройте раздел — товары загрузятся автоматически.</div></div>
       </section>
 
       <section id="view-categories" class="admin-view">
@@ -1352,15 +1395,24 @@
       </section>
 
       <section id="view-settings" class="admin-view">
-        <div class="section-head"><div><h2>Настройки магазина</h2><p>Отправитель, доставка и параметры посылки KrisVane.</p></div><button id="settingsSaveBtn" class="btn btn-primary" onclick="saveStoreSettings()">Сохранить настройки</button></div>
+        <div class="section-head"><div><h2>Настройки магазина</h2><p>Магазин, отправитель, доставка и внешний вид админ-панели.</p></div><button id="settingsSaveBtn" class="btn btn-primary" onclick="saveStoreSettings()">Сохранить настройки</button></div>
         <div class="panel"><div class="settings-grid">
-          <div class="field"><label>Название магазина</label><input id="settingStoreName" class="input" placeholder="KrisVane"></div>
-          <div class="field"><label>Имя отправителя</label><input id="settingSenderName" class="input" placeholder="Имя и фамилия"></div>
-          <div class="field"><label>Телефон отправителя</label><input id="settingSenderPhone" class="input" placeholder="+380..."></div>
+          <div class="field"><label>Название магазина</label><input id="settingStoreName" class="input" placeholder="Например: KrisVane"></div>
+          <div class="field"><label>Имя отправителя</label><input id="settingSenderName" class="input" placeholder="Например: Іван Крисенко"></div>
+          <div class="field"><label>Телефон отправителя</label><input id="settingSenderPhone" class="input" placeholder="Например: +380 67 123 45 67"></div>
           <div class="field"><label>Перевозчик по умолчанию</label><select id="settingCarrier" class="select"><option value="nova_poshta">Nova Poshta</option><option value="ukrposhta" disabled>Укрпочта — скоро</option><option value="meest" disabled>Meest — скоро</option></select></div>
-          <div class="field"><label>Вес посылки, кг</label><input id="settingWeight" class="input" type="number" min="0.001" step="0.001"></div>
-          <div class="field"><label>Описание содержимого</label><input id="settingDescription" class="input" placeholder="Одяг"></div>
         </div></div>
+        <div class="panel">
+          <div class="section-head"><div><h2 style="font-size:18px">Интерфейс</h2><p>Эти параметры сохраняются на этом устройстве и применяются сразу.</p></div><button class="btn btn-secondary" type="button" onclick="resetUiPreferences()">Сбросить оформление</button></div>
+          <div class="settings-grid">
+            <div class="field"><label>Тема</label><select id="uiTheme" class="select" onchange="previewUiPreferences()"><option value="violet">Тёмная · Фиолетовая</option><option value="light">Светлая · Белая</option><option value="graphite">Графитовая</option><option value="midnight">Полночь · Синяя</option><option value="emerald">Изумрудная</option><option value="rose">Розовая</option><option value="amber">Янтарная</option></select></div>
+            <div class="field"><label>Язык админ-панели</label><select id="uiLanguage" class="select" onchange="previewUiPreferences()"><option value="ru">Русский</option><option value="uk">Українська</option><option value="en">English</option><option value="pl">Polski</option><option value="de">Deutsch</option></select></div>
+            <div class="field"><label>Плотность интерфейса</label><select id="uiDensity" class="select" onchange="previewUiPreferences()"><option value="comfortable">Обычная</option><option value="compact">Компактная</option></select></div>
+            <div class="field"><label>Анимации</label><select id="uiMotion" class="select" onchange="previewUiPreferences()"><option value="full">Полные · рекомендовано</option><option value="reduced">Уменьшенные</option></select></div>
+            <div class="field"><label>Запоминать открытую вкладку</label><select id="uiRememberTab" class="select"><option value="yes">Да</option><option value="no">Нет</option></select></div>
+            <div class="field"><label>Подтверждать удаление</label><select id="uiConfirmDelete" class="select"><option value="yes">Да · безопаснее</option><option value="no">Нет</option></select></div>
+          </div>
+        </div>
         <section class="np-test" id="npTestPanel">
         <div class="np-test-head">
           <div>
@@ -1447,6 +1499,8 @@
     let adminCustomers = [];
     let adminSettings = null;
     const loadedAdminViews = new Set(["orders"]);
+    // Appearance is restored immediately when the script starts.
+    try { const _p=JSON.parse(localStorage.getItem("krisvaneAdminUiPrefs")||"{}"); document.documentElement.dataset.theme=_p.theme||"violet"; document.documentElement.dataset.density=_p.density||"comfortable"; document.documentElement.dataset.motion=_p.motion||"full"; } catch(_) {}
 
 
     /* =========================================
@@ -3324,7 +3378,7 @@
       document.querySelectorAll(".nav-item[data-view]").forEach(v=>v.classList.toggle("active",v.dataset.view===name));
       document.getElementById("pageTitle").textContent=ADMIN_VIEW_META[name][0];
       document.getElementById("pageSubtitle").textContent=ADMIN_VIEW_META[name][1];
-      try { sessionStorage.setItem("krisvaneAdminView",name); } catch(_) {}
+      try { if(getUiPrefs().rememberTab!=="no") sessionStorage.setItem("krisvaneAdminView",name); else sessionStorage.removeItem("krisvaneAdminView"); } catch(_) {}
       if (loadedAdminViews.has(name)) return;
       loadedAdminViews.add(name);
       if(name==="products") await loadProducts();
@@ -3338,12 +3392,28 @@
     function closeAdminModal(){ document.getElementById("adminModal").classList.remove("show"); }
     function openAdminModal(title,html){ document.getElementById("adminModalTitle").textContent=title; document.getElementById("adminModalBody").innerHTML=html; document.getElementById("adminModal").classList.add("show"); }
     function editableFields(obj){ return Object.keys(obj||{}).filter(k=>!isSystemField(k) && !Array.isArray(obj[k]) && (obj[k]===null || ["string","number","boolean"].includes(typeof obj[k]))); }
-    function fieldHtml(k,v){ const label=k.replaceAll("_"," "); if(typeof v==="boolean") return `<div class="field"><label>${escapeHtml(label)}</label><select class="select modal-field" data-key="${escapeHtml(k)}"><option value="true" ${v?'selected':''}>Да</option><option value="false" ${!v?'selected':''}>Нет</option></select></div>`; const type=typeof v==="number"?"number":"text"; return `<div class="field"><label>${escapeHtml(label)}</label><input class="input modal-field" data-key="${escapeHtml(k)}" type="${type}" value="${escapeHtml(v??'')}"></div>`; }
+    const FIELD_META={
+      category_id:["Категория","Выберите основную категорию"], subcategory_id:["Подкатегория","Выберите подкатегорию"],
+      name:["Название товара","Например: KrisVane Oversize Hoodie"], title:["Название","Например: KrisVane Oversize Hoodie"],
+      slug:["Адрес товара (slug)","Например: krisvane-oversize-hoodie"], sku:["Артикул","Например: KV-HOODIE-BLK"],
+      brand:["Бренд","Например: KrisVane"], description:["Описание","Например: Оверсайз худи из плотного хлопка"],
+      price:["Цена, грн","Например: 1999"], old_price:["Старая цена, грн","Например: 2399"],
+      is_published:["Опубликован","Показывать товар покупателям"], is_new:["Метка NEW","Показывать как новинку"],
+      is_featured:["Рекомендуемый","Показывать в избранных подборках"], sort_order:["Порядок сортировки","Например: 10"]
+    };
+    function fieldHtml(k,v){
+      const meta=FIELD_META[k]||[k.replaceAll("_"," "),""]; const label=meta[0], hint=meta[1];
+      if(k==="category_id") return `<div class="field"><label>${escapeHtml(label)}</label><select class="select modal-field" data-key="${k}"><option value="">— Выберите категорию —</option>${adminCategories.map(c=>`<option value="${escapeHtml(c.id)}" ${String(v)===String(c.id)?'selected':''}>${escapeHtml(c.name||('#'+c.id))}</option>`).join('')}</select><small class="muted">${escapeHtml(hint)}</small></div>`;
+      if(k==="subcategory_id") return `<div class="field"><label>${escapeHtml(label)}</label><select class="select modal-field" data-key="${k}"><option value="">— Без подкатегории —</option>${adminSubcategories.map(c=>`<option value="${escapeHtml(c.id)}" ${String(v)===String(c.id)?'selected':''}>${escapeHtml(c.name||('#'+c.id))}</option>`).join('')}</select><small class="muted">${escapeHtml(hint)}</small></div>`;
+      if(typeof v==="boolean" || ["is_published","is_new","is_featured","is_active"].includes(k)) return `<div class="field"><label>${escapeHtml(label)}</label><select class="select modal-field" data-key="${escapeHtml(k)}"><option value="true" ${v===true?'selected':''}>Да</option><option value="false" ${v!==true?'selected':''}>Нет</option></select>${hint?`<small class="muted">${escapeHtml(hint)}</small>`:''}</div>`;
+      const type=(typeof v==="number" || ["price","old_price","sort_order"].includes(k))?"number":"text";
+      return `<div class="field ${k==='description'?'full':''}"><label>${escapeHtml(label)}</label><input class="input modal-field" data-key="${escapeHtml(k)}" type="${type}" value="${escapeHtml(v??'')}" placeholder="${escapeHtml(hint)}">${hint?`<small class="muted">${escapeHtml(hint)}</small>`:''}</div>`;
+    }
     function collectModalPayload(template){ const out={}; document.querySelectorAll("#adminModal .modal-field").forEach(el=>{ const k=el.dataset.key; const original=template?.[k]; if(typeof original==="boolean") out[k]=el.value==="true"; else if(typeof original==="number") out[k]=el.value===""?null:Number(el.value); else out[k]=el.value===""?null:el.value; }); return out; }
 
     async function loadProducts(){ const box=document.getElementById("productsAdminContainer"); box.innerHTML='<div class="loading">Загружаем товары…</div>'; const {data,error}=await supabaseClient.from("products").select("*").order("created_at",{ascending:false}); if(error){box.innerHTML=`<div class="empty">${escapeHtml(error.message)}</div>`;return;} adminProducts=data||[]; renderProducts(); }
-    function renderProducts(){ const box=document.getElementById("productsAdminContainer"); const q=(document.getElementById("productSearch")?.value||"").toLowerCase(); const rows=adminProducts.filter(p=>JSON.stringify(p).toLowerCase().includes(q)); if(!rows.length){box.innerHTML='<div class="empty">Товары не найдены.</div>';return;} box.innerHTML=`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Товар</th><th>Цена</th><th>Публикация</th><th>NEW</th><th>Featured</th><th>Действия</th></tr></thead><tbody>${rows.map(p=>`<tr><td><strong>${escapeHtml(p.name??p.title??`#${p.id}`)}</strong><div class="muted">${escapeHtml(p.slug??p.sku??'')}</div></td><td>${p.price!=null?money(p.price):'—'}${p.old_price!=null?`<div class="muted">старая: ${money(p.old_price)}</div>`:''}</td><td><span class="pill ${p.is_published?'on':'off'}">${p.is_published?'Опубликован':'Скрыт'}</span></td><td>${humanValue(p.is_new)}</td><td>${humanValue(p.is_featured)}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="editDataRow('products',${JSON.stringify(String(p.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="deleteDataRow('products',${JSON.stringify(String(p.id))},'товар')">Удалить</button></div></td></tr>`).join('')}</tbody></table></div>`; }
-    function openCreateProduct(){ const template=adminProducts[0]; if(!template){showToast("Для безопасного создания нужен хотя бы один товар-шаблон в таблице.","error");return;} openCreateFromTemplate("products",template,"Новый товар"); }
+    function renderProducts(){ const box=document.getElementById("productsAdminContainer"); const q=(document.getElementById("productSearch")?.value||"").toLowerCase(); const rows=adminProducts.filter(p=>JSON.stringify(p).toLowerCase().includes(q)); if(!rows.length){box.innerHTML='<div class="empty">Товары не найдены.</div>';return;} box.innerHTML=`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Товар</th><th>Цена</th><th>Публикация</th><th>NEW</th><th>Рекомендуемый</th><th>Действия</th></tr></thead><tbody>${rows.map(p=>`<tr><td><strong>${escapeHtml(p.name??p.title??`#${p.id}`)}</strong><div class="muted">${escapeHtml(p.slug??p.sku??'')}</div></td><td>${p.price!=null?money(p.price):'—'}${p.old_price!=null?`<div class="muted">старая: ${money(p.old_price)}</div>`:''}</td><td><span class="pill ${p.is_published?'on':'off'}">${p.is_published?'Опубликован':'Скрыт'}</span></td><td>${humanValue(p.is_new)}</td><td>${humanValue(p.is_featured)}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="editDataRow('products',${JSON.stringify(String(p.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="deleteDataRow('products',${JSON.stringify(String(p.id))},'товар')">Удалить</button></div></td></tr>`).join('')}</tbody></table></div>`; }
+    async function openCreateProduct(){ if(!adminCategories.length || !adminSubcategories.length) await loadCategories(); const template=adminProducts[0]; if(!template){showToast("Для безопасного создания нужен хотя бы один товар-шаблон в таблице.","error");return;} openCreateFromTemplate("products",template,"Добавление товара"); }
 
     async function loadCategories(){ const [c,sb]=await Promise.all([supabaseClient.from("categories").select("*").order("created_at",{ascending:false}),supabaseClient.from("subcategories").select("*").order("created_at",{ascending:false})]); const box=document.getElementById("categoriesAdminContainer"), sub=document.getElementById("subcategoriesAdminContainer"); if(c.error){box.innerHTML=`<div class="empty">${escapeHtml(c.error.message)}</div>`;} else {adminCategories=c.data||[];renderCategories();} if(sb.error){sub.innerHTML=`<div class="empty">${escapeHtml(sb.error.message)}</div>`;} else {adminSubcategories=sb.data||[];renderSubcategories();} }
     function renderCategories(){ const box=document.getElementById("categoriesAdminContainer"); const q=(document.getElementById("categorySearch")?.value||"").toLowerCase(); const rows=adminCategories.filter(x=>JSON.stringify(x).toLowerCase().includes(q)); box.innerHTML=rows.length?`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Категория</th><th>Slug</th><th>Статус</th><th>Действия</th></tr></thead><tbody>${rows.map(x=>`<tr><td><strong>${escapeHtml(x.name??`#${x.id}`)}</strong></td><td>${escapeHtml(x.slug??'—')}</td><td>${x.is_active===undefined?'—':`<span class="pill ${x.is_active?'on':'off'}">${x.is_active?'Активна':'Скрыта'}</span>`}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="editDataRow('categories',${JSON.stringify(String(x.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="deleteDataRow('categories',${JSON.stringify(String(x.id))},'категорию')">Удалить</button></div></td></tr>`).join('')}</tbody></table></div>`:'<div class="empty">Категории не найдены.</div>'; }
@@ -3359,10 +3429,27 @@
     async function saveDataRow(table,id){ const row=findAdminRow(table,id); const payload=collectModalPayload(row); const {error}=await supabaseClient.from(table).update(payload).eq("id",id); if(error){showToast(error.message,"error");return;} closeAdminModal();showToast("Изменения сохранены."); if(table==="products")await loadProducts();else await loadCategories(); }
     function openCreateFromTemplate(table,template,title){ const blank={}; editableFields(template).forEach(k=>{ if(["slug","name","title","description","sku"].includes(k))blank[k]=""; else if(typeof template[k]==="boolean")blank[k]=template[k]; else if(typeof template[k]==="number")blank[k]=0; else blank[k]=null; }); openAdminModal(title,`<div class="modal-grid">${editableFields(blank).map(k=>fieldHtml(k,blank[k])).join('')}</div><div class="modal-actions"><button class="btn btn-primary" onclick="createDataRow('${table}')">Создать</button></div>`); window.adminCreateTemplate=blank; }
     async function createDataRow(table){ const payload=collectModalPayload(window.adminCreateTemplate||{}); const {error}=await supabaseClient.from(table).insert(payload); if(error){showToast(error.message,"error");return;} closeAdminModal();showToast("Создано."); if(table==="products")await loadProducts();else await loadCategories(); }
-    async function deleteDataRow(table,id,label){ if(!confirm(`Удалить ${label}? Это действие нельзя отменить.`))return; const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error){showToast(error.message,"error");return;} showToast("Удалено."); if(table==="products")await loadProducts();else await loadCategories(); }
+    async function deleteDataRow(table,id,label){ if(getUiPrefs().confirmDelete!=="no" && !confirm(`Удалить ${label}? Это действие нельзя отменить.`))return; const {error}=await supabaseClient.from(table).delete().eq("id",id); if(error){showToast(error.message,"error");return;} showToast("Удалено."); if(table==="products")await loadProducts();else await loadCategories(); }
 
-    async function loadStoreSettingsForm(){ const {data,error}=await supabaseClient.from("store_settings").select("*").limit(1).single(); if(error){showToast(error.message,"error");return;} adminSettings=data; document.getElementById("settingStoreName").value=data.store_name??"KrisVane"; document.getElementById("settingSenderName").value=data.sender_name??""; document.getElementById("settingSenderPhone").value=data.sender_phone??""; document.getElementById("settingCarrier").value=data.default_carrier??"nova_poshta"; document.getElementById("settingWeight").value=data.parcel_weight??0.5; document.getElementById("settingDescription").value=data.parcel_description??"Одяг"; await loadNpSavedSettings(); }
-    async function saveStoreSettings(){ if(!adminSettings) await loadStoreSettingsForm(); if(!adminSettings)return; const weight=Number(document.getElementById("settingWeight").value); if(!(weight>0)){showToast("Вес посылки должен быть больше нуля.","error");return;} const btn=document.getElementById("settingsSaveBtn");btn.disabled=true;btn.textContent="Сохраняем…"; const payload={store_name:document.getElementById("settingStoreName").value.trim()||"KrisVane",sender_name:document.getElementById("settingSenderName").value.trim()||null,sender_phone:document.getElementById("settingSenderPhone").value.trim()||null,default_carrier:document.getElementById("settingCarrier").value,parcel_weight:weight,parcel_description:document.getElementById("settingDescription").value.trim()||"Одяг",updated_at:new Date().toISOString()}; const {error}=await supabaseClient.from("store_settings").update(payload).eq("id",adminSettings.id); btn.disabled=false;btn.textContent="Сохранить настройки"; if(error){showToast(error.message,"error");return;} adminSettings={...adminSettings,...payload};showToast("Настройки KrisVane сохранены."); }
+    const UI_PREF_KEY="krisvaneAdminUiPrefs";
+    const UI_DEFAULTS={theme:"violet",language:"ru",density:"comfortable",motion:"full",rememberTab:"yes",confirmDelete:"yes"};
+    function getUiPrefs(){ try{return {...UI_DEFAULTS,...JSON.parse(localStorage.getItem(UI_PREF_KEY)||"{}")};}catch(_){return {...UI_DEFAULTS};} }
+    function applyUiPrefs(p=getUiPrefs()){ document.documentElement.dataset.theme=p.theme; document.documentElement.dataset.density=p.density; document.documentElement.dataset.motion=p.motion; document.documentElement.lang=p.language; applyAdminLanguage(p.language); }
+    function fillUiPrefs(){ const p=getUiPrefs(); [["uiTheme","theme"],["uiLanguage","language"],["uiDensity","density"],["uiMotion","motion"],["uiRememberTab","rememberTab"],["uiConfirmDelete","confirmDelete"]].forEach(([id,k])=>{const el=document.getElementById(id);if(el)el.value=p[k];}); }
+    function previewUiPreferences(){ const p={...getUiPrefs(),theme:document.getElementById("uiTheme")?.value||"violet",language:document.getElementById("uiLanguage")?.value||"ru",density:document.getElementById("uiDensity")?.value||"comfortable",motion:document.getElementById("uiMotion")?.value||"full"}; applyUiPrefs(p); }
+    function saveUiPreferences(){ const p={theme:document.getElementById("uiTheme")?.value||"violet",language:document.getElementById("uiLanguage")?.value||"ru",density:document.getElementById("uiDensity")?.value||"comfortable",motion:document.getElementById("uiMotion")?.value||"full",rememberTab:document.getElementById("uiRememberTab")?.value||"yes",confirmDelete:document.getElementById("uiConfirmDelete")?.value||"yes"}; localStorage.setItem(UI_PREF_KEY,JSON.stringify(p)); applyUiPrefs(p); }
+    function resetUiPreferences(){ localStorage.removeItem(UI_PREF_KEY); applyUiPrefs(UI_DEFAULTS); fillUiPrefs(); showToast("Оформление сброшено."); }
+    const ADMIN_LANG={
+      ru:{navOrders:"Заказы",navProducts:"Товары",navCategories:"Категории",navCustomers:"Покупатели",navSettings:"Настройки"},
+      uk:{navOrders:"Замовлення",navProducts:"Товари",navCategories:"Категорії",navCustomers:"Покупці",navSettings:"Налаштування"},
+      en:{navOrders:"Orders",navProducts:"Products",navCategories:"Categories",navCustomers:"Customers",navSettings:"Settings"},
+      pl:{navOrders:"Zamówienia",navProducts:"Produkty",navCategories:"Kategorie",navCustomers:"Klienci",navSettings:"Ustawienia"},
+      de:{navOrders:"Bestellungen",navProducts:"Produkte",navCategories:"Kategorien",navCustomers:"Kunden",navSettings:"Einstellungen"}
+    };
+    function applyAdminLanguage(lang){ const d=ADMIN_LANG[lang]||ADMIN_LANG.ru; document.querySelectorAll("[data-i18n]").forEach(el=>{if(d[el.dataset.i18n])el.textContent=d[el.dataset.i18n];}); }
+
+    async function loadStoreSettingsForm(){ const {data,error}=await supabaseClient.from("store_settings").select("*").limit(1).single(); if(error){showToast(error.message,"error");return;} adminSettings=data; document.getElementById("settingStoreName").value=data.store_name??"KrisVane"; document.getElementById("settingSenderName").value=data.sender_name??""; document.getElementById("settingSenderPhone").value=data.sender_phone??""; document.getElementById("settingCarrier").value=data.default_carrier??"nova_poshta"; fillUiPrefs(); await loadNpSavedSettings(); }
+    async function saveStoreSettings(){ if(!adminSettings) await loadStoreSettingsForm(); if(!adminSettings)return; const btn=document.getElementById("settingsSaveBtn");btn.disabled=true;btn.textContent="Сохраняем…"; const payload={store_name:document.getElementById("settingStoreName").value.trim()||"KrisVane",sender_name:document.getElementById("settingSenderName").value.trim()||null,sender_phone:document.getElementById("settingSenderPhone").value.trim()||null,default_carrier:document.getElementById("settingCarrier").value,updated_at:new Date().toISOString()}; const {error}=await supabaseClient.from("store_settings").update(payload).eq("id",adminSettings.id); btn.disabled=false;btn.textContent="Сохранить настройки"; if(error){showToast(error.message,"error");return;} saveUiPreferences(); adminSettings={...adminSettings,...payload};showToast("Настройки KrisVane сохранены."); }
 
     document.addEventListener("keydown",e=>{if(e.key==="Escape")closeAdminModal();});
 
