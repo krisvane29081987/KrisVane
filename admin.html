@@ -4538,7 +4538,7 @@ function kv9Suit(){return KV9_SUITS[kv9Lang()]||KV9_SUITS.uk}
 // Add Suits to the category taxonomy as a real selectable category.
 if(typeof KV2_TAXONOMY==='object' && !KV2_TAXONOMY['Костюмы']){
   KV2_TAXONOMY['Костюмы']=[
-    'Классические костюмы','Повседневные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'
+    'Спортивные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'
   ];
 }
 if(typeof KV2_TAX_I18N==='object'){
@@ -4623,14 +4623,14 @@ const KV10_SUIT_SIZES=[
   'XXXL • 60–62'
 ];
 const KV10_SUIT_SUBS={
- uk:['Класичні костюми','Повсякденні костюми','Брючні костюми','Костюми зі спідницею','Костюми-трійки','Комплекти'],
- ru:['Классические костюмы','Повседневные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'],
- en:['Classic suits','Casual suits','Trouser suits','Skirt suits','Three-piece suits','Sets'],
- be:['Класічныя касцюмы','Паўсядзённыя касцюмы','Штановыя касцюмы','Касцюмы са спадніцай','Касцюмы-тройкі','Камплекты'],
- zh:['经典套装','休闲套装','裤装套装','裙装套装','三件套','组合套装']
+ uk:['Спортивні костюми','Брючні костюми','Костюми зі спідницею','Костюми-трійки','Комплекти'],
+ ru:['Спортивные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'],
+ en:['Tracksuits','Trouser suits','Skirt suits','Three-piece suits','Sets'],
+ be:['Спартыўныя касцюмы','Штановыя касцюмы','Касцюмы са спадніцай','Касцюмы-тройкі','Камплекты'],
+ zh:['运动套装','裤装套装','裙装套装','三件套','组合套装']
 };
 if(typeof KV2_TAX_I18N==='object'){
- const keys=['Классические костюмы','Повседневные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'];
+ const keys=['Спортивные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'];
  Object.entries(KV10_SUIT_SUBS).forEach(([lang,vals])=>{
    KV2_TAX_I18N[lang]=KV2_TAX_I18N[lang]||{};
    keys.forEach((k,i)=>KV2_TAX_I18N[lang][k]=vals[i]);
@@ -4654,6 +4654,48 @@ document.addEventListener('click',e=>{
    setTimeout(()=>kv10ApplySuitSizes(),60);
  }
 },true);
+</script>
+
+
+<script>
+/* v10.2 — reliable suit-size refresh */
+function kv102SuitSelected(){
+  const labels=[...document.querySelectorAll('button,div,span')]
+    .map(el=>(el.textContent||'').trim())
+    .filter(Boolean);
+  const suitNames=['Костюмы','Костюми','Suits','Касцюмы','套装'];
+  return suitNames.some(n=>labels.includes(n)) &&
+    [...document.querySelectorAll('[data-selected="true"],.selected,.active,[aria-selected="true"]')]
+      .some(el=>suitNames.includes((el.textContent||'').replace('✓','').trim()));
+}
+function kv102FindSizeWrap(){
+  return document.getElementById('kvSizeChoices') ||
+    document.querySelector('[data-kv-size-choices],.kv-size-choices,.kv-size-grid');
+}
+function kv102RenderSuitSizes(){
+  const wrap=kv102FindSizeWrap();
+  if(!wrap)return;
+  const modal=wrap.closest('.modal,.kv-modal,[role="dialog"]')||document;
+  const txt=modal.textContent||'';
+  if(!['Костюмы','Костюми','Suits','Касцюмы','套装'].some(n=>txt.includes(n)))return;
+  wrap.style.display='';
+  wrap.innerHTML=KV10_SUIT_SIZES.map(s=>`<button type="button" class="kv-size-chip" data-size="${s}">${s}</button>`).join('');
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest('button,[role="option"],[data-value]')){
+    setTimeout(kv102RenderSuitSizes,80);
+    setTimeout(kv102RenderSuitSizes,260);
+  }
+},true);
+const kv102Observer=new MutationObserver(()=>{
+  clearTimeout(window.__kv102t);
+  window.__kv102t=setTimeout(kv102RenderSuitSizes,60);
+});
+setTimeout(()=>{
+ const modal=document.querySelector('.modal,.kv-modal,[role="dialog"]');
+ if(modal)kv102Observer.observe(modal,{childList:true,subtree:true});
+ kv102RenderSuitSizes();
+},150);
 </script>
 
 </body>
