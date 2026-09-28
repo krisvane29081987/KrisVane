@@ -4304,7 +4304,7 @@ setTimeout(kv6TranslateTargeted,120);setTimeout(kv6TranslateTargeted,500);
 </style>
 <script>
 /* ===== KrisVane v7: sizes + condition + final order-status translation ===== */
-const KV7_CLOTHING_SIZES=['XS','S','M','L','XL','XXL'];
+const KV7_CLOTHING_SIZES=['XXS','XS','S','M','L','XL','XXL','XXXL'];
 const KV7_SHOE_SIZES=Array.from({length:28},(_,i)=>{
   const n=35+i*.5;
   return Number.isInteger(n)?String(n):n.toFixed(1);
@@ -4513,6 +4513,100 @@ const kv8Ui=window.applyUiPrefs;
 window.applyUiPrefs=function(p=getUiPrefs()){kv8Ui(p);setTimeout(kv8Apply,90)}
 document.addEventListener('click',()=>setTimeout(kv8Apply,60),false);
 setTimeout(kv8Apply,250);
+</script>
+
+
+<style>
+/* v9 image preview removal */
+#kvImagePreviewList{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px;margin-top:12px}
+.kv-image-preview{position:relative;overflow:hidden;border:1px solid var(--border);border-radius:14px;aspect-ratio:1;background:var(--panel-2,#11151d);animation:kvImgIn .38s cubic-bezier(.2,.8,.2,1)}
+.kv-image-preview img{width:100%;height:100%;object-fit:cover;display:block}
+.kv-image-remove{position:absolute;right:7px;top:7px;width:30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.24);background:rgba(8,10,15,.72);color:#fff;font-size:19px;line-height:1;cursor:pointer;backdrop-filter:blur(8px);transition:transform .2s ease,background .2s ease}
+.kv-image-remove:hover{transform:scale(1.08) rotate(5deg);background:rgba(180,35,50,.82)}
+.kv-image-preview.kv-removing{animation:kvImgOut .42s cubic-bezier(.55,0,.8,.25) forwards}
+@keyframes kvImgIn{from{opacity:0;transform:translateY(8px) scale(.94)}to{opacity:1;transform:none}}
+@keyframes kvImgOut{0%{opacity:1;transform:none}45%{opacity:.65;transform:translateY(-5px) rotate(1.5deg) scale(.96)}100%{opacity:0;transform:translateY(18px) rotate(4deg) scale(.78)}}
+</style>
+<script>
+/* KrisVane v9: Suits category + removable pre-upload image previews */
+const KV9_SUITS={
+ uk:'Костюми',ru:'Костюмы',en:'Suits',be:'Касцюмы',zh:'套装'
+};
+function kv9Lang(){return getUiPrefs().language||'uk'}
+function kv9Suit(){return KV9_SUITS[kv9Lang()]||KV9_SUITS.uk}
+
+// Add Suits to the category taxonomy as a real selectable category.
+if(typeof KV2_TAXONOMY==='object' && !KV2_TAXONOMY['Костюмы']){
+  KV2_TAXONOMY['Костюмы']=[
+    'Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'
+  ];
+}
+if(typeof KV2_TAX_I18N==='object'){
+  const map={
+    uk:['Костюми','Брючні костюми','Костюми зі спідницею','Костюми-трійки','Комплекти'],
+    ru:['Костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'],
+    en:['Suits','Trouser suits','Skirt suits','Three-piece suits','Sets'],
+    be:['Касцюмы','Штановыя касцюмы','Касцюмы са спадніцай','Касцюмы-тройкі','Камплекты'],
+    zh:['套装','裤装套装','裙装套装','三件套','组合套装']
+  };
+  Object.entries(map).forEach(([lang,a])=>{
+    KV2_TAX_I18N[lang]=KV2_TAX_I18N[lang]||{};
+    KV2_TAX_I18N[lang]['Костюмы']=a[0];
+    ['Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'].forEach((k,i)=>KV2_TAX_I18N[lang][k]=a[i+1]);
+  });
+}
+
+let kv9SelectedImages=[];
+function kv9Input(){return document.getElementById('kvProductImages')}
+function kv9EnsurePreview(){
+  const input=kv9Input(); if(!input)return null;
+  let box=document.getElementById('kvImagePreviewList');
+  if(!box){box=document.createElement('div');box.id='kvImagePreviewList';input.parentElement.appendChild(box)}
+  return box;
+}
+function kv9SyncInput(){
+  const input=kv9Input(); if(!input)return;
+  try{
+    const dt=new DataTransfer();
+    kv9SelectedImages.forEach(x=>dt.items.add(x.file));
+    input.files=dt.files;
+  }catch(e){}
+}
+function kv9RenderImages(){
+  const box=kv9EnsurePreview();if(!box)return;
+  box.innerHTML=kv9SelectedImages.map(x=>`<div class="kv-image-preview" data-kvimg="${x.id}"><img src="${x.url}" alt=""><button type="button" class="kv-image-remove" data-remove-img="${x.id}" aria-label="Remove image">×</button></div>`).join('');
+}
+function kv9BindImages(){
+  const input=kv9Input();if(!input||input.dataset.kv9Bound)return;
+  input.dataset.kv9Bound='1';
+  input.addEventListener('change',()=>{
+    [...input.files].forEach(file=>{
+      const id=(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random());
+      kv9SelectedImages.push({id,file,url:URL.createObjectURL(file)});
+    });
+    kv9SyncInput();kv9RenderImages();
+    if(typeof kv2MarkDirty==='function')kv2MarkDirty();
+  });
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-remove-img]');if(!b)return;
+  e.preventDefault();e.stopPropagation();
+  const id=b.dataset.removeImg, card=b.closest('.kv-image-preview');
+  card?.classList.add('kv-removing');
+  setTimeout(()=>{
+    const x=kv9SelectedImages.find(v=>v.id===id);if(x)URL.revokeObjectURL(x.url);
+    kv9SelectedImages=kv9SelectedImages.filter(v=>v.id!==id);
+    kv9SyncInput();kv9RenderImages();
+    if(typeof kv2MarkDirty==='function')kv2MarkDirty();
+  },390);
+},true);
+
+const kv9Open=window.openCreateProduct;
+window.openCreateProduct=async function(){
+  kv9SelectedImages.forEach(x=>URL.revokeObjectURL(x.url));kv9SelectedImages=[];
+  await kv9Open();
+  setTimeout(()=>{kv9BindImages();kv9RenderImages()},30);
+};
 </script>
 
 </body>
