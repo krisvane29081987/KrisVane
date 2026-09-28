@@ -97,12 +97,16 @@
     3. Оформить тестовый заказ
   </button>
 
-  <button onclick="returnOrderToStock()">
+  <button onclick="returnOrder1()">
     4. Вернуть заказ №1 на склад
   </button>
 
-  <button onclick="testOrderStatus()">
+  <button onclick="testStatusManagement()">
     5. Проверить управление статусом
+  </button>
+
+  <button onclick="runOrder2Lifecycle()">
+    6. Провести заказ №2 до готовности
   </button>
 
   <div id="log">Готов к тесту.</div>
@@ -144,7 +148,6 @@ async function checkSession() {
     error
   } = await db.auth.getUser();
 
-
   if (error || !user) {
 
     show(
@@ -154,7 +157,6 @@ async function checkSession() {
 
     return;
   }
-
 
   show(
     '✅ Авторизация работает\n\n' +
@@ -174,12 +176,10 @@ async function addTestProduct() {
 
   show('Добавляем товар...');
 
-
   const {
     data: { user },
     error: userError
   } = await db.auth.getUser();
-
 
   if (userError || !user) {
 
@@ -189,14 +189,14 @@ async function addTestProduct() {
   }
 
 
-  // Получаем тестовый вариант
-
   const {
     data: variant,
     error: variantError
   } = await db
     .from('product_variants')
-    .select('id, name, stock_quantity, reserved_quantity')
+    .select(
+      'id, name, stock_quantity, reserved_quantity'
+    )
     .eq('sku', 'KV-TEST-001-M')
     .single();
 
@@ -211,8 +211,6 @@ async function addTestProduct() {
     return;
   }
 
-
-  // Получаем или создаём корзину
 
   let {
     data: cart,
@@ -259,12 +257,9 @@ async function addTestProduct() {
       return;
     }
 
-
     cart = newCart;
   }
 
-
-  // Добавляем две штуки
 
   const {
     error: itemError
@@ -298,7 +293,8 @@ async function addTestProduct() {
     'Вариант: ' + variant.name +
     '\nКоличество: 2' +
     '\nНа складе: ' + variant.stock_quantity +
-    '\nВ резерве сейчас: ' + variant.reserved_quantity
+    '\nВ резерве сейчас: ' +
+    variant.reserved_quantity
   );
 }
 
@@ -310,7 +306,6 @@ async function addTestProduct() {
 async function checkout() {
 
   show('Оформляем заказ...');
-
 
   const {
     data,
@@ -357,13 +352,12 @@ async function checkout() {
 
 
 // ==========================================
-// 4. ВОЗВРАТ ЗАКАЗА НА СКЛАД
+// 4. ВОЗВРАТ ЗАКАЗА №1 НА СКЛАД
 // ==========================================
 
-async function returnOrderToStock() {
+async function returnOrder1() {
 
   show('Возвращаем заказ №1 на склад...');
-
 
   const {
     data: { user },
@@ -373,7 +367,7 @@ async function returnOrderToStock() {
 
   if (userError || !user) {
 
-    show('❌ Сначала необходимо войти.');
+    show('❌ Пользователь не авторизован.');
 
     return;
   }
@@ -410,26 +404,15 @@ async function returnOrderToStock() {
 
 
 // ==========================================
-// 5. ПРОВЕРКА БЕЗОПАСНОЙ СМЕНЫ СТАТУСА
+// 5. ПРОВЕРКА ЗАЩИТЫ СТАТУСОВ
 // ==========================================
 
-async function testOrderStatus() {
+async function testStatusManagement() {
 
-  show('Проверяем безопасное управление статусом...');
-
-
-  const {
-    data: { user },
-    error: userError
-  } = await db.auth.getUser();
-
-
-  if (userError || !user) {
-
-    show('❌ Сначала необходимо войти.');
-
-    return;
-  }
+  show(
+    'Пробуем запрещённый переход:\n' +
+    'returned → processing...'
+  );
 
 
   const {
@@ -448,7 +431,9 @@ async function testOrderStatus() {
     show(
       '🔒 ПЕРЕХОД ОТКЛОНЁН\n\n' +
       error.message +
-      '\n\nЕсли заказ №1 имеет статус returned — это правильный результат.'
+      '\n\n' +
+      'Если заказ №1 имеет статус returned — ' +
+      'это правильный результат.'
     );
 
     return;
@@ -456,9 +441,79 @@ async function testOrderStatus() {
 
 
   show(
-    '✅ СТАТУС УСПЕШНО ИЗМЕНЁН!\n\n' +
-    'Order ID: 1\n' +
-    'Новый статус: processing'
+    '⚠️ Переход неожиданно был разрешён.\n\n' +
+    'Это нужно проверить.'
+  );
+}
+
+
+// ==========================================
+// 6. ЗАКАЗ №2:
+// pending → confirmed → processing
+// → ready_to_ship
+// ==========================================
+
+async function runOrder2Lifecycle() {
+
+  show(
+    'Проводим заказ №2 по статусам...\n\n' +
+    'Начинаем с pending.'
+  );
+
+
+  const steps = [
+    'confirmed',
+    'processing',
+    'ready_to_ship'
+  ];
+
+
+  for (const status of steps) {
+
+    show(
+      'Заказ №2\n\n' +
+      'Устанавливаем статус: ' +
+      status +
+      '...'
+    );
+
+
+    const {
+      error
+    } = await db.rpc(
+      'admin_set_order_status',
+      {
+        p_order_id: 2,
+        p_new_status: status
+      }
+    );
+
+
+    if (error) {
+
+      show(
+        '❌ ОШИБКА НА СТАТУСЕ: ' +
+        status +
+        '\n\n' +
+        error.message
+      );
+
+      return;
+    }
+  }
+
+
+  show(
+    '✅ ЗАКАЗ №2 ГОТОВ К ОТПРАВКЕ!\n\n' +
+
+    'pending → confirmed\n' +
+    'confirmed → processing\n' +
+    'processing → ready_to_ship\n\n' +
+
+    'Текущий статус: ready_to_ship\n\n' +
+
+    'Следующий шаг — ' +
+    'тест отправки с ТТН 🚚'
   );
 }
 
