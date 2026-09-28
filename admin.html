@@ -4478,15 +4478,10 @@ function kv8Txt(k){return (KV8[kv8Lang()]||KV8.uk)[k]||k}
 function kv8PatchOldPrice(){
  const input=document.getElementById('kvOldPrice');
  if(!input)return;
- let wrap=input.parentElement;
- if(!wrap.classList.contains('kv-old-price-wrap')){
-   wrap.classList.add('kv-old-price-wrap');
-   const s=document.createElement('span');
-   s.className='kv-old-price-optional';
-   wrap.appendChild(s);
- }
- const s=wrap.querySelector('.kv-old-price-optional');
- if(s)s.textContent=kv8Txt('optional');
+ input.placeholder='2399 • '+kv8Txt('optional');
+ const wrap=input.parentElement;
+ const old=wrap?.querySelector('.kv-old-price-optional');
+ if(old)old.remove();
 }
 function kv8PatchBags(){
  document.querySelectorAll('[data-value="Сумки и багаж"],[data-category="Сумки и багаж"],.kv-option,.kv-cat-option,.kv-category-option').forEach(el=>{
