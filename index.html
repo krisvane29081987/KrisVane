@@ -90,11 +90,52 @@
         backdrop-filter:blur(15px);border-top:1px solid var(--line)}.mobileNav button{border:0;background:transparent;color:#a5abbb;font-size:11px}.mobileNav b{display:block;color:#fff;font-size:18px}
     }
     @media(max-width:420px){.grid{grid-template-columns:1fr 1fr}.info{padding:10px}.name{font-size:13px}.price{font-size:15px}.heroBox{min-height:320px}}
+
+    /* KrisVane v2 — client filters, menu and persistent view */
+    .topin{grid-template-columns:auto auto minmax(260px,680px) auto}
+    .menuBtn{width:44px;height:44px;border:1px solid var(--line);border-radius:13px;background:#11131b;color:var(--text);
+      display:grid;place-items:center;padding:0;transition:.2s}
+    .menuBtn:hover{border-color:#6d5cff88;transform:translateY(-1px)}
+    .hamb{width:18px;display:grid;gap:4px}.hamb i{display:block;height:2px;background:currentColor;border-radius:10px}
+    .filterBar{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:start;margin:0 0 20px}
+    .filters{margin:0;display:grid;grid-template-columns:repeat(5,minmax(150px,1fr));gap:10px}
+    .filterField{display:grid;gap:6px}.filterField label{font-size:12px;color:var(--muted);font-weight:800}
+    .filterField select,.filterField input{width:100%;height:43px;background:#11131b;color:#fff;border:1px solid var(--line);
+      border-radius:12px;padding:0 12px;outline:none}
+    .filterField select:focus,.filterField input:focus{border-color:#725cff99;box-shadow:0 0 0 3px #725cff14}
+    .resetFilters{height:43px;align-self:end;white-space:nowrap}
+    .sideShade{position:fixed;inset:0;background:#000a;backdrop-filter:blur(6px);z-index:100;opacity:0;pointer-events:none;transition:.28s}
+    .sideShade.open{opacity:1;pointer-events:auto}
+    .sideMenu{position:fixed;left:0;top:0;bottom:0;width:min(390px,92vw);z-index:101;background:#0d0f16;border-right:1px solid var(--line);
+      transform:translateX(-105%);transition:.38s cubic-bezier(.2,.8,.2,1);display:flex;flex-direction:column;box-shadow:30px 0 80px #0008}
+    .sideMenu.open{transform:none}.sideHead{height:76px;padding:0 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line)}
+    .sideBody{padding:16px;overflow:auto}.menuSection{padding:8px 0 18px}.menuSectionTitle{font-size:11px;color:var(--muted);font-weight:900;
+      text-transform:uppercase;letter-spacing:.12em;padding:0 8px 8px}
+    .menuItem{width:100%;min-height:48px;border:0;background:transparent;color:#e8eaf2;border-radius:12px;padding:10px 12px;
+      display:flex;align-items:center;gap:12px;text-align:left;transition:.2s}
+    .menuItem:hover{background:#ffffff0a}.menuItem .mi{width:28px;text-align:center;font-size:18px}.menuItem small{display:block;color:var(--muted);margin-top:2px}
+    .settingsPanel{display:grid;gap:10px;padding:10px 8px}.settingsPanel label{font-size:12px;color:var(--muted);font-weight:800}
+    .settingsPanel select{height:42px;border:1px solid var(--line);border-radius:11px;background:#12141c;color:#fff;padding:0 10px}
+    body[data-theme="light"]{--bg:#f3f5fa;--panel:#fff;--panel2:#f8f9fc;--line:#dce1eb;--text:#151823;--muted:#687084;--shadow:0 24px 80px #29304420}
+    body[data-theme="light"] .top,body[data-theme="light"] .nav{background:#f7f8fbe8}
+    body[data-theme="light"] .iconbtn,body[data-theme="light"] .menuBtn,body[data-theme="light"] .search input,
+    body[data-theme="light"] .filterField select,body[data-theme="light"] .filterField input,body[data-theme="light"] .sideMenu,
+    body[data-theme="light"] .drawer,body[data-theme="light"] .modal,body[data-theme="light"] .secondary{background:#fff;color:#151823}
+    body[data-theme="graphite"]{--bg:#111214;--panel:#181a1e;--panel2:#1d2025;--line:#30343c;--text:#f5f6f8;--muted:#9da3ae;--accent:#8a909d;--accent2:#5f6673}
+    body[data-theme="blue"]{--bg:#07101d;--panel:#0c1728;--panel2:#102039;--line:#203653;--text:#f4f8ff;--muted:#8ea3bd;--accent:#3287ff;--accent2:#54b8ff}
+    body[data-density="compact"] .section{padding-top:14px} body[data-density="compact"] .grid{gap:10px}
+    body[data-density="compact"] .info{padding:10px} body[data-density="compact"] .filterField select,body[data-density="compact"] .filterField input{height:39px}
+    body[data-motion="off"] *,body[data-motion="off"] *:before,body[data-motion="off"] *:after{animation:none!important;transition:none!important;scroll-behavior:auto!important}
+    @media(max-width:1180px){.filters{grid-template-columns:repeat(3,minmax(150px,1fr))}}
+    @media(max-width:760px){.topin{grid-template-columns:auto auto 1fr auto}.logo{font-size:21px}.filterBar{grid-template-columns:1fr}.filters{grid-template-columns:1fr 1fr}.resetFilters{width:100%}}
+    @media(max-width:480px){.filters{grid-template-columns:1fr}.topin{gap:7px}.menuBtn{width:40px;height:40px}.logo{font-size:19px}}
+
     @media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;transition-duration:.01ms!important}}
   </style>
 </head>
 <body>
 <header class="top"><div class="shell topin">
+  <button class="menuBtn" id="menuBtn" aria-label="Открыть меню"><span class="hamb"><i></i><i></i><i></i></span></button>
   <a class="logo" href="#" aria-label="KrisVane">Kris<span>Vane</span></a>
   <div class="search"><input id="search" placeholder="Поиск товаров, брендов, категорий…" autocomplete="off"><button id="searchBtn">⌕</button></div>
   <div class="actions">
@@ -120,10 +161,20 @@
 </div></div></section>
 
 <section class="section" id="catalog"><div class="shell">
-  <div class="sectionHead"><div><h2 id="catalogTitle">Каталог</h2><p id="catalogSub">Выберите то, что подходит именно вам.</p></div><button class="secondary" id="clearFilters">Сбросить</button></div>
-  <div class="filters">
-    <select id="sort"><option value="default">По умолчанию</option><option value="priceAsc">Сначала дешевле</option><option value="priceDesc">Сначала дороже</option><option value="new">Сначала новые</option></select>
-    <select id="stockFilter"><option value="all">Все товары</option><option value="available">В наличии</option></select>
+  <div class="sectionHead"><div><h2 id="catalogTitle">Каталог</h2><p id="catalogSub">Фильтры используют категории, подкатегории, бренды, размеры и состояние из каталога KrisVane.</p></div></div>
+  <div class="filterBar">
+    <div class="filters">
+      <div class="filterField"><label>Категория</label><select id="categoryFilter"><option value="">Все категории</option></select></div>
+      <div class="filterField"><label>Подкатегория</label><select id="subcategoryFilter"><option value="">Все подкатегории</option></select></div>
+      <div class="filterField"><label>Бренд</label><select id="brandFilter"><option value="">Все бренды</option></select></div>
+      <div class="filterField"><label>Размер</label><select id="sizeFilter"><option value="">Все размеры</option></select></div>
+      <div class="filterField"><label>Состояние / NEW</label><select id="conditionFilter"><option value="">Любое состояние</option></select></div>
+      <div class="filterField"><label>Наличие</label><select id="stockFilter"><option value="all">Все товары</option><option value="available">В наличии</option><option value="out">Нет в наличии</option></select></div>
+      <div class="filterField"><label>Цена от</label><input id="priceMin" type="number" min="0" inputmode="numeric" placeholder="0 грн"></div>
+      <div class="filterField"><label>Цена до</label><input id="priceMax" type="number" min="0" inputmode="numeric" placeholder="Без лимита"></div>
+      <div class="filterField"><label>Сортировка</label><select id="sort"><option value="default">По умолчанию</option><option value="priceAsc">Сначала дешевле</option><option value="priceDesc">Сначала дороже</option><option value="new">Сначала новые</option><option value="nameAsc">По названию А–Я</option></select></div>
+    </div>
+    <button class="secondary resetFilters" id="clearFilters">Сбросить фильтр</button>
   </div>
   <div class="grid" id="products"></div>
   <div style="text-align:center;margin-top:22px"><button class="secondary" id="loadMore" hidden>Показать ещё</button></div>
@@ -135,6 +186,30 @@
   <div><b>Покупателям</b><p>Каталог</p><p>Избранное</p><p>Корзина</p></div>
   <div><b>Доставка</b><p>Nova Poshta</p><p>Украина</p></div>
 </div></footer>
+
+<div class="sideShade" id="sideShade"></div>
+<aside class="sideMenu" id="sideMenu" aria-label="Меню KrisVane">
+  <div class="sideHead"><div class="logo">Kris<span>Vane</span></div><button class="close" id="closeMenu">✕</button></div>
+  <div class="sideBody">
+    <div class="menuSection"><div class="menuSectionTitle">Аккаунт</div>
+      <button class="menuItem" id="menuProfile"><span class="mi">◉</span><span><b>Профиль</b><small>Вход, данные аккаунта и заказы</small></span></button>
+      <button class="menuItem" id="menuFavorites"><span class="mi">♡</span><span><b>Избранное</b><small>Сохранённые товары</small></span></button>
+      <button class="menuItem" id="menuCart"><span class="mi">🛍</span><span><b>Корзина</b><small>Товары перед оформлением</small></span></button>
+    </div>
+    <div class="menuSection"><div class="menuSectionTitle">Покупки</div>
+      <button class="menuItem" id="menuDelivery"><span class="mi">▤</span><span><b>Доставка</b><small>Nova Poshta, город и отделение — на этапе оформления</small></span></button>
+      <button class="menuItem" id="menuOrders"><span class="mi">◫</span><span><b>Мои заказы</b><small>История и статусы заказов</small></span></button>
+    </div>
+    <div class="menuSection"><div class="menuSectionTitle">Настройки сайта</div>
+      <div class="settingsPanel">
+        <label for="siteTheme">Тема</label><select id="siteTheme"><option value="dark">Тёмная · фиолетовая</option><option value="blue">Тёмная · синяя</option><option value="graphite">Графитовая</option><option value="light">Светлая</option></select>
+        <label for="siteDensity">Плотность интерфейса</label><select id="siteDensity"><option value="normal">Обычная</option><option value="compact">Компактная</option></select>
+        <label for="siteMotion">Анимации</label><select id="siteMotion"><option value="full">Полные</option><option value="off">Нет</option></select>
+        <label for="rememberView">Запоминать место на сайте</label><select id="rememberView"><option value="yes">Да</option><option value="no">Нет</option></select>
+      </div>
+    </div>
+  </div>
+</aside>
 
 <div class="drawerShade" id="drawerShade"></div><aside class="drawer" id="cartDrawer">
   <div class="drawerHead"><b style="font-size:20px">Корзина</b><button class="close" id="closeCart">✕</button></div>
@@ -167,9 +242,28 @@ const store = {
 };
 const state={
   products:[],filtered:[],categories:[],subcategories:[],variants:new Map(),images:new Map(),
-  category:"",query:"",sort:"default",stock:"all",page:1,pageSize:24,
+  category:"",subcategory:"",brand:"",size:"",condition:"",query:"",sort:"default",stock:"all",priceMin:"",priceMax:"",page:1,pageSize:24,
   favorites:new Set(store.get("favorites",[])),cart:store.get("cart",[]),selectedProduct:null,selectedVariant:null,user:null
-};
+;
+const viewDefaults={theme:"dark",density:"normal",motion:"full",remember:"yes",scrollY:0,category:"",subcategory:"",brand:"",size:"",condition:"",sort:"default",stock:"all",priceMin:"",priceMax:"",query:""};
+const view={...viewDefaults,...store.get("view",{})};
+function saveView(){
+  if(view.remember!=="yes") return;
+  store.set("view",{...view,scrollY:window.scrollY,category:state.category,subcategory:state.subcategory,brand:state.brand,size:state.size,condition:state.condition,
+    sort:state.sort,stock:state.stock,priceMin:state.priceMin,priceMax:state.priceMax,query:state.query});
+}
+function applyAppearance(){
+  document.body.dataset.theme=view.theme||"dark";
+  document.body.dataset.density=view.density||"normal";
+  document.body.dataset.motion=view.motion||"full";
+  if($("#siteTheme"))$("#siteTheme").value=view.theme||"dark";
+  if($("#siteDensity"))$("#siteDensity").value=view.density||"normal";
+  if($("#siteMotion"))$("#siteMotion").value=view.motion||"full";
+  if($("#rememberView"))$("#rememberView").value=view.remember||"yes";
+}
+Object.assign(state,{category:view.category||"",subcategory:view.subcategory||"",brand:view.brand||"",size:view.size||"",condition:view.condition||"",
+  sort:view.sort||"default",stock:view.stock||"all",priceMin:view.priceMin||"",priceMax:view.priceMax||"",query:view.query||""});
+applyAppearance();
 
 function toast(msg){const n=document.createElement("div");n.className="toast";n.textContent=msg;$("#toasts").append(n);setTimeout(()=>n.remove(),2600)}
 function saveLocal(){store.set("favorites",[...state.favorites]);store.set("cart",state.cart);renderCounts()}
@@ -198,11 +292,37 @@ async function loadAll(){
   state.products=pc.data||[];state.categories=cc.data||[];state.subcategories=sc.data||[];
   for(const v of vc.data||[]){const a=state.variants.get(v.product_id)||[];a.push(v);state.variants.set(v.product_id,a)}
   for(const im of ic.data||[]){const a=state.images.get(im.product_id)||[];a.push(im);state.images.set(im.product_id,a)}
-  renderCategories();applyFilters();
+  renderCategories();syncFilterOptions();applyFilters();
 }
 function renderCategories(){
   const root=$("#categoryNav");const fixed=`<button class="chip ${state.category===""?"active":""}" data-category="">Все</button><button class="chip ${state.category==="new"?"active":""}" data-category="new">Новинки</button>`;
   root.innerHTML=fixed+state.categories.map(c=>`<button class="chip ${String(state.category)===String(c.id)?"active":""}" data-category="${esc(c.id)}">${esc(c.name)}</button>`).join("");
+}
+
+function variantLabel(v){return String(v.name||v.size||v.variant_name||v.sku||"").trim()}
+function conditionValue(p){
+  const raw=String(p.condition||p.new_condition||p.item_condition||"").trim();
+  if(raw)return raw;
+  if(p.is_new===true)return "Новое";
+  return "";
+}
+function fillSelect(el,items,selected,emptyLabel){
+  if(!el)return;
+  const vals=[...new Set(items.filter(Boolean).map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"ru",{numeric:true}));
+  el.innerHTML=`<option value="">${emptyLabel}</option>`+vals.map(x=>`<option value="${esc(x)}">${esc(x)}</option>`).join("");
+  el.value=vals.includes(String(selected))?String(selected):"";
+}
+function syncFilterOptions(){
+  const cat=$("#categoryFilter");
+  cat.innerHTML=`<option value="">Все категории</option>`+state.categories.map(c=>`<option value="${esc(c.id)}">${esc(c.name)}</option>`).join("");
+  cat.value=state.category==="new"?"":state.category;
+  const subs=state.subcategories.filter(s=>!state.category||state.category==="new"||String(s.category_id)===String(state.category));
+  $("#subcategoryFilter").innerHTML=`<option value="">Все подкатегории</option>`+subs.map(s=>`<option value="${esc(s.id)}">${esc(s.name)}</option>`).join("");
+  $("#subcategoryFilter").value=subs.some(s=>String(s.id)===String(state.subcategory))?state.subcategory:"";
+  fillSelect($("#brandFilter"),state.products.map(p=>p.brand||"KrisVane"),state.brand,"Все бренды");
+  fillSelect($("#sizeFilter"),[...state.variants.values()].flat().map(variantLabel),state.size,"Все размеры");
+  fillSelect($("#conditionFilter"),state.products.map(conditionValue),state.condition,"Любое состояние");
+  $("#sort").value=state.sort;$("#stockFilter").value=state.stock;$("#priceMin").value=state.priceMin;$("#priceMax").value=state.priceMax;$("#search").value=state.query;
 }
 function applyFilters(){
   let a=[...state.products];
@@ -210,11 +330,19 @@ function applyFilters(){
   if(q)a=a.filter(p=>[p.name,p.brand,p.sku,p.description].some(v=>String(v||"").toLowerCase().includes(q)));
   if(state.category==="new")a=a.filter(p=>p.is_new===true||String(p.condition||"").toLowerCase().includes("new"));
   else if(state.category)a=a.filter(p=>String(p.category_id)===String(state.category));
+  if(state.subcategory)a=a.filter(p=>String(p.subcategory_id)===String(state.subcategory));
+  if(state.brand)a=a.filter(p=>String(p.brand||"KrisVane")===String(state.brand));
+  if(state.size)a=a.filter(p=>productVariants(p.id).some(v=>variantLabel(v)===state.size));
+  if(state.condition)a=a.filter(p=>conditionValue(p)===state.condition);
   if(state.stock==="available")a=a.filter(productAvailable);
+  if(state.stock==="out")a=a.filter(p=>!productAvailable(p));
+  if(state.priceMin!=="")a=a.filter(p=>Number(p.price||0)>=Number(state.priceMin));
+  if(state.priceMax!=="")a=a.filter(p=>Number(p.price||0)<=Number(state.priceMax));
   if(state.sort==="priceAsc")a.sort((x,y)=>Number(x.price)-Number(y.price));
   if(state.sort==="priceDesc")a.sort((x,y)=>Number(y.price)-Number(x.price));
   if(state.sort==="new")a.sort((x,y)=>new Date(y.created_at)-new Date(x.created_at));
-  state.filtered=a;state.page=1;renderProducts();
+  if(state.sort==="nameAsc")a.sort((x,y)=>String(x.name||"").localeCompare(String(y.name||""),"ru"));
+  state.filtered=a;state.page=1;renderProducts();saveView();
 }
 function renderProducts(){
   const show=state.filtered.slice(0,state.page*state.pageSize);
@@ -290,7 +418,7 @@ async function checkout(){
 document.addEventListener("click",e=>{
   const fav=e.target.closest("[data-fav]");if(fav){e.stopPropagation();toggleFav(fav.dataset.fav);return}
   const card=e.target.closest("[data-product]");if(card){openProduct(card.dataset.product);return}
-  const cat=e.target.closest("[data-category]");if(cat){state.category=cat.dataset.category;renderCategories();applyFilters();return}
+  const cat=e.target.closest("[data-category]");if(cat){state.category=cat.dataset.category;state.subcategory="";renderCategories();syncFilterOptions();applyFilters();return}
   const th=e.target.closest("[data-thumb]");if(th&&$("#mainProductImg")){$("#mainProductImg").src=th.dataset.thumb;return}
   const sz=e.target.closest("[data-variant]");if(sz){state.selectedVariant=sz.dataset.variant;$$(".size").forEach(x=>x.classList.toggle("on",x===sz));$("#addCart").disabled=false;return}
   const minus=e.target.closest("[data-minus]");if(minus){cartChange(minus.dataset.minus,-1);return}
@@ -299,16 +427,45 @@ document.addEventListener("click",e=>{
   const mob=e.target.closest("[data-mobile]");if(mob){const a=mob.dataset.mobile;if(a==="cart")openCart();else if(a==="catalog")$("#catalog").scrollIntoView();else if(a==="fav"){state.category="";state.query="";$("#search").value="";state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalog").scrollIntoView()}else scrollTo({top:0,behavior:"smooth"})}
 });
 $("#search").addEventListener("input",e=>{state.query=e.target.value;clearTimeout(window.__kvq);window.__kvq=setTimeout(applyFilters,180)});
-$("#searchBtn").onclick=()=>applyFilters();$("#sort").onchange=e=>{state.sort=e.target.value;applyFilters()};$("#stockFilter").onchange=e=>{state.stock=e.target.value;applyFilters()};
-$("#clearFilters").onclick=()=>{state.category="";state.query="";state.sort="default";state.stock="all";$("#search").value="";$("#sort").value="default";$("#stockFilter").value="all";renderCategories();applyFilters()};
+$("#searchBtn").onclick=()=>applyFilters();
+$("#categoryFilter").onchange=e=>{state.category=e.target.value;state.subcategory="";renderCategories();syncFilterOptions();applyFilters()};
+$("#subcategoryFilter").onchange=e=>{state.subcategory=e.target.value;applyFilters()};
+$("#brandFilter").onchange=e=>{state.brand=e.target.value;applyFilters()};
+$("#sizeFilter").onchange=e=>{state.size=e.target.value;applyFilters()};
+$("#conditionFilter").onchange=e=>{state.condition=e.target.value;applyFilters()};
+$("#sort").onchange=e=>{state.sort=e.target.value;applyFilters()};
+$("#stockFilter").onchange=e=>{state.stock=e.target.value;applyFilters()};
+$("#priceMin").addEventListener("input",e=>{state.priceMin=e.target.value;clearTimeout(window.__kvp);window.__kvp=setTimeout(applyFilters,220)});
+$("#priceMax").addEventListener("input",e=>{state.priceMax=e.target.value;clearTimeout(window.__kvp2);window.__kvp2=setTimeout(applyFilters,220)});
+$("#clearFilters").onclick=()=>{Object.assign(state,{category:"",subcategory:"",brand:"",size:"",condition:"",query:"",sort:"default",stock:"all",priceMin:"",priceMax:""});
+  renderCategories();syncFilterOptions();applyFilters()};
 $("#loadMore").onclick=()=>{state.page++;renderProducts()};$("#cartBtn").onclick=openCart;$("#closeCart").onclick=closeCart;$("#drawerShade").onclick=closeCart;
 $("#modalShade").onclick=closeProduct;$("#productModal").addEventListener("click",e=>{if(e.target.closest("#closeProduct"))closeProduct();if(e.target.closest("#addCart"))addCart();if(e.target.closest("#modalFav")&&state.selectedProduct){toggleFav(state.selectedProduct.id);e.target.closest("#modalFav").textContent=state.favorites.has(String(state.selectedProduct.id))?"♥":"♡"}});
 $("#favBtn").onclick=()=>{state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalogTitle").textContent="Избранное";$("#catalog").scrollIntoView()};
 $("#accountBtn").onclick=account;$("#checkoutBtn").onclick=checkout;$("#heroCatalog").onclick=()=>$("#catalog").scrollIntoView();$("#heroNew").onclick=()=>{state.category="new";renderCategories();applyFilters();$("#catalog").scrollIntoView()};
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProduct();closeCart()}});
+
+function openMenu(){$("#sideShade").classList.add("open");$("#sideMenu").classList.add("open");document.body.style.overflow="hidden"}
+function closeMenu(){$("#sideShade").classList.remove("open");$("#sideMenu").classList.remove("open");document.body.style.overflow=""}
+$("#menuBtn").onclick=openMenu;$("#closeMenu").onclick=closeMenu;$("#sideShade").onclick=closeMenu;
+$("#menuProfile").onclick=()=>{closeMenu();account()};
+$("#menuFavorites").onclick=()=>{closeMenu();state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalogTitle").textContent="Избранное";$("#catalog").scrollIntoView()};
+$("#menuCart").onclick=()=>{closeMenu();openCart()};
+$("#menuDelivery").onclick=()=>{closeMenu();toast("Город и отделение Nova Poshta выбираются при оформлении заказа.")};
+$("#menuOrders").onclick=async()=>{closeMenu();const {data}=await sb.auth.getSession();if(!data.session){store.set("returnAfterAuth","orders");location.href="auth.html";return}toast("Раздел «Мои заказы» подготовлен к следующему этапу.")};
+$("#siteTheme").onchange=e=>{view.theme=e.target.value;applyAppearance();saveView()};
+$("#siteDensity").onchange=e=>{view.density=e.target.value;applyAppearance();saveView()};
+$("#siteMotion").onchange=e=>{view.motion=e.target.value;applyAppearance();saveView()};
+$("#rememberView").onchange=e=>{view.remember=e.target.value;if(view.remember==="yes")saveView();else store.set("view",{...viewDefaults,remember:"no",theme:view.theme,density:view.density,motion:view.motion})};
+let __saveScrollTimer;
+window.addEventListener("scroll",()=>{if(view.remember!=="yes")return;clearTimeout(__saveScrollTimer);__saveScrollTimer=setTimeout(saveView,180)},{passive:true});
+window.addEventListener("beforeunload",saveView);
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeProduct();closeCart();closeMenu()}});
+
 window.addEventListener("pageshow",()=>renderCounts());
 
-renderCounts();loadAll();
+renderCounts();
+loadAll().then?.(()=>{});
+if(view.remember==="yes")setTimeout(()=>window.scrollTo({top:Number(view.scrollY||0),behavior:"auto"}),450);
 </script>
 </body>
 </html>
