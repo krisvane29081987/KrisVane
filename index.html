@@ -1210,6 +1210,86 @@ body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="
   .catalogModeBar .secondary{margin-left:0}
 }
 
+
+/* ===== KrisVane functional navigation update ===== */
+.personIcon svg,
+.mobilePersonIcon svg{
+  width:21px;
+  height:21px;
+  display:block;
+  fill:#fff;
+}
+.personIcon{
+  display:grid;
+  place-items:center;
+}
+.headerAction{
+  min-width:max-content;
+}
+.headerActionIcon{
+  font-size:18px;
+  line-height:1;
+}
+.accountAccessSection{
+  margin-top:8px;
+  padding-top:16px;
+  border-top:1px solid #ffffff0d;
+}
+.accountAccessItem{
+  border:1px solid var(--line);
+  background:var(--panel);
+}
+.accountAccessItem:hover{
+  border-color:#725cff66;
+  background:var(--panel2);
+}
+
+/* On phones the bottom navigation carries Favorites/Cart/Account clearly,
+   so the header stays clean and leaves room for the logo/menu. */
+@media(max-width:760px){
+  body{padding-bottom:78px}
+  .actions{display:none}
+  .topin{
+    grid-template-columns:auto auto minmax(0,1fr);
+  }
+  .mobileNav{
+    grid-template-columns:repeat(5,minmax(0,1fr));
+    height:72px;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .mobileNav button{
+    min-width:0;
+    padding:7px 2px 6px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    gap:2px;
+    overflow:hidden;
+  }
+  .mobileNav button span{
+    width:100%;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    white-space:nowrap;
+    font-size:10px;
+  }
+  .mobileNav b{
+    min-height:23px;
+    display:grid;
+    place-items:center;
+    line-height:1;
+  }
+  .mobilePersonIcon svg{
+    width:20px;
+    height:20px;
+  }
+}
+@media(max-width:390px){
+  .mobileNav button span{font-size:9px}
+  .mobileNav{height:70px}
+}
+
 </style>
   </head>
   <body>
@@ -1232,12 +1312,16 @@ body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="
           <button id="searchBtn">⌕</button>
         </div>
         <div class="actions">
-          <button class="iconbtn" id="favBtn" title="Избранное">♡ <span class="badge" id="favCount">0</span>
+          <button class="iconbtn headerAction" id="favBtn" title="Избранное" type="button">
+            <span class="headerActionIcon" aria-hidden="true">♡</span>
+            <span class="actionText">Избранное</span>
+            <span class="badge" id="favCount">0</span>
           </button>
-          <button class="iconbtn" id="cartBtn" title="Корзина">🛍 <span class="badge" id="cartCount">0</span>
+          <button class="iconbtn headerAction" id="cartBtn" title="Корзина" type="button">
+            <span class="headerActionIcon" aria-hidden="true">🛍</span>
             <span class="actionText">Корзина</span>
+            <span class="badge" id="cartCount">0</span>
           </button>
-          <button class="iconbtn" id="accountBtn" title="Аккаунт">◉</button>
         </div>
       </div>
     </header>
@@ -1388,11 +1472,16 @@ body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="
       <div class="sideBody">
         <div class="menuSection">
           <div class="menuSectionTitle">Аккаунт</div>
-          <button class="menuItem" id="menuProfile">
-            <span class="mi">◉</span>
+          <button class="menuItem" id="menuProfile" type="button">
+            <span class="mi personIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="7.2" r="4.2"></circle>
+                <path d="M4.2 21c.35-5.1 3.2-8 7.8-8s7.45 2.9 7.8 8H4.2z"></path>
+              </svg>
+            </span>
             <span>
-              <b>Профиль</b>
-              <small>Вход, данные аккаунта и заказы</small>
+              <b>Аккаунт</b>
+              <small>Имя, аватар и настройки аккаунта</small>
             </span>
           </button>
           <button class="menuItem" id="menuFavorites">
@@ -1536,6 +1625,22 @@ body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="
             </div>
           </div>
         </div>
+
+        <div class="menuSection accountAccessSection">
+          <div class="menuSectionTitle">Сессия</div>
+          <button class="menuItem accountAccessItem" id="menuAuthAction" type="button">
+            <span class="mi personIcon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" focusable="false">
+                <circle cx="12" cy="7.2" r="4.2"></circle>
+                <path d="M4.2 21c.35-5.1 3.2-8 7.8-8s7.45 2.9 7.8 8H4.2z"></path>
+              </svg>
+            </span>
+            <span>
+              <b id="menuAuthTitle">Войти / Регистрация</b>
+              <small id="menuAuthHint">Войти в аккаунт KrisVane</small>
+            </span>
+          </button>
+        </div>
       </div>
     </aside>
     <div class="drawerShade" id="drawerShade">
@@ -1559,16 +1664,21 @@ body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="
     </div>
     <section class="modal" id="productModal" aria-modal="true" role="dialog">
     </section>
-    <nav class="mobileNav">
-      <button data-mobile="home">
-        <b>⌂</b>Главная</button>
-        <button data-mobile="catalog">
-          <b>▦</b>Каталог</button>
-          <button data-mobile="fav">
-            <b>♡</b>Избранное</button>
-            <button data-mobile="cart">
-              <b>🛍</b>Корзина</button>
-            </nav>
+    <nav class="mobileNav" aria-label="Мобильная навигация">
+      <button data-mobile="home" type="button"><b>⌂</b><span>Главная</span></button>
+      <button data-mobile="catalog" type="button"><b>▦</b><span>Каталог</span></button>
+      <button data-mobile="fav" type="button"><b>♡</b><span>Избранное</span></button>
+      <button data-mobile="cart" type="button"><b>🛍</b><span>Корзина</span></button>
+      <button data-mobile="account" type="button">
+        <b class="mobilePersonIcon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" focusable="false">
+            <circle cx="12" cy="7.2" r="4.2"></circle>
+            <path d="M4.2 21c.35-5.1 3.2-8 7.8-8s7.45 2.9 7.8 8H4.2z"></path>
+          </svg>
+        </b>
+        <span>Аккаунт</span>
+      </button>
+    </nav>
             
 <div id="localFileNotice" style="
   display:none;
@@ -1586,7 +1696,7 @@ body[data-motion="off"] *, body[data-motion="off"] *::before, body[data-motion="
   backdrop-filter:blur(16px);
   font:600 13px/1.45 system-ui,sans-serif;
 ">
-  Локальный предпросмотр: интерфейс работает, но каталог Supabase лучше проверять
+  Локальный предпросмотр: часть функций аккаунта и магазина лучше проверять
   на GitHub Pages после замены index.html.
 </div>
 
@@ -2622,9 +2732,9 @@ function cartChange(key,d){
   const x=state.cart.find(i=>i.key===key);if(!x)return;x.qty+=d;if(x.qty<=0)state.cart=state.cart.filter(i=>i.key!==key);else if(x.qty>x.max)x.qty=x.max;saveLocal();renderCart()
 }
 async function account(){
-  const {data}=await sb.auth.getSession();state.user=data.session?.user||null;
-  if(state.user){toast("Вы вошли как "+(state.user.email||"пользователь"))}
-  else location.href="auth.html";
+  const {data}=await sb.auth.getSession();
+  state.user=data.session?.user||null;
+  location.href=state.user ? "account.html" : "auth.html";
 }
 async function checkout(){
   if(!state.cart.length){toast("Корзина пуста");return}
@@ -2645,7 +2755,15 @@ document.addEventListener("click",e=>{
   const minus=e.target.closest("[data-minus]");if(minus){cartChange(minus.dataset.minus,-1);return}
   const plus=e.target.closest("[data-plus]");if(plus){cartChange(plus.dataset.plus,1);return}
   const rem=e.target.closest("[data-remove]");if(rem){state.cart=state.cart.filter(x=>x.key!==rem.dataset.remove);saveLocal();renderCart();return}
-  const mob=e.target.closest("[data-mobile]");if(mob){const a=mob.dataset.mobile;if(a==="cart")openCart();else if(a==="catalog")$("#catalog").scrollIntoView();else if(a==="fav"){state.category="";state.query="";$("#search").value="";state.filtered=state.products.filter(p=>state.favorites.has(String(p.id)));state.page=1;renderProducts();$("#catalog").scrollIntoView()}else scrollTo({top:0,behavior:"smooth"})}
+  const mob=e.target.closest("[data-mobile]");
+  if(mob){
+    const a=mob.dataset.mobile;
+    if(a==="cart") openCart();
+    else if(a==="catalog") showCatalog();
+    else if(a==="fav") showFavorites();
+    else if(a==="account") account();
+    else scrollTo({top:0,behavior:view.motion==="off"?"auto":"smooth"});
+  }
 });
 
 function enhanceSelect(select) {
@@ -2816,7 +2934,7 @@ function showCatalog() {
 
 $("#favBtn").onclick = showFavorites;
 $("#backToCatalog")?.addEventListener("click", showCatalog);
-$("#accountBtn").onclick=account;$("#checkoutBtn").onclick=checkout;$("#heroCatalog").onclick=()=>$("#catalog").scrollIntoView();$("#heroNew").onclick=()=>{state.category="new";renderCategories();applyFilters();$("#catalog").scrollIntoView()};
+$("#checkoutBtn").onclick=checkout;$("#heroCatalog").onclick=()=>$("#catalog").scrollIntoView();$("#heroNew").onclick=()=>{state.category="new";renderCategories();applyFilters();$("#catalog").scrollIntoView()};
 
 function openMenu() {
   const shade = $("#sideShade");
@@ -2915,6 +3033,46 @@ $("#menuProfile")?.addEventListener("click", () => {
   closeMenu();
   account();
 });
+
+async function refreshAccountNavigation(){
+  const {data}=await sb.auth.getSession();
+  state.user=data.session?.user||null;
+
+  const title=$("#menuAuthTitle");
+  const hint=$("#menuAuthHint");
+  if(!title||!hint) return;
+
+  if(state.user){
+    const displayName=state.user.user_metadata?.full_name || state.user.email?.split("@")[0] || "Пользователь";
+    title.textContent="Выйти из аккаунта";
+    hint.textContent=displayName + (state.user.email ? " • " + state.user.email : "");
+  }else{
+    title.textContent="Войти / Регистрация";
+    hint.textContent="Войти в аккаунт KrisVane";
+  }
+}
+
+$("#menuAuthAction")?.addEventListener("click", async () => {
+  const {data}=await sb.auth.getSession();
+  if(data.session){
+    const {error}=await sb.auth.signOut();
+    if(error){
+      toast("Не удалось выйти из аккаунта.");
+      return;
+    }
+    state.user=null;
+    await refreshAccountNavigation();
+    closeMenu();
+    toast("Вы вышли из аккаунта.");
+  }else{
+    location.href="auth.html";
+  }
+});
+
+sb.auth.onAuthStateChange(() => {
+  refreshAccountNavigation();
+});
+refreshAccountNavigation();
 
 $("#menuFavorites")?.addEventListener("click", () => {
   closeMenu();
