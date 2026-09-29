@@ -3929,9 +3929,9 @@ const kv2OldApply=window.applyUiPrefs;window.applyUiPrefs=function(p=getUiPrefs(
 
 // Product catalog used by the create form. Selected items are created in Supabase only when needed.
 const KV2_TAXONOMY={
- 'Одежда':['Футболки','Майки','Лонгсливы','Поло','Рубашки','Блузы','Топы','Худи','Свитшоты','Свитеры','Кардиганы','Жилеты','Джинсы','Брюки','Джоггеры','Леггинсы','Шорты','Юбки','Платья','Комбинезоны','Костюмы','Пижамы','Домашняя одежда','Нижнее бельё','Носки','Колготки'],
+ 'Одежда':['Футболки','Майки','Лонгсливы','Поло','Рубашки','Блузы','Топы','Худи','Свитшоты','Толстовки','Свитеры','Кардиганы','Водолазки','Кофты','Жилеты','Пиджаки','Жакеты','Джинсы','Брюки','Штаны','Джоггеры','Леггинсы','Шорты','Юбки','Платья','Сарафаны','Комбинезоны','Костюмы','Куртки','Пуховики','Парки','Ветровки','Бомберы','Косухи','Пальто','Тренчи','Плащи','Дублёнки','Шубы','Дождевики','Пижамы','Домашняя одежда','Нижнее бельё','Носки','Колготки','Купальники','Плавки','Термобельё','Спортивная одежда','Рабочая одежда'],
  'Верхняя одежда':['Куртки','Пуховики','Парки','Ветровки','Бомберы','Косухи','Пальто','Тренчи','Плащи','Дублёнки','Шубы','Дождевики'],
- 'Обувь':['Кроссовки','Кеды','Слипоны','Лоферы','Мокасины','Туфли','Балетки','Эспадрильи','Ботинки','Челси','Берцы','Ботильоны','Сапоги','Ботфорты','Угги','Сандалии','Босоножки','Шлёпанцы','Сабо','Домашняя обувь','Резиновая обувь'],
+ 'Обувь':['Кроссовки','Кеды','Слипоны','Лоферы','Мокасины','Туфли','Балетки','Эспадрильи','Полуботинки','Ботинки','Челси','Берцы','Ботильоны','Полусапоги','Сапоги','Ботфорты','Угги','Дутики','Сандалии','Босоножки','Шлёпанцы','Вьетнамки','Сабо','Мюли','Тапочки','Домашняя обувь','Резиновая обувь','Резиновые сапоги','Треккинговая обувь','Спортивная обувь'],
  'Сумки и багаж':['Сумки','Сумки через плечо','Шопперы','Клатчи','Поясные сумки','Рюкзаки','Портфели','Чемоданы','Дорожные сумки','Косметички'],
  'Аксессуары':['Ремни','Зонты','Очки','Солнцезащитные очки','Шарфы','Палантины','Платки','Перчатки','Варежки','Галстуки','Бабочки','Подтяжки','Брелоки','Чехлы','Кошельки','Кардхолдеры'],
  'Головные уборы':['Кепки','Бейсболки','Панамы','Шапки','Береты','Шляпы','Балaclавы','Повязки'],
@@ -4337,7 +4337,7 @@ function kv7RenderSizes(animate=true){
   const valid=new Set(sizes);
   [...kv2CreateState.sizes].forEach(x=>{if(!valid.has(x))kv2CreateState.sizes.delete(x)});
   const render=()=>{
-    grid.innerHTML=sizes.map(x=>`<button type="button" class="kv-size ${kv2CreateState.sizes.has(x)?'selected':''}" data-size="${escapeHtml(x)}">${escapeHtml(x)}</button>`).join('');
+    grid.innerHTML=sizes.map(x=>`<button type="button" class="kv-size ${kv2CreateState.sizes.has(x)?'selected':''}" data-size="${escapeHtml(x)}" onclick="kv2ToggleSize(this.dataset.size,this)">${escapeHtml(x)}</button>`).join('');
     const tx=KV7_SIZE_TEXT[kv7Lang()]||KV7_SIZE_TEXT.uk;
     section.querySelector('h4').textContent=tx.title;
     const hint=section.querySelector('.kv-hint');if(hint)hint.textContent=tx.hint;
@@ -4408,16 +4408,7 @@ window.kv2ChooseCategory=function(v){
   setTimeout(()=>kv7RenderSizes(true),20);
 };
 
-// Size buttons use stable data values (including half shoe sizes).
-document.addEventListener('click',e=>{
-  const b=e.target.closest('#kvDynamicSizeGrid .kv-size');
-  if(!b)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  const s=b.dataset.size;
-  if(kv2CreateState.sizes.has(s)){kv2CreateState.sizes.delete(s);b.classList.remove('selected')}
-  else{kv2CreateState.sizes.add(s);b.classList.add('selected')}
-  kv2MarkDirty();
-},true);
+// Size buttons are handled directly by kv2ToggleSize() on each rendered button.
 
 // Finish the two order status labels that could originate from Ukrainian/Russian base text.
 const KV7_STATUS_BASE={
@@ -4672,13 +4663,10 @@ function kv102FindSizeWrap(){
     document.querySelector('[data-kv-size-choices],.kv-size-choices,.kv-size-grid');
 }
 function kv102RenderSuitSizes(){
-  const wrap=kv102FindSizeWrap();
-  if(!wrap)return;
-  const modal=wrap.closest('.modal,.kv-modal,[role="dialog"]')||document;
-  const txt=modal.textContent||'';
-  if(!['Костюмы','Костюми','Suits','Касцюмы','套装'].some(n=>txt.includes(n)))return;
-  wrap.style.display='';
-  wrap.innerHTML=KV10_SUIT_SIZES.map(s=>`<button type="button" class="kv-size-chip" data-size="${s}">${s}</button>`).join('');
+  // Legacy compatibility only. Never infer the category from modal text: the hidden
+  // category list itself contains "Костюмы" and used to overwrite normal size buttons.
+  if((kv2CreateState?.category||'').trim()!=='Костюмы')return;
+  // v7/v12+ are the active size renderers; do not replace their clickable grid.
 }
 document.addEventListener('click',e=>{
   if(e.target.closest('button,[role="option"],[data-value]')){
