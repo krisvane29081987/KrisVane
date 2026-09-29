@@ -4025,7 +4025,7 @@ window.previewUiPreferences=function(){
 // Robust delegated interaction: no inline-handler race with translation.
 document.addEventListener('click',e=>{
  const modal=document.getElementById('kvCreateProduct');if(!modal)return;
- const size=e.target.closest('.kv-size');if(size){e.preventDefault();const s=(size.textContent||'').trim();kv2ToggleSize(s,size);return}
+ // Size buttons use their own onclick handler. Do not toggle them again here: the old delegated handler caused every click to toggle ON and immediately OFF.
  const opt=e.target.closest('.kv-option');if(!opt)return;
  const choice=opt.closest('.kv-choice');if(!choice)return;
  e.preventDefault();e.stopPropagation();
