@@ -5304,7 +5304,7 @@ window.openCreateProduct=async function(){
     box.innerHTML=`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Товар</th><th>Цена</th><th>Публикация</th><th>Состояние</th><th>Размеры / остаток</th><th>Действия</th></tr></thead><tbody>${rows.map(p=>{
       const vars=vm.get(String(p.id))||[];
       const sizes=vars.length?`<div class="kv-admin-size-list">${vars.map(v=>{const s=variantSize(v)||'—',stock=Number(v.stock_quantity||0),reserved=Number(v.reserved_quantity||0),free=Math.max(0,stock-reserved);return `<span class="kv-admin-size-chip ${free<=0?'zero':''}">${esc(s)} · ${free}</span>`}).join('')}</div>`:'—';
-      return `<tr><td><strong>${esc(p.name??p.title??`#${p.id}`)}</strong><div class="muted">${esc(p.sku??'')}</div></td><td>${p.price!=null?money(p.price):'—'}${p.old_price!=null?`<div class="kv-old-price-admin">${money(p.old_price)}</div>`:''}</td><td><span class="pill ${p.is_published?'on':'off'}">${p.is_published?'Опубликован':'Скрыт'}</span></td><td>${conditionBadges(p)}</td><td>${sizes}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="kv20EditProduct(${JSON.stringify(String(p.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="kv20DeleteProduct(${JSON.stringify(String(p.id))})">Удалить</button></div></td></tr>`}).join('')}</tbody></table></div>`;
+      return `<tr><td><strong>${esc(p.name??p.title??`#${p.id}`)}</strong><div class="muted">${esc(p.sku??'')}</div></td><td>${p.price!=null?money(p.price):'—'}${p.old_price!=null?`<div class="kv-old-price-admin">${money(p.old_price)}</div>`:''}</td><td><span class="pill ${p.is_published?'on':'off'}">${p.is_published?'Опубликован':'Скрыт'}</span></td><td>${conditionBadges(p)}</td><td>${sizes}</td><td><div class="mini-actions"><button type="button" class="btn btn-secondary btn-small" data-kv20-action="edit" data-product-id="${esc(String(p.id))}">Изменить</button><button type="button" class="btn btn-danger btn-small" data-kv20-action="delete" data-product-id="${esc(String(p.id))}">Удалить</button></div></td></tr>`}).join('')}</tbody></table></div>`;
     try{kvTranslateDom()}catch(_){ }
   };
 
@@ -5313,6 +5313,24 @@ window.openCreateProduct=async function(){
   function categoryOptions(selected){return `<option value="">— Выберите категорию —</option>${adminCategories.map(c=>`<option value="${esc(c.id)}" ${String(c.id)===String(selected)?'selected':''}>${esc(c.name)}</option>`).join('')}`}
   function subOptions(catId,selected){return `<option value="">— Без подкатегории —</option>${adminSubcategories.filter(s=>!catId||String(s.category_id)===String(catId)).map(s=>`<option value="${esc(s.id)}" ${String(s.id)===String(selected)?'selected':''}>${esc(s.name)}</option>`).join('')}`}
   function stockEditor(vars){return `<div class="kv-stock-editor">${vars.map((v,i)=>`<div class="kv-stock-row"><strong>${esc(variantSize(v)||('Вариант '+(i+1)))}</strong><label class="muted">Всего, шт.</label><input class="input kv20-stock" type="number" min="0" step="1" value="${Number(v.stock_quantity||0)}" data-id="${esc(v.id)}"><div class="muted" style="margin-top:5px">Резерв: ${Number(v.reserved_quantity||0)}</div></div>`).join('')}</div>`}
+
+  /* v21: product actions use delegated events instead of inline onclick.
+     This survives table re-rendering and DOM translation passes. */
+  if(!window.__kv20ProductActionDelegation){
+    window.__kv20ProductActionDelegation=true;
+    document.addEventListener('click',function(e){
+      const btn=e.target.closest('[data-kv20-action][data-product-id]');
+      if(!btn)return;
+      const table=btn.closest('#productsAdminContainer');
+      if(!table)return;
+      e.preventDefault();
+      e.stopPropagation();
+      const id=btn.dataset.productId;
+      const action=btn.dataset.kv20Action;
+      if(action==='edit') window.kv20EditProduct?.(id);
+      else if(action==='delete') window.kv20DeleteProduct?.(id);
+    },true);
+  }
 
   window.kv20EditProduct=async function(id){
     if(!adminCategories.length||!adminSubcategories.length)await loadCategories();
