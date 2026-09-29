@@ -1397,12 +1397,6 @@ body[data-glow="off"] .heroBox::after{display:none}
         </div>
       </div>
     </header>
-    <nav class="nav">
-      <div class="shell navin" id="categoryNav">
-        <button class="chip active" data-category="">Все</button>
-        <button class="chip" data-category="new">Новинки</button>
-      </div>
-    </nav>
     <main>
       <section class="hero">
         <div class="shell">
@@ -2174,9 +2168,10 @@ async function loadAll() {
   }
 }
 function renderCategories(){
-  const root=$("#categoryNav");const fixed=`<button class="chip ${state.category===""?"active":""}" data-category="">Все</button>
-            <button class="chip ${state.category==="new"?"active":""}" data-category="new">Новинки</button>`;
-  root.innerHTML=fixed+state.categories.map(c=>`<button class="chip ${String(state.category)===String(c.id)?"active":""}" data-category="${esc(c.id)}">${esc(c.name)}</button>`).join("");
+  // v20: the duplicate top category strip was intentionally removed.
+  // Category selection lives only in the main Filters panel.
+  const root=$("#categoryNav");
+  if (!root) return;
 }
 
 function variantLabel(v){
@@ -3019,11 +3014,20 @@ function enhanceSelect(select) {
         event.preventDefault();
         event.stopPropagation();
 
+        // Close the visual layer BEFORE rebuilding dependent filter options.
+        // This prevents the old dropdown contents from lingering as a faded
+        // "ghost" while category/subcategory/size options are being replaced.
+        wrapper.classList.add("kvSelecting");
+        wrapper.classList.remove("open");
+        syncFilterDropSpace();
+
         select.value = option.value;
         select.dispatchEvent(new Event("change", {bubbles: true}));
         rebuild();
-        wrapper.classList.remove("open");
-        syncFilterDropSpace();
+
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => wrapper.classList.remove("kvSelecting"));
+        });
       });
 
       options.append(optionButton);
@@ -3528,6 +3532,16 @@ body[data-density="compact"] .filters .kvOption.selected{transform:translateY(-1
 }
 
 body[data-motion="off"] .filterDropSpace{
+  transition:none!important;
+}
+
+/* ===== KrisVane v20 — clean filter selection ===== */
+/* While an option changes dependent lists, hide only the dropdown layer itself.
+   The reserved page space still collapses with the normal smooth v19 animation. */
+.filters .kvSelect.kvSelecting .kvSelectDrop{
+  opacity:0!important;
+  visibility:hidden!important;
+  pointer-events:none!important;
   transition:none!important;
 }
 </style>
