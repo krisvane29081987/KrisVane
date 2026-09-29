@@ -32,8 +32,14 @@ main{max-width:1080px;margin:34px auto 70px;padding:0 22px}.layout{display:grid;
 <section class="card section"><h2>Личные данные</h2><p class="lead">Основная информация аккаунта KrisVane.</p>
 <form id="profileForm"><div class="grid"><div><label for="fullName">Имя</label><input id="fullName" maxlength="80" autocomplete="name" placeholder="Например, Иван"></div><div><label for="email">Email</label><input id="email" disabled><div class="hint">Пока email доступен только для просмотра.</div></div></div><div class="actions"><button class="btn primary">Сохранить изменения</button></div></form></section>
 <section class="card section"><h2>Аватар</h2><p class="lead">PNG, JPG, WEBP или GIF до 5 МБ.</p><div class="row"><div><b>Фотография профиля</b><span>Сохраняется в вашем каталоге avatars.</span></div><button id="avatarChoose2" class="btn">Выбрать изображение</button></div></section>
-<section class="card section"><h2>Безопасность</h2><p class="lead">Смена пароля через Supabase Auth.</p>
-<form id="passwordForm"><div class="grid"><div><label for="newPassword">Новый пароль</label><input id="newPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Минимум 6 символов"></div><div><label for="repeatPassword">Повторите пароль</label><input id="repeatPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Повторите пароль"></div></div><div class="actions"><button class="btn primary">Изменить пароль</button></div></form></section>
+<section class="card section"><h2>Безопасность</h2><p class="lead">Для смены пароля сначала подтвердите текущий пароль.</p>
+<form id="passwordForm">
+<div class="grid">
+<div><label for="currentPassword">Текущий пароль</label><input id="currentPassword" type="password" autocomplete="current-password" placeholder="Введите текущий пароль"></div>
+<div></div>
+<div><label for="newPassword">Новый пароль</label><input id="newPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Минимум 6 символов"></div>
+<div><label for="repeatPassword">Повторите пароль</label><input id="repeatPassword" type="password" minlength="6" autocomplete="new-password" placeholder="Повторите пароль"></div>
+</div><div class="actions"><button class="btn primary">Изменить пароль</button></div></form></section>
 <section class="card section"><h2>Аккаунт</h2><p class="lead">Дополнительная информация. Позже сюда сможем добавить адреса доставки и другие настройки.</p><div class="row"><div><b>Дата регистрации</b><span id="createdAt">—</span></div></div><div class="row"><div><b>Выход</b><span>Завершить текущий сеанс.</span></div><button class="btn danger logout">Выйти</button></div></section>
 </div></section></main><div id="toast" class="toast"></div>
 <script type="module">
@@ -48,7 +54,32 @@ async function load(){theme();const r=await sb.auth.getUser();$("#loading").clas
 $("#profileForm").addEventListener("submit",async e=>{e.preventDefault();const n=$("#fullName").value.trim();if(!n)return toast("Введите имя.","error");const q=await sb.from("profiles").update({full_name:n}).eq("id",user.id).select("id,full_name,avatar_url,role,created_at,updated_at").single();if(q.error)return toast("Не удалось сохранить имя.","error");profile=q.data;render();toast("Изменения сохранены.")});
 function choose(){ $("#avatarInput").value="";$("#avatarInput").click() }$("#avatarEdit").onclick=choose;$("#avatarChoose").onclick=choose;$("#avatarChoose2").onclick=choose;
 $("#avatarInput").addEventListener("change",async e=>{const f=e.target.files?.[0];if(!f)return;if(!["image/png","image/jpeg","image/webp","image/gif"].includes(f.type))return toast("Нужен PNG, JPG, WEBP или GIF.","error");if(f.size>5*1024*1024)return toast("Максимум 5 МБ.","error");const ext=(f.name.split(".").pop()||"jpg").replace(/[^a-z0-9]/gi,"").toLowerCase(),path=`${user.id}/avatar-${Date.now()}.${ext}`;toast("Загружаем аватар…");const up=await sb.storage.from("avatars").upload(path,f,{cacheControl:"3600",contentType:f.type});if(up.error)return toast("Не удалось загрузить аватар.","error");const pub=sb.storage.from("avatars").getPublicUrl(path).data.publicUrl;const old=profile?.avatar_url||"";const q=await sb.from("profiles").update({avatar_url:pub}).eq("id",user.id).select("id,full_name,avatar_url,role,created_at,updated_at").single();if(q.error){await sb.storage.from("avatars").remove([path]);return toast("Профиль не обновился.","error")}profile=q.data;render();try{const marker="/storage/v1/object/public/avatars/";if(old.includes(marker)){const p=decodeURIComponent(old.split(marker)[1].split("?")[0]);if(p.startsWith(user.id+"/")&&p!==path)await sb.storage.from("avatars").remove([p])}}catch{}toast("Аватар обновлён.")});
-$("#passwordForm").addEventListener("submit",async e=>{e.preventDefault();const a=$("#newPassword").value,b=$("#repeatPassword").value;if(a.length<6)return toast("Минимум 6 символов.","error");if(a!==b)return toast("Пароли не совпадают.","error");const q=await sb.auth.updateUser({password:a});if(q.error)return toast("Не удалось изменить пароль: "+q.error.message,"error");e.target.reset();toast("Пароль изменён.")});
+$("#passwordForm").addEventListener("submit",async e=>{
+  e.preventDefault();
+  const current=$("#currentPassword").value;
+  const next=$("#newPassword").value;
+  const repeat=$("#repeatPassword").value;
+
+  if(!current)return toast("Введите текущий пароль.","error");
+  if(next.length<6)return toast("Новый пароль должен содержать минимум 6 символов.","error");
+  if(next!==repeat)return toast("Новые пароли не совпадают.","error");
+  if(!user?.email)return toast("Не удалось определить email аккаунта.","error");
+
+  const verify=await sb.auth.signInWithPassword({email:user.email,password:current});
+  if(verify.error){
+    console.error(verify.error);
+    return toast("Текущий пароль указан неверно.","error");
+  }
+
+  const q=await sb.auth.updateUser({password:next});
+  if(q.error){
+    console.error(q.error);
+    return toast("Не удалось изменить пароль: "+q.error.message,"error");
+  }
+
+  e.target.reset();
+  toast("Пароль успешно изменён.");
+});
 $$(".logout").forEach(b=>b.onclick=async()=>{const q=await sb.auth.signOut();if(q.error)return toast("Не удалось выйти.","error");location.href="auth.html"});
 load();
 </script></body></html>
