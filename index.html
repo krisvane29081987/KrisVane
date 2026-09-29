@@ -3571,6 +3571,19 @@ function animateHeroHalo(now){
 }
 requestAnimationFrame(animateHeroHalo);
 
+
+/* v25 storefront promo banner */
+async function kv25LoadPromoBanner(){
+  try{
+    const hero=document.querySelector('.heroBox');if(!hero)return;
+    const {data,error}=await sb.from('storefront_announcements').select('message,enabled').eq('id',1).maybeSingle();
+    if(error||!data?.enabled||!String(data.message||'').trim())return;
+    let banner=document.getElementById('kvPromoBanner');
+    if(!banner){banner=document.createElement('div');banner.id='kvPromoBanner';banner.className='kv-promo-banner';hero.insertAdjacentElement('afterend',banner)}
+    const text=document.createElement('div');text.className='kv-promo-text';text.textContent=String(data.message).trim();banner.replaceChildren(text);
+  }catch(e){console.warn('KrisVane promo:',e)}
+}
+kv25LoadPromoBanner();
 </script>
     
 
@@ -3665,3 +3678,11 @@ body[data-motion="off"] .filterDropSpace{
 
 </body>
   </html>
+<style id="kv25-promo-style">
+.kv-promo-banner{margin-top:18px;border:1px solid color-mix(in srgb,var(--accent) 38%,var(--line));border-radius:20px;background:linear-gradient(120deg,color-mix(in srgb,var(--panel) 94%,var(--accent) 6%),color-mix(in srgb,var(--panel2) 92%,var(--accent2) 8%));box-shadow:0 14px 38px rgba(0,0,0,.16),0 0 24px color-mix(in srgb,var(--accent) 14%,transparent);padding:15px 18px;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
+.kv-promo-banner::before{content:"";position:absolute;inset:-70% 35%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 18%,transparent),transparent);transform:rotate(18deg);animation:kvPromoSweep 7s ease-in-out infinite}
+.kv-promo-text{position:relative;z-index:1;font-weight:900;letter-spacing:.02em;font-size:clamp(15px,2vw,20px);white-space:pre-wrap}
+body[data-motion="none"] .kv-promo-banner::before{animation:none}
+@keyframes kvPromoSweep{0%,65%,100%{transform:translateX(-150%) rotate(18deg)}80%{transform:translateX(150%) rotate(18deg)}}
+@media(max-width:760px){.kv-promo-banner{margin-top:13px;border-radius:16px;padding:13px 14px}}
+</style>
