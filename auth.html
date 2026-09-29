@@ -11,11 +11,23 @@
     :root{--bg:#08090b;--card:#111318;--line:#242833;--text:#f5f7fb;--muted:#8e95a3;--accent:#6f7cff;--danger:#ff6b78;--ok:#63d79a}
     body{margin:0;min-height:100vh;font-family:Inter,system-ui,-apple-system,Segoe UI,sans-serif;background:radial-gradient(circle at 50% 0,#171a27 0,transparent 36%),var(--bg);color:var(--text);display:grid;place-items:center;padding:24px}
     .wrap{width:min(440px,100%)}.brand{text-align:center;margin-bottom:24px}.brand h1{font-size:34px;margin:0;letter-spacing:-1.4px}.brand p{color:var(--muted);margin:8px 0 0}
-    .card{position:relative;isolation:isolate;background:rgba(17,19,24,.94);border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.35);backdrop-filter:blur(16px)}
-    .card::before{content:"";position:absolute;inset:-3px;border-radius:27px;padding:2px;pointer-events:none;z-index:-1;background:conic-gradient(from var(--glow-angle),transparent 0deg,transparent 246deg,rgba(255,255,255,.08) 270deg,rgba(238,244,255,.95) 300deg,rgba(255,255,255,.18) 326deg,transparent 348deg,transparent 360deg);filter:drop-shadow(0 0 8px rgba(245,248,255,.34)) drop-shadow(0 0 18px rgba(226,236,255,.16));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude;animation:perimeterFlow 6.5s linear infinite}
-    .card::after{content:"";position:absolute;inset:-10px;border-radius:32px;pointer-events:none;z-index:-2;background:conic-gradient(from var(--glow-angle),transparent 0deg,transparent 255deg,rgba(236,243,255,.03) 270deg,rgba(244,248,255,.25) 300deg,rgba(225,235,255,.07) 333deg,transparent 350deg);filter:blur(13px);animation:perimeterFlow 6.5s linear infinite}
-    @property --glow-angle{syntax:"<angle>";inherits:false;initial-value:0deg}
-    @keyframes perimeterFlow{to{--glow-angle:360deg}}
+    .card{position:relative;isolation:isolate;background:rgba(17,19,24,.97);border:1px solid var(--line);border-radius:24px;padding:26px;box-shadow:0 24px 80px rgba(0,0,0,.35),0 0 18px rgba(238,244,255,.082),0 0 38px rgba(225,235,255,.038);backdrop-filter:blur(16px)}
+    .card::before{content:"";position:absolute;inset:-3px;border-radius:27px;padding:2px;pointer-events:none;z-index:-1;background:rgba(238,244,255,.135);filter:drop-shadow(0 0 7px rgba(240,245,255,.15));-webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask-composite:exclude}
+    .cardGlow{position:absolute;inset:-22px;z-index:-2;pointer-events:none;border-radius:46px;filter:blur(9px);opacity:1}
+    .glowTrack{position:absolute;inset:19px;border-radius:28px;padding:4px;background:conic-gradient(from 0deg,
+      rgba(255,255,255,.03) 0deg,
+      rgba(255,255,255,.03) var(--a1s),
+      rgba(236,243,255,.22) var(--a1m),
+      rgba(255,255,255,.035) var(--a1e),
+      rgba(255,255,255,.03) var(--a2s),
+      rgba(245,248,255,.18) var(--a2m),
+      rgba(255,255,255,.035) var(--a2e),
+      rgba(255,255,255,.03) var(--a3s),
+      rgba(229,238,255,.15) var(--a3m),
+      rgba(255,255,255,.03) var(--a3e),
+      rgba(255,255,255,.03) 360deg);
+      -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);
+      -webkit-mask-composite:xor;mask-composite:exclude}
     .tabs{display:grid;grid-template-columns:1fr 1fr;background:#0b0d11;padding:4px;border-radius:14px;margin-bottom:22px}.tab{border:0;background:transparent;color:var(--muted);padding:11px;border-radius:11px;font:inherit;font-weight:700;cursor:pointer}.tab.active{background:#1b1e27;color:#fff}
     form{display:grid;gap:15px}.field{display:grid;gap:7px}.field.hidden{display:none}label{font-size:13px;color:#b9bfca;font-weight:650}input{width:100%;border:1px solid var(--line);background:#0b0d11;color:#fff;border-radius:13px;padding:13px 14px;font:inherit;outline:none;transition:.18s}input:focus{border-color:#6572ed;box-shadow:0 0 0 3px rgba(111,124,255,.13)}
     .hint{font-size:12px;color:var(--muted)}button.submit{margin-top:3px;border:0;border-radius:14px;padding:14px;background:linear-gradient(135deg,#7884ff,#5f6be5);color:#fff;font:inherit;font-weight:800;cursor:pointer;transition:.18s}.submit:hover{transform:translateY(-1px)}.submit:disabled{opacity:.55;cursor:not-allowed;transform:none}
@@ -33,7 +45,7 @@
 <body>
   <main class="wrap">
     <div class="brand"><h1>KrisVane</h1><p>Твой аккаунт магазина</p></div>
-    <section id="mainCard" class="card">
+    <section id="mainCard" class="card"><div class="cardGlow" aria-hidden="true"><div id="glowTrack" class="glowTrack"></div></div>
       <div id="authBox">
         <div class="tabs">
           <button class="tab active" data-mode="login" type="button">Вход</button>
@@ -146,6 +158,66 @@ function showAuth(){
   $('authBox').style.display='block';
   $('sessionBox').classList.remove('show');
 }
+
+const glowTrack=$('glowTrack');
+const glowZones=[
+  {angle:318,speed:9.8,width:42,target:318,targetAt:0},
+  {angle:112,speed:10.2,width:48,target:112,targetAt:0},
+  {angle:205,speed:9.6,width:38,target:205,targetAt:0}
+];
+let lastGlowTime=performance.now();
+
+function circularDelta(from,to){
+  return ((to-from+540)%360)-180;
+}
+function chooseGlowTarget(zone,now){
+  const direction=Math.random()<.5?-1:1;
+  const travel=55+Math.random()*105;
+  zone.target=(zone.angle+direction*travel+360)%360;
+  zone.targetAt=now+(travel/zone.speed)*1000;
+}
+glowZones.forEach(z=>chooseGlowTarget(z,lastGlowTime));
+
+function animateGlow(now){
+  const dt=Math.min((now-lastGlowTime)/1000,.05);
+  lastGlowTime=now;
+
+  glowZones.forEach(zone=>{
+    let delta=circularDelta(zone.angle,zone.target);
+    if(Math.abs(delta)<1.4 || now>=zone.targetAt){
+      chooseGlowTarget(zone,now);
+      delta=circularDelta(zone.angle,zone.target);
+    }
+    const maxStep=zone.speed*dt;
+    const step=Math.sign(delta)*Math.min(Math.abs(delta),maxStep);
+    zone.angle=(zone.angle+step+360)%360;
+  });
+
+  const z=[...glowZones].sort((a,b)=>a.angle-b.angle);
+  const stops=[];
+  z.forEach((zone,i)=>{
+    const half=zone.width/2;
+    let s=zone.angle-half,m=zone.angle,e=zone.angle+half;
+    // CSS conic gradients cannot wrap a stop through 0°, so mirror wrapped zones.
+    if(s<0){
+      stops.push([0,zone.angle+360, e+360]);
+      s+=360;m+=360;e+=360;
+    }
+    stops.push([s,m,e]);
+  });
+
+  // Use three original zones directly; values can exceed 360 safely only poorly,
+  // so normalize and render via dynamically generated conic-gradient segments.
+  const layers=glowZones.map((zone,i)=>{
+    const a=zone.angle;
+    const w=zone.width;
+    const bright=i===0?'.36':i===1?'.30':'.255';
+    return `conic-gradient(from ${a-w/2}deg, transparent 0deg, rgba(238,244,255,${bright}) ${w/2}deg, transparent ${w}deg, transparent 360deg)`;
+  });
+  glowTrack.style.background=layers.join(',')+',rgba(238,244,255,.052)';
+  requestAnimationFrame(animateGlow);
+}
+requestAnimationFrame(animateGlow);
 
 (async()=>{
   const {data:{session}}=await client.auth.getSession();
