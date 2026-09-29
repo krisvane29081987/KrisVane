@@ -3967,7 +3967,7 @@ set('is_new',kvCondition==='new');
 set('condition',kvCondition);
 set('product_condition',kvCondition);
 set('item_condition',kvCondition);
-set('is_featured',false);set('sort_order',0);if(!Object.keys(payload).length)throw new Error('Не удалось определить поля таблицы products.');const pr=await supabaseClient.from('products').insert(payload).select('*').single();if(pr.error)throw pr.error;const product=pr.data;const sizes=[...kv2CreateState.sizes];if(sizes.length){const vr=await supabaseClient.from('product_variants').select('*').limit(1);const vt=vr.data?.[0]||null;for(let i=0;i<sizes.length;i++){const v={product_id:product.id};if(vt){if('variant_name'in vt)v.variant_name=sizes[i];else if('name'in vt)v.name=sizes[i];else if('size'in vt)v.size=sizes[i];if('sku'in vt)v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;if('stock_quantity'in vt)v.stock_quantity=0;if('reserved_quantity'in vt)v.reserved_quantity=0;if('is_active'in vt)v.is_active=true}else{v.variant_name=sizes[i];v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;v.stock_quantity=0;v.reserved_quantity=0}const ir=await supabaseClient.from('product_variants').insert(v);if(ir.error)throw ir.error}}
+set('is_featured',false);set('sort_order',0);if(!Object.keys(payload).length)throw new Error('Не удалось определить поля таблицы products.');const pr=await supabaseClient.from('products').insert(payload).select('*').single();if(pr.error)throw pr.error;const product=pr.data;const sizes=[...kv2CreateState.sizes];if(sizes.length){const vr=await supabaseClient.from('product_variants').select('*').limit(1);const vt=vr.data?.[0]||null;for(let i=0;i<sizes.length;i++){const v={product_id:product.id};if(vt){if('variant_name'in vt)v.variant_name=sizes[i];else if('name'in vt)v.name=sizes[i];else if('size'in vt)v.size=sizes[i];if('sku'in vt)v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;if('stock_quantity'in vt)v.stock_quantity=(typeof kv20CreateStockValue==='function'?kv20CreateStockValue(sizes[i]):0);if('reserved_quantity'in vt)v.reserved_quantity=0;if('is_active'in vt)v.is_active=true}else{v.variant_name=sizes[i];v.sku=`${sku}-${sizes[i].replace(/\s+/g,'-')}`;v.stock_quantity=(typeof kv20CreateStockValue==='function'?kv20CreateStockValue(sizes[i]):0);v.reserved_quantity=0}const ir=await supabaseClient.from('product_variants').insert(v);if(ir.error)throw ir.error}}
  if(kv2Photos.length){const ir=await supabaseClient.from('product_images').select('*').limit(1);const it=ir.data?.[0]||null;for(let i=0;i<kv2Photos.length;i++){const f=kv2Photos[i],path=`${product.id}/${Date.now()}-${i}-${f.name.replace(/[^a-zA-Z0-9._-]/g,'_')}`;const up=await supabaseClient.storage.from('products').upload(path,f,{upsert:false});if(up.error)throw up.error;const pub=supabaseClient.storage.from('products').getPublicUrl(path).data.publicUrl;const row={product_id:product.id};if(it){if('image_url'in it)row.image_url=pub;else if('url'in it)row.url=pub;if('sort_order'in it)row.sort_order=i;if('alt_text'in it)row.alt_text=name;if('is_active'in it)row.is_active=true}else{row.image_url=pub;row.sort_order=i}const ins=await supabaseClient.from('product_images').insert(row);if(ins.error)throw ins.error}}
  kv2Dirty=false;showToast('Товар создан.');closeAdminModal();loadedAdminViews.delete('products');await loadProducts()}catch(e){showToast(e.message||String(e),'error')}finally{btn.disabled=false;btn.textContent=kv2('add')}}
 const kv2BaseClose=window.closeAdminModal;window.closeAdminModal=function(force=false){if(!force&&kv2Dirty){if(!confirm(kv2('unsaved')))return}kv2Dirty=false;kv2BaseClose()};
@@ -5253,3 +5253,155 @@ window.openCreateProduct=async function(){
 
 </body>
 </html>
+<style id="kv20-product-admin-style">
+.kv-old-price-admin{text-decoration:line-through;opacity:.58;margin-top:3px}
+.kv-admin-size-list{display:flex;flex-wrap:wrap;gap:6px;min-width:180px}
+.kv-admin-size-chip{display:inline-flex;gap:5px;align-items:center;padding:5px 8px;border:1px solid var(--border);border-radius:9px;font-size:.82rem;white-space:nowrap}
+.kv-admin-size-chip.zero{opacity:.52}
+.kv-stock-editor{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:10px;margin-top:12px}
+.kv-stock-row{border:1px solid var(--border);border-radius:12px;padding:10px;background:color-mix(in srgb,var(--panel) 90%,transparent)}
+.kv-stock-row strong{display:block;margin-bottom:7px}
+.kv-stock-row input{width:100%}
+.kv-condition-multi{display:flex;flex-wrap:wrap;gap:8px;margin-top:8px}
+.kv-condition-multi .kv-option.selected{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 18%,transparent)}
+.kv-risk-note{border:1px solid color-mix(in srgb,#f0a020 55%,var(--border));background:color-mix(in srgb,#f0a020 9%,var(--panel));border-radius:12px;padding:10px 12px;margin-bottom:12px}
+</style>
+<script id="kv20-product-admin-script">
+/* v20 — product administration: stock per size, full edit/delete, condition badges,
+   protected SKU/category/subcategory changes. Kept as a final override layer so the
+   older admin remains untouched and rollback is trivial. */
+(function(){
+  const COND_ORDER=['new','unworn','like_new','used'];
+  const COND_LABELS=(typeof KV7_CONDITIONS!=='undefined')?KV7_CONDITIONS:{
+    ru:{new:'Новое',unworn:'Не ношенное',like_new:'Как новое',used:'Б/У'}
+  };
+  const lang=()=>((typeof getUiPrefs==='function'&&getUiPrefs().language)||'ru');
+  const condLabel=v=>(COND_LABELS[lang()]||COND_LABELS.ru||{})[v]||v;
+  const esc=v=>typeof escapeHtml==='function'?escapeHtml(v):String(v??'');
+  const productById=id=>adminProducts.find(p=>String(p.id)===String(id));
+  const categoryName=id=>adminCategories.find(c=>String(c.id)===String(id))?.name||'';
+  const subcategoryName=id=>adminSubcategories.find(c=>String(c.id)===String(id))?.name||'';
+  const variantSize=v=>String(v.size??v.variant_name??v.name??'').trim();
+  function productConditions(p){
+    if(Array.isArray(p?.conditions)&&p.conditions.length)return p.conditions.filter(x=>COND_ORDER.includes(x));
+    const raw=p?.condition??p?.product_condition??p?.item_condition??(p?.is_new?'new':'');
+    if(Array.isArray(raw))return raw.filter(x=>COND_ORDER.includes(x));
+    const arr=String(raw||'').split(/[;,|]/).map(x=>x.trim()).filter(x=>COND_ORDER.includes(x));
+    return arr.length?arr:(p?.is_new?['new']:[]);
+  }
+  function conditionBadges(p){const a=productConditions(p);return a.length?a.map(x=>`<span class="pill on">${esc(condLabel(x))}</span>`).join(' '):'—'}
+  async function fetchVariants(ids){
+    if(!ids.length)return new Map();
+    const {data,error}=await supabaseClient.from('product_variants').select('*').in('product_id',ids);
+    const m=new Map();if(error)return m;(data||[]).forEach(v=>{const k=String(v.product_id);if(!m.has(k))m.set(k,[]);m.get(k).push(v)});return m;
+  }
+  window.renderProducts=async function(){
+    const box=document.getElementById('productsAdminContainer');if(!box)return;
+    const q=(document.getElementById('productSearch')?.value||'').toLowerCase();
+    const rows=adminProducts.filter(p=>JSON.stringify(p).toLowerCase().includes(q));
+    if(!rows.length){box.innerHTML='<div class="empty">Товары не найдены.</div>';return}
+    const vm=await fetchVariants(rows.map(x=>x.id));
+    box.innerHTML=`<div class="table-wrap"><table class="admin-table"><thead><tr><th>Товар</th><th>Цена</th><th>Публикация</th><th>Состояние</th><th>Размеры / остаток</th><th>Действия</th></tr></thead><tbody>${rows.map(p=>{
+      const vars=vm.get(String(p.id))||[];
+      const sizes=vars.length?`<div class="kv-admin-size-list">${vars.map(v=>{const s=variantSize(v)||'—',stock=Number(v.stock_quantity||0),reserved=Number(v.reserved_quantity||0),free=Math.max(0,stock-reserved);return `<span class="kv-admin-size-chip ${free<=0?'zero':''}">${esc(s)} · ${free}</span>`}).join('')}</div>`:'—';
+      return `<tr><td><strong>${esc(p.name??p.title??`#${p.id}`)}</strong><div class="muted">${esc(p.sku??'')}</div></td><td>${p.price!=null?money(p.price):'—'}${p.old_price!=null?`<div class="kv-old-price-admin">${money(p.old_price)}</div>`:''}</td><td><span class="pill ${p.is_published?'on':'off'}">${p.is_published?'Опубликован':'Скрыт'}</span></td><td>${conditionBadges(p)}</td><td>${sizes}</td><td><div class="mini-actions"><button class="btn btn-secondary btn-small" onclick="kv20EditProduct(${JSON.stringify(String(p.id))})">Изменить</button><button class="btn btn-danger btn-small" onclick="kv20DeleteProduct(${JSON.stringify(String(p.id))})">Удалить</button></div></td></tr>`}).join('')}</tbody></table></div>`;
+    try{kvTranslateDom()}catch(_){ }
+  };
+
+  function boolSelect(id,label,val){return `<div class="field"><label>${esc(label)}</label><select id="${id}" class="select"><option value="true" ${val?'selected':''}>Да</option><option value="false" ${!val?'selected':''}>Нет</option></select></div>`}
+  function conditionEditor(selected){const set=new Set(selected);return `<div class="field full"><label>Состояние товара · можно выбрать несколько</label><div id="kv20Conditions" class="kv-condition-multi">${COND_ORDER.map(c=>`<button type="button" class="kv-option ${set.has(c)?'selected':''}" data-kv20-condition="${c}">${esc(condLabel(c))} <span class="kv-check">✓</span></button>`).join('')}</div><small class="muted">На старой схеме основным считается первое выбранное состояние. Для полноценного множественного хранения используйте поле conditions.</small></div>`}
+  function categoryOptions(selected){return `<option value="">— Выберите категорию —</option>${adminCategories.map(c=>`<option value="${esc(c.id)}" ${String(c.id)===String(selected)?'selected':''}>${esc(c.name)}</option>`).join('')}`}
+  function subOptions(catId,selected){return `<option value="">— Без подкатегории —</option>${adminSubcategories.filter(s=>!catId||String(s.category_id)===String(catId)).map(s=>`<option value="${esc(s.id)}" ${String(s.id)===String(selected)?'selected':''}>${esc(s.name)}</option>`).join('')}`}
+  function stockEditor(vars){return `<div class="kv-stock-editor">${vars.map((v,i)=>`<div class="kv-stock-row"><strong>${esc(variantSize(v)||('Вариант '+(i+1)))}</strong><label class="muted">Всего, шт.</label><input class="input kv20-stock" type="number" min="0" step="1" value="${Number(v.stock_quantity||0)}" data-id="${esc(v.id)}"><div class="muted" style="margin-top:5px">Резерв: ${Number(v.reserved_quantity||0)}</div></div>`).join('')}</div>`}
+
+  window.kv20EditProduct=async function(id){
+    if(!adminCategories.length||!adminSubcategories.length)await loadCategories();
+    const p=productById(id);if(!p)return showToast('Товар не найден.','error');
+    const rel=await kvLoadProductRelations(id);const vars=rel.variants||[];
+    const selected=productConditions(p);
+    openAdminModal('Изменение товара',`<div class="product-studio" id="kv20EditProduct" data-id="${esc(id)}">
+      <div class="kv-risk-note"><strong>Артикул, категория и подкатегория защищены.</strong><div class="muted">Перед изменением каждого из этих полей KrisVane отдельно попросит подтверждение: изменение может повлиять на клиентский каталог.</div></div>
+      <div class="kv-product-section"><h4>Основное</h4><div class="form-grid">
+        <div class="field"><label>Название товара</label><input id="kv20Name" class="input" value="${esc(p.name??p.title??'')}"></div>
+        <div class="field"><label>Артикул</label><input id="kv20Sku" class="input" value="${esc(p.sku??'')}" data-original="${esc(p.sku??'')}"></div>
+        <div class="field"><label>Цена, грн</label><input id="kv20Price" class="input" type="number" min="0" step="0.01" value="${esc(p.price??'')}"></div>
+        <div class="field"><label>Старая цена, грн</label><input id="kv20OldPrice" class="input" type="number" min="0" step="0.01" value="${esc(p.old_price??'')}"></div>
+        <div class="field full"><label>Описание</label><textarea id="kv20Description" class="input" rows="5">${esc(p.description??'')}</textarea></div>
+      </div></div>
+      <div class="kv-product-section"><h4>Каталог</h4><div class="form-grid">
+        <div class="field"><label>Бренд</label><input id="kv20Brand" class="input" value="${esc(p.brand??'')}"></div>
+        <div class="field"><label>Категория</label><select id="kv20Category" class="select" data-original="${esc(p.category_id??'')}">${categoryOptions(p.category_id)}</select></div>
+        <div class="field"><label>Подкатегория</label><select id="kv20Subcategory" class="select" data-original="${esc(p.subcategory_id??'')}">${subOptions(p.category_id,p.subcategory_id)}</select></div>
+        ${boolSelect('kv20Published','Опубликован',!!p.is_published)}
+        ${('is_featured' in p)?boolSelect('kv20Featured','Рекомендуемый',!!p.is_featured):''}
+        ${('sort_order' in p)?`<div class="field"><label>Порядок сортировки</label><input id="kv20Sort" class="input" type="number" value="${Number(p.sort_order||0)}"></div>`:''}
+        ${conditionEditor(selected)}
+      </div></div>
+      <div class="kv-product-section"><h4>Размеры и остатки</h4>${vars.length?stockEditor(vars):'<div class="muted">У товара пока нет вариантов размеров.</div>'}</div>
+      <div class="kv-product-section"><h4>Фотографии</h4>${kvRelationList('image',rel.images||[],rel.imageError)}${kvGenericRelationForm('image',(rel.images||[])[0],id)}</div>
+      <div class="kv-form-actions"><button type="button" class="btn btn-secondary" onclick="closeAdminModal()">Закрыть</button><button type="button" class="btn btn-primary" id="kv20Save" onclick="kv20SaveProduct(${JSON.stringify(String(id))})">Сохранить всё</button></div>
+    </div>`);
+  };
+
+  document.addEventListener('click',e=>{const b=e.target.closest('[data-kv20-condition]');if(!b)return;e.preventDefault();b.classList.toggle('selected')},true);
+  document.addEventListener('change',e=>{if(e.target?.id!=='kv20Category')return;const sel=document.getElementById('kv20Subcategory');if(sel)sel.innerHTML=subOptions(e.target.value,'')},true);
+
+  function changed(el){return String(el?.value??'')!==String(el?.dataset.original??'')}
+  function confirmRisk(label,from,to){return confirm(`Точно изменить ${label}?\n\n${from||'—'} → ${to||'—'}\n\nЭто может повлиять на отображение товара на клиентском сайте.`)}
+  window.kv20SaveProduct=async function(id){
+    const p=productById(id);if(!p)return;
+    const sku=document.getElementById('kv20Sku'),cat=document.getElementById('kv20Category'),sub=document.getElementById('kv20Subcategory');
+    if(changed(sku)&&!confirmRisk('артикул',sku.dataset.original,sku.value)){sku.value=sku.dataset.original;sku.focus();return}
+    if(changed(cat)&&!confirmRisk('категорию',categoryName(cat.dataset.original),categoryName(cat.value))){cat.value=cat.dataset.original;const s=document.getElementById('kv20Subcategory');s.innerHTML=subOptions(cat.value,sub.dataset.original);s.value=sub.dataset.original;cat.focus();return}
+    if(changed(sub)&&!confirmRisk('подкатегорию',subcategoryName(sub.dataset.original),subcategoryName(sub.value))){sub.value=sub.dataset.original;sub.focus();return}
+    const btn=document.getElementById('kv20Save');btn.disabled=true;btn.textContent='…';
+    try{
+      const payload={};const set=(k,v)=>{if(k in p)payload[k]=v};
+      const name=document.getElementById('kv20Name').value.trim();
+      set('name',name);set('title',name);set('sku',sku.value.trim());set('brand',document.getElementById('kv20Brand').value.trim());set('description',document.getElementById('kv20Description').value.trim());
+      set('price',Number(document.getElementById('kv20Price').value));const op=document.getElementById('kv20OldPrice').value;set('old_price',op===''?null:Number(op));
+      set('category_id',cat.value||null);set('subcategory_id',sub.value||null);set('is_published',document.getElementById('kv20Published').value==='true');
+      if(document.getElementById('kv20Featured'))set('is_featured',document.getElementById('kv20Featured').value==='true');if(document.getElementById('kv20Sort'))set('sort_order',Number(document.getElementById('kv20Sort').value||0));
+      const conditions=[...document.querySelectorAll('#kv20Conditions [data-kv20-condition].selected')].map(x=>x.dataset.kv20Condition);const primary=conditions[0]||'';
+      set('is_new',conditions.includes('new'));set('condition',primary||null);set('product_condition',primary||null);set('item_condition',primary||null);if('conditions' in p)payload.conditions=conditions;
+      const ur=await supabaseClient.from('products').update(payload).eq('id',id);if(ur.error)throw ur.error;
+      for(const input of document.querySelectorAll('.kv20-stock')){const qty=Math.max(0,Math.floor(Number(input.value)||0));const r=await supabaseClient.from('product_variants').update({stock_quantity:qty}).eq('id',input.dataset.id);if(r.error)throw r.error}
+      showToast('Товар и остатки сохранены.');closeAdminModal(true);await loadProducts();
+    }catch(e){showToast(e.message||String(e),'error')}finally{btn.disabled=false;btn.textContent='Сохранить всё'}
+  };
+
+  window.kv20DeleteProduct=async function(id){
+    const p=productById(id);if(!p)return;
+    if(!confirm(`Удалить товар «${p.name||p.title||p.sku||id}»?\n\nБудут удалены его размеры/остатки и записи фотографий. Это действие нельзя отменить.`))return;
+    try{
+      let r=await supabaseClient.from('product_variants').delete().eq('product_id',id);if(r.error)throw r.error;
+      r=await supabaseClient.from('product_images').delete().eq('product_id',id);if(r.error)throw r.error;
+      r=await supabaseClient.from('products').delete().eq('id',id);if(r.error)throw r.error;
+      showToast('Товар удалён.');await loadProducts();
+    }catch(e){showToast(e.message||String(e),'error')}
+  };
+
+  /* Creation: add stock inputs for every selected size and persist them instead of 0. */
+  const oldToggle=window.kv2ToggleSize;
+  window.kv2ToggleSize=function(s,btn){oldToggle(s,btn);setTimeout(kv20SyncCreateStock,0)};
+  function kv20SyncCreateStock(){
+    const sec=document.getElementById('kvDynamicSizesSection');if(!sec)return;let box=document.getElementById('kv20CreateStock');
+    if(!box){box=document.createElement('div');box.id='kv20CreateStock';box.className='kv-stock-editor';sec.appendChild(box)}
+    const old={};box.querySelectorAll('input').forEach(i=>old[i.dataset.size]=i.value);
+    box.innerHTML=[...kv2CreateState.sizes].map(s=>`<div class="kv-stock-row"><strong>${esc(s)}</strong><label class="muted">Количество, шт.</label><input class="input kv20-create-stock" data-size="${esc(s)}" type="number" min="0" step="1" value="${esc(old[s]??0)}"></div>`).join('');
+  }
+  const oldRender=typeof kv7RenderSizes==='function'?kv7RenderSizes:null;
+  if(oldRender){window.kv7RenderSizes=function(){const r=oldRender.apply(this,arguments);setTimeout(kv20SyncCreateStock,220);return r}}
+
+  window.kv20CreateStockValue=function(size){
+    const el=[...document.querySelectorAll('.kv20-create-stock')].find(i=>i.dataset.size===String(size));
+    return Math.max(0,Math.floor(Number(el?.value)||0));
+  };
+  document.addEventListener('click',e=>{
+    if(e.target.closest('[data-v14-suit-num],[data-v15-num],[data-v16-num]'))setTimeout(kv20SyncCreateStock,30);
+  },false);
+
+  /* Re-render once after this final override is installed. */
+  setTimeout(()=>{if(document.getElementById('productsAdminContainer')&&adminProducts?.length)window.renderProducts()},180);
+})();
+</script>
