@@ -5785,3 +5785,103 @@ const prevApply=window.applyUiPrefs;window.applyUiPrefs=function(){const r=prevA
 setTimeout(mount,360);
 })();
 </script>
+
+<style id="kv26-scope-complete-style">
+/* v26 — complete catalog scope choices; keep the v25 motion language */
+#kv24Global .kv25-select-menu{scrollbar-width:thin;scrollbar-color:color-mix(in srgb,var(--accent) 55%,transparent) transparent}
+#kv24Global .kv25-option{position:relative;overflow:hidden}
+#kv24Global .kv25-option::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,color-mix(in srgb,var(--accent) 13%,transparent),transparent 72%);opacity:0;transform:translateX(-12%);transition:opacity .22s ease,transform .34s cubic-bezier(.22,.72,.2,1);pointer-events:none}
+#kv24Global .kv25-option:hover::before,#kv24Global .kv25-option.active::before{opacity:1;transform:none}
+#kv24Global .kv25-option>*{position:relative}
+#kv24Global .kv25-select.kv26-refresh .kv25-select-menu{animation:kv26MenuRefresh .36s cubic-bezier(.22,.72,.2,1)}
+@keyframes kv26MenuRefresh{0%{opacity:.35;transform:translateY(-5px) scale(.99)}100%{opacity:1;transform:none}}
+html[data-motion="none"] #kv24Global .kv25-option::before,html[data-motion="none"] #kv24Global .kv25-select.kv26-refresh .kv25-select-menu{transition:none!important;animation:none!important}
+</style>
+<script id="kv26-scope-complete">
+(function(){
+  const $=id=>document.getElementById(id);
+  const ALL_CATEGORIES=['Одежда','Обувь','Костюмы','Сумки и рюкзаки','Аксессуары','Головные уборы'];
+  const TAX={
+    'Одежда':['Худи','Свитшоты','Футболки','Лонгсливы','Рубашки','Поло','Свитеры','Кардиганы','Водолазки','Кофты','Толстовки','Куртки','Пуховики','Ветровки','Бомберы','Парки','Пальто','Жилеты','Джинсы','Брюки','Штаны','Джоггеры','Шорты','Юбки','Платья','Сарафаны','Комбинезоны','Леггинсы','Нижнее бельё','Носки','Домашняя одежда'],
+    'Обувь':['Кроссовки','Кеды','Ботинки','Туфли','Лоферы','Мокасины','Сандалии','Босоножки','Шлёпанцы','Сабо','Балетки','Сапоги','Полусапоги','Ботфорты','Угги','Домашняя обувь'],
+    'Костюмы':['Спортивные костюмы','Брючные костюмы','Костюмы с юбкой','Костюмы-тройки','Комплекты'],
+    'Сумки и рюкзаки':['Рюкзаки','Сумки через плечо','Сумки на плечо','Шопперы','Поясные сумки','Спортивные сумки','Дорожные сумки','Клатчи','Портфели','Сумки для ноутбука','Кошельки','Кардхолдеры'],
+    'Аксессуары':['Ремни','Зонты','Очки','Солнцезащитные очки','Шарфы','Платки','Перчатки','Варежки','Галстуки','Бабочки','Брелоки','Чехлы','Косметички','Кошельки','Кардхолдеры'],
+    'Головные уборы':['Кепки','Бейсболки','Панамы','Шапки','Бини','Береты','Шляпы','Козырьки','Балаклавы']
+  };
+  const BRANDS=(typeof KV_BRANDS!=='undefined'&&Array.isArray(KV_BRANDS)?KV_BRANDS:['KrisVane','Nike','adidas','Puma','New Balance','Reebok','ASICS','Converse','Vans','Jordan','Under Armour','The North Face','Columbia','Patagonia','Carhartt WIP','Levi’s','Lee','Wrangler','Dickies','Champion','Lacoste','Tommy Hilfiger','Calvin Klein','Hugo Boss','Ralph Lauren','Guess','Diesel','G-Star RAW','Zara','Mango','H&M','Uniqlo','COS','Massimo Dutti','Bershka','Pull&Bear','Stradivarius','Reserved','Cropp','House','Sinsay','Gucci','Prada','Versace','Balenciaga','Burberry','Louis Vuitton','Dior','Saint Laurent','Givenchy','Valentino','Moncler','Stone Island','Off-White','Supreme','Palm Angels','Fear of God','Essentials','Rick Owens','Dr. Martens','Timberland','UGG','Birkenstock','Crocs','Salomon','Merrell','Skechers']);
+  const lang=()=>{try{return getUiPrefs().language||'uk'}catch(_){return'uk'}};
+  const allWord=()=>({uk:'Усі',ru:'Все',en:'All',be:'Усе',zh:'全部'})[lang()]||'Все';
+  const uniq=a=>[...new Set(a.filter(Boolean).map(v=>String(v).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));
+  const cats=()=>Array.isArray(adminCategories)?adminCategories:[];
+  const subs=()=>Array.isArray(adminSubcategories)?adminSubcategories:[];
+  const products=()=>Array.isArray(adminProducts)?adminProducts:[];
+  const catName=c=>String(c?.name||c?.title||c?.slug||'').trim();
+  const subName=s=>String(s?.name||s?.title||s?.slug||'').trim();
+  const categoryByToken=token=>cats().find(c=>String(c.id)===String(token))||cats().find(c=>catName(c)===String(token));
+  const categoryNameFromToken=token=>catName(categoryByToken(token))||String(token||'');
+  const subByToken=token=>subs().find(s=>String(s.id)===String(token))||subs().find(s=>subName(s)===String(token));
+  const productCatName=p=>catName(cats().find(c=>String(c.id)===String(p.category_id)))||String(p.category||'').trim();
+  const productSubName=p=>subName(subs().find(s=>String(s.id)===String(p.subcategory_id)))||String(p.subcategory||'').trim();
+  function setOptions(el,rows,keep=''){
+    if(!el)return;
+    el.innerHTML=`<option value="">${allWord()}</option>`+rows.map(r=>`<option value="${escapeHtml(String(r.value))}">${escapeHtml(String(r.label))}</option>`).join('');
+    el.value=rows.some(r=>String(r.value)===String(keep))?String(keep):'';
+  }
+  function rebuildFancy(native){
+    if(!native)return;let wrap=native.nextElementSibling;
+    if(!wrap?.classList.contains('kv25-select')){native.classList.add('kv25-native-hidden');wrap=document.createElement('div');wrap.className='kv25-select';native.insertAdjacentElement('afterend',wrap)}
+    const opts=[...native.options],chosen=opts.find(o=>o.value===native.value)||opts[0];
+    wrap.innerHTML=`<button type="button" class="kv25-select-btn">${escapeHtml(chosen?.textContent||allWord())}</button><div class="kv25-select-menu">${opts.map(o=>`<button type="button" class="kv25-option ${o.value===native.value?'active':''}" data-value="${escapeHtml(o.value)}"><span>${escapeHtml(o.textContent)}</span></button>`).join('')}</div>`;
+    wrap.querySelector('.kv25-select-btn').onclick=e=>{e.stopPropagation();const opening=!wrap.classList.contains('open');document.querySelectorAll('.kv25-select.open').forEach(x=>{if(x!==wrap)x.classList.remove('open')});wrap.classList.toggle('open',opening)};
+    wrap.querySelectorAll('.kv25-option').forEach(btn=>btn.onclick=e=>{e.stopPropagation();native.value=btn.dataset.value;wrap.classList.remove('open');native.dispatchEvent(new Event('change',{bubbles:true}))});
+    wrap.classList.remove('kv26-refresh');void wrap.offsetWidth;wrap.classList.add('kv26-refresh');
+  }
+  function categoryRows(){
+    const real=cats().map(c=>({value:String(c.id),label:catName(c)})).filter(x=>x.label&&ALL_CATEGORIES.includes(x.label));
+    const names=new Set(real.map(x=>x.label));
+    const virtual=ALL_CATEGORIES.filter(n=>!names.has(n)).map(n=>({value:`name:${n}`,label:n}));
+    return [...real,...virtual];
+  }
+  function selectedCategoryName(){const v=$('kv24Cat')?.value||'';return v.startsWith('name:')?v.slice(5):categoryNameFromToken(v)}
+  function subRows(){
+    const cval=$('kv24Cat')?.value||'',cname=selectedCategoryName();
+    const real=subs().filter(s=>!cval||String(s.category_id)===String(categoryByToken(cval)?.id)||catName(cats().find(c=>String(c.id)===String(s.category_id)))===cname).map(s=>({value:String(s.id),label:subName(s)})).filter(x=>x.label);
+    const names=new Set(real.map(x=>x.label));
+    const virtual=(TAX[cname]||[]).filter(n=>!names.has(n)).map(n=>({value:`name:${n}`,label:n}));
+    return [...real,...virtual];
+  }
+  function brandRows(){const actual=products().map(p=>String(p.brand||'').trim());return uniq([...BRANDS,...actual]).map(b=>({value:b,label:b}))}
+  function matches(p){
+    const cv=$('kv24Cat')?.value||'',sv=$('kv24Sub')?.value||'',bv=$('kv24Brand')?.value||'';
+    if(cv){if(cv.startsWith('name:')){if(productCatName(p)!==cv.slice(5))return false}else if(String(p.category_id)!==String(cv))return false}
+    if(sv){if(sv.startsWith('name:')){if(productSubName(p)!==sv.slice(5))return false}else if(String(p.subcategory_id)!==String(sv))return false}
+    if(bv&&String(p.brand||'').trim()!==bv)return false;
+    return true;
+  }
+  function count(){const el=$('kv24Count');if(!el)return;const tx=({uk:['Буде змінено','товарів'],ru:['Будет изменено','товаров'],en:['Will change','products'],be:['Будзе зменена','тавараў'],zh:['将修改','件商品']})[lang()]||['Будет изменено','товаров'];el.textContent=`${tx[0]}: ${products().filter(matches).length} ${tx[1]}`;el.classList.remove('kv25-pop');void el.offsetWidth;el.classList.add('kv25-pop')}
+  function rebuildSubs(){const el=$('kv24Sub');if(!el)return;const keep=el.value;setOptions(el,subRows(),keep);rebuildFancy(el);count()}
+  function rebuildBrands(){const el=$('kv24Brand');if(!el)return;const keep=el.value;setOptions(el,brandRows(),keep);rebuildFancy(el);count()}
+  function mount(){
+    const c=$('kv24Cat'),s=$('kv24Sub'),b=$('kv24Brand');if(!c||!s||!b)return false;
+    const kc=c.value,ks=s.value,kb=b.value;
+    setOptions(c,categoryRows(),kc);rebuildFancy(c);
+    setOptions(s,subRows(),ks);rebuildFancy(s);
+    setOptions(b,brandRows(),kb);rebuildFancy(b);
+    c.onchange=()=>{rebuildSubs();rebuildBrands();count()};s.onchange=()=>{rebuildBrands();count()};b.onchange=count;
+    count();return true;
+  }
+  // Override the scope calculation used by v24 bulk actions. Virtual taxonomy choices match by their real category/subcategory names.
+  scopeProducts=function(){return products().filter(matches)};
+  scopeObject=function(){const c=$('kv24Cat')?.value||'',s=$('kv24Sub')?.value||'';return {category_id:c&&!c.startsWith('name:')?c:null,category_name:c.startsWith('name:')?c.slice(5):null,subcategory_id:s&&!s.startsWith('name:')?s:null,subcategory_name:s.startsWith('name:')?s.slice(5):null,brand:$('kv24Brand')?.value||null}};
+  // v25 safe actions use their own closed-over selector; patch their visible buttons after every mount to use the shared scopeProducts through v24 runBulk where appropriate.
+  const oldMount=window.mount;
+  let tries=0;const timer=setInterval(()=>{tries++;if(mount()||tries>20)clearInterval(timer)},180);
+  if(typeof loadProducts==='function'){
+    const lp=loadProducts;loadProducts=async function(){const r=await lp.apply(this,arguments);setTimeout(mount,30);return r};
+  }
+  if(typeof window.applyUiPrefs==='function'){
+    const ap=window.applyUiPrefs;window.applyUiPrefs=function(){const r=ap.apply(this,arguments);setTimeout(mount,220);return r};
+  }
+})();
+</script>
