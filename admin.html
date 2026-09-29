@@ -5251,6 +5251,118 @@ window.openCreateProduct=async function(){
 
 
 
+
+<style id="kv25-scope-polish-style">
+/* v25: live scope filters + KrisVane animated dropdowns */
+#kv24Global .kv24-card{transition:transform .35s cubic-bezier(.22,.72,.2,1),border-color .35s ease,box-shadow .35s ease}
+#kv24Global .kv24-card:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--accent) 38%,var(--border));box-shadow:0 14px 34px rgba(0,0,0,.12)}
+.kv25-native-hidden{position:absolute!important;opacity:0!important;pointer-events:none!important;width:1px!important;height:1px!important}
+.kv25-select{position:relative;width:100%}.kv25-select-btn{width:100%;min-height:46px;padding:0 42px 0 14px;border:1px solid var(--border);border-radius:13px;background:var(--panel2);color:var(--text);font:inherit;text-align:left;cursor:pointer;position:relative;transition:border-color .28s ease,box-shadow .28s ease,transform .28s ease,background .28s ease}
+.kv25-select-btn:hover{border-color:color-mix(in srgb,var(--accent) 58%,var(--border));transform:translateY(-1px)}
+.kv25-select-btn::after{content:'⌄';position:absolute;right:14px;top:50%;transform:translateY(-52%);color:var(--accent);font-size:19px;transition:transform .38s cubic-bezier(.22,.72,.2,1)}
+.kv25-select.open .kv25-select-btn{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 13%,transparent)}
+.kv25-select.open .kv25-select-btn::after{transform:translateY(-45%) rotate(180deg)}
+.kv25-select-menu{position:absolute;z-index:90;left:0;right:0;top:calc(100% + 7px);max-height:0;overflow:auto;opacity:0;pointer-events:none;transform:translateY(-9px) scale(.985);transform-origin:top;background:color-mix(in srgb,var(--panel) 97%,var(--accent) 3%);border:1px solid color-mix(in srgb,var(--accent) 38%,var(--border));border-radius:14px;padding:5px;box-shadow:0 18px 45px rgba(0,0,0,.28);transition:max-height .55s cubic-bezier(.22,.72,.2,1),opacity .25s ease,transform .42s cubic-bezier(.22,.72,.2,1)}
+.kv25-select.open .kv25-select-menu{max-height:260px;opacity:1;pointer-events:auto;transform:none}
+.kv25-option{display:flex;width:100%;border:0;border-radius:10px;padding:10px 11px;background:transparent;color:var(--text);font:inherit;text-align:left;cursor:pointer;transition:background .2s ease,transform .2s ease,color .2s ease}.kv25-option:hover{background:color-mix(in srgb,var(--accent) 12%,transparent);transform:translateX(3px)}.kv25-option.active{background:color-mix(in srgb,var(--accent) 18%,transparent);color:var(--accent);font-weight:800}
+#kv24Count.kv25-pop{animation:kv25pop .42s cubic-bezier(.2,.85,.25,1)}@keyframes kv25pop{0%{transform:scale(.94);opacity:.55}65%{transform:scale(1.045)}100%{transform:none;opacity:1}}
+.kv25-scope-flash{animation:kv25scope .46s ease}@keyframes kv25scope{0%{opacity:.55;transform:translateY(4px)}100%{opacity:1;transform:none}}
+html[data-motion="none"] .kv25-select-menu,html[data-motion="none"] .kv25-select-btn,html[data-motion="none"] .kv25-option,html[data-motion="none"] #kv24Global .kv24-card{transition:none!important;animation:none!important}
+</style>
+<script id="kv25-scope-fix">
+(function(){
+  const $=id=>document.getElementById(id);
+  const lang=()=>{try{return getUiPrefs().language||'uk'}catch(_){return'uk'}};
+  const WORDS={
+    uk:{all:'Усі',noMatch:'Немає товарів у вибраній області',badPrice:'Ціна після зміни має бути більшою за 0.',oldEqual:'Стара ціна має бути вищою за поточну. Ця операція пропущена для несумісних товарів.'},
+    ru:{all:'Все',noMatch:'Нет товаров в выбранной области',badPrice:'Цена после изменения должна быть больше 0.',oldEqual:'Старая цена должна быть выше текущей. Операция пропущена для несовместимых товаров.'},
+    en:{all:'All',noMatch:'No products in the selected scope',badPrice:'The resulting price must be greater than 0.',oldEqual:'Old price must be higher than current price. Incompatible products were skipped.'},
+    be:{all:'Усе',noMatch:'Няма тавараў у выбранай вобласці',badPrice:'Выніковая цана павінна быць большай за 0.',oldEqual:'Старая цана павінна быць вышэй за бягучую. Несумяшчальныя тавары прапушчаны.'},
+    zh:{all:'全部',noMatch:'所选范围内没有商品',badPrice:'修改后的价格必须大于 0。',oldEqual:'旧价格必须高于当前价格；不兼容的商品已跳过。'}
+  };
+  const W=()=>WORDS[lang()]||WORDS.uk;
+  function uniq(a){return [...new Set(a.filter(Boolean).map(x=>String(x).trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,undefined,{numeric:true,sensitivity:'base'}));}
+  function allProducts(){return Array.isArray(adminProducts)?adminProducts:[]}
+  function cats(){return Array.isArray(adminCategories)?adminCategories:[]}
+  function subs(){return Array.isArray(adminSubcategories)?adminSubcategories:[]}
+  function setOptions(el,items,keep=''){
+    if(!el)return;
+    el.innerHTML=`<option value="">${W().all}</option>`+items.map(x=>`<option value="${escapeHtml(String(x.value))}">${escapeHtml(String(x.label))}</option>`).join('');
+    el.value=items.some(x=>String(x.value)===String(keep))?String(keep):'';
+  }
+  function currentFiltered(ignoreBrand=false){
+    const c=$('kv24Cat')?.value||'',s=$('kv24Sub')?.value||'',b=$('kv24Brand')?.value||'';
+    return allProducts().filter(p=>(!c||String(p.category_id)===c)&&(!s||String(p.subcategory_id)===s)&&(ignoreBrand||!b||String(p.brand||'').trim()===b));
+  }
+  function animateCount(){const e=$('kv24Count');if(!e)return;e.classList.remove('kv25-pop');void e.offsetWidth;e.classList.add('kv25-pop');}
+  function updateCount(){const e=$('kv24Count');if(!e)return;const tx={uk:['Буде змінено','товарів'],ru:['Будет изменено','товаров'],en:['Will change','products'],be:['Будзе зменена','тавараў'],zh:['将修改','件商品']}[lang()]||['Будет изменено','товаров'];e.textContent=`${tx[0]}: ${currentFiltered().length} ${tx[1]}`;animateCount();}
+  function rebuildBrands(){const el=$('kv24Brand');if(!el)return;const old=el.value;const brands=uniq(currentFiltered(true).map(p=>p.brand||''));setOptions(el,brands.map(b=>({value:b,label:b})),old);rebuildFancy(el);}
+  function rebuildSubs(){const el=$('kv24Sub');if(!el)return;const old=el.value,c=$('kv24Cat')?.value||'';const rows=subs().filter(s=>!c||String(s.category_id)===c).map(s=>({value:s.id,label:s.name||s.title||s.slug||s.id}));setOptions(el,rows,old);rebuildFancy(el);rebuildBrands();updateCount();}
+  function refreshScope(){
+    const c=$('kv24Cat');if(!c)return;
+    const oldC=c.value;
+    setOptions(c,cats().map(x=>({value:x.id,label:x.name||x.title||x.slug||x.id})),oldC);
+    rebuildFancy(c);rebuildSubs();rebuildBrands();updateCount();
+    const box=c.closest('.kv24-card');box?.classList.remove('kv25-scope-flash');if(box){void box.offsetWidth;box.classList.add('kv25-scope-flash')}
+  }
+  function closeFancy(except){document.querySelectorAll('.kv25-select.open').forEach(x=>{if(x!==except)x.classList.remove('open')})}
+  function rebuildFancy(native){
+    if(!native)return;
+    let wrap=native.nextElementSibling;
+    if(!wrap?.classList.contains('kv25-select')){
+      native.classList.add('kv25-native-hidden');
+      wrap=document.createElement('div');wrap.className='kv25-select';native.insertAdjacentElement('afterend',wrap);
+    }
+    const options=[...native.options];const chosen=options.find(o=>o.value===native.value)||options[0];
+    wrap.innerHTML=`<button type="button" class="kv25-select-btn">${escapeHtml(chosen?.textContent||W().all)}</button><div class="kv25-select-menu">${options.map(o=>`<button type="button" class="kv25-option ${o.value===native.value?'active':''}" data-value="${escapeHtml(o.value)}">${escapeHtml(o.textContent)}</button>`).join('')}</div>`;
+    wrap.querySelector('.kv25-select-btn').onclick=e=>{e.stopPropagation();const opening=!wrap.classList.contains('open');closeFancy(wrap);wrap.classList.toggle('open',opening)};
+    wrap.querySelectorAll('.kv25-option').forEach(btn=>btn.onclick=e=>{e.stopPropagation();native.value=btn.dataset.value;wrap.classList.remove('open');native.dispatchEvent(new Event('change',{bubbles:true}));rebuildFancy(native)});
+  }
+  document.addEventListener('click',()=>closeFancy());
+  function wire(){
+    const c=$('kv24Cat'),s=$('kv24Sub'),b=$('kv24Brand'),pt=$('kv24PriceType');if(!c)return false;
+    c.onchange=()=>{rebuildSubs();rebuildBrands();updateCount()};
+    s.onchange=()=>{rebuildBrands();updateCount()};
+    b.onchange=updateCount;
+    [c,s,b,pt].forEach(rebuildFancy);
+    return true;
+  }
+  async function ensureData(){
+    try{if((!cats().length||!subs().length)&&typeof loadCategories==='function')await loadCategories()}catch(e){console.warn('KV25 taxonomy load',e)}
+    refreshScope();wire();
+  }
+  // v24 mounted before products/categories were necessarily loaded. Refresh after every product load.
+  if(typeof loadProducts==='function'){
+    const oldLoad=loadProducts;
+    loadProducts=async function(){const r=await oldLoad.apply(this,arguments);await ensureData();return r};
+  }
+  // Safer price actions: never send zero/negative prices; don't create an invalid old_price relation on increases.
+  function selectedRows(){return currentFiltered()}
+  async function safeBulk(action,desc,transform,filter=()=>true){
+    const rows=selectedRows().filter(filter);if(!rows.length){showToast(W().noMatch,'error');return}
+    const ok=await kv23Confirm({icon:'↻',title:({uk:'Підтвердити глобальну зміну?',ru:'Подтвердить глобальное изменение?',en:'Confirm global change?',be:'Пацвердзіць глабальную змену?',zh:'确认全局更改？'})[lang()],message:desc,detail:`${rows.length}`,confirmText:({uk:'Продовжити',ru:'Продолжить',en:'Continue',be:'Працягнуць',zh:'继续'})[lang()],cancelText:({uk:'Скасувати',ru:'Отмена',en:'Cancel',be:'Адмена',zh:'取消'})[lang()]});if(!ok)return;
+    const snapshot=rows.map(p=>({id:p.id,price:p.price??null,old_price:p.old_price??null,is_published:p.is_published??null,conditions:Array.isArray(p.conditions)?p.conditions:null}));
+    const hist=await supabaseClient.from('catalog_bulk_history').insert({action_type:action,description:desc,scope:{category_id:$('kv24Cat')?.value||null,subcategory_id:$('kv24Sub')?.value||null,brand:$('kv24Brand')?.value||null},snapshot,affected_count:rows.length}).select('id').single();if(hist.error)throw hist.error;
+    try{for(const p of rows){const patch=transform(p);if(!patch||!Object.keys(patch).length)continue;const q=await supabaseClient.from('products').update(patch).eq('id',p.id);if(q.error)throw q.error}loadedAdminViews.delete('products');await loadProducts();showToast(`${rows.length}`)}catch(e){showToast(`${e.message||e} · history #${hist.data?.id||'?'}`,'error')}
+  }
+  function wireSafePrices(){
+    const down=$('kv24Discount'),up=$('kv24Increase'),oldCur=$('kv24OldCurrent');if(!down||down.dataset.kv25)return;
+    down.dataset.kv25='1';up.dataset.kv25='1';
+    down.onclick=async()=>{const type=$('kv24PriceType').value,v=Number($('kv24PriceValue').value);if(!(v>0))return;await safeBulk('discount',`−${v}${type==='percent'?'%':' грн'}`,p=>{const old=Number(p.price);if(!Number.isFinite(old))return{};const next=Math.round((type==='percent'?old*(1-v/100):old-v)*100)/100;if(!(next>0))throw new Error(W().badPrice);return {old_price:old,price:next}})};
+    up.onclick=async()=>{const type=$('kv24PriceType').value,v=Number($('kv24PriceValue').value);if(!(v>0))return;await safeBulk('increase',`+${v}${type==='percent'?'%':' грн'}`,p=>{const old=Number(p.price);if(!Number.isFinite(old))return{};const next=Math.round((type==='percent'?old*(1+v/100):old+v)*100)/100;const existingOld=Number(p.old_price);return {price:next,old_price:Number.isFinite(existingOld)&&existingOld>next?existingOld:null}})};
+    // old_price == price commonly violates the product price relation. Keep the button safe instead of sending an invalid row.
+    if(oldCur){oldCur.onclick=()=>showToast(W().oldEqual,'error')}
+  }
+  // Theme/language changes remount the v24 panel; refresh only after that remount.
+  if(typeof window.applyUiPrefs==='function'){
+    const oldApply=window.applyUiPrefs;
+    window.applyUiPrefs=function(){const r=oldApply.apply(this,arguments);setTimeout(async()=>{await ensureData();wireSafePrices()},180);return r};
+  }
+  setTimeout(async()=>{await ensureData();wireSafePrices()},500);
+  setTimeout(async()=>{await ensureData();wireSafePrices()},1100);
+})();
+</script>
+
 </body>
 </html>
 <style id="kv20-product-admin-style">
