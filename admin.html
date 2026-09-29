@@ -3962,7 +3962,7 @@ window.openCreateProduct=async function(){
  kv2ChooseBrand('KrisVane');kv2Dirty=false;document.getElementById('kvUnsaved').hidden=true;
 };
 async function kv2EnsureTaxonomy(catName,subName){let cat=adminCategories.find(x=>(x.name||'').toLowerCase()===catName.toLowerCase());if(!cat){const tpl=adminCategories[0]||{name:'',slug:'',is_active:true,sort_order:0};const payload={};for(const k of editableFields(tpl)){if(k==='name')payload[k]=catName;else if(k==='slug')payload[k]=kv2Slug(catName);else if(k==='is_active')payload[k]=true;else if(k==='sort_order')payload[k]=0}if(!('name'in payload))payload.name=catName;const r=await supabaseClient.from('categories').insert(payload).select('*').single();if(r.error)throw r.error;cat=r.data;adminCategories.push(cat)}let sub=null;if(subName){sub=adminSubcategories.find(x=>String(x.category_id)===String(cat.id)&&(x.name||'').toLowerCase()===subName.toLowerCase());if(!sub){const tpl=adminSubcategories[0]||{name:'',slug:'',category_id:null,is_active:true,sort_order:0};const payload={};for(const k of editableFields(tpl)){if(k==='name')payload[k]=subName;else if(k==='slug')payload[k]=kv2Slug(subName);else if(k==='category_id')payload[k]=cat.id;else if(k==='is_active')payload[k]=true;else if(k==='sort_order')payload[k]=0}payload.category_id=cat.id;if(!('name'in payload))payload.name=subName;const r=await supabaseClient.from('subcategories').insert(payload).select('*').single();if(r.error)throw r.error;sub=r.data;adminSubcategories.push(sub)}}return{cat,sub}}
-async function kv2CreateProduct(){const btn=document.getElementById('kvCreateBtn');const name=document.getElementById('kvName').value.trim(),sku=document.getElementById('kvSku').value.trim(),price=Number(document.getElementById('kvPrice').value);if(!name||!sku||!Number.isFinite(price)||price<0)return showToast('Заполните название, артикул и цену.','error');if(!kv2CreateState.category)return showToast('Выберите категорию.','error');btn.disabled=true;btn.textContent='…';try{const {cat,sub}=await kv2EnsureTaxonomy(kv2CreateState.category,kv2CreateState.subcategory);const tpl=adminProducts[0]||{};const payload={};const set=(k,v)=>{if(k in tpl)payload[k]=v};set('name',name);set('title',name);set('sku',sku);set('slug',kv2Slug(name));set('brand',kv2CreateState.brand);set('description',document.getElementById('kvDescription').value.trim());set('price',price);set('old_price',document.getElementById('kvOldPrice').value?Number(document.getElementById('kvOldPrice').value):null);set('category_id',cat.id);set('subcategory_id',sub?.id||null);set('is_published',document.getElementById('kvPublished').value==='true');const kvCondition=document.getElementById('kvCondition')?.value||'new';
+async function kv2CreateProduct(){const btn=document.getElementById('kvCreateBtn');const name=document.getElementById('kvName').value.trim(),sku=document.getElementById('kvSku').value.trim(),price=Number(document.getElementById('kvPrice').value);if(!name||!sku||!Number.isFinite(price)||price<0)return showToast(EL().required,'error');if(!kv2CreateState.category)return showToast(EL().needCategory,'error');btn.disabled=true;btn.textContent='…';try{const {cat,sub}=await kv2EnsureTaxonomy(kv2CreateState.category,kv2CreateState.subcategory);const tpl=adminProducts[0]||{};const payload={};const set=(k,v)=>{if(k in tpl)payload[k]=v};set('name',name);set('title',name);set('sku',sku);set('slug',kv2Slug(name));set('brand',kv2CreateState.brand);set('description',document.getElementById('kvDescription').value.trim());set('price',price);set('old_price',document.getElementById('kvOldPrice').value?Number(document.getElementById('kvOldPrice').value):null);set('category_id',cat.id);set('subcategory_id',sub?.id||null);set('is_published',document.getElementById('kvPublished').value==='true');const kvCondition=document.getElementById('kvCondition')?.value||'new';
 set('is_new',kvCondition==='new');
 set('condition',kvCondition);
 set('product_condition',kvCondition);
@@ -5448,30 +5448,61 @@ window.openCreateProduct=async function(){
   const CONDS=['new','unworn','like_new','used'];
   let editCtx=null;
 
-  function risk(label){
+  const EDIT_I18N={
+    uk:{sku:'Артикул',category:'Категорія',subcategory:'Підкатегорія',riskTitle:'Обережно: важливе поле',riskText:'Зміна цього поля може вплинути на відображення та зв’язки товару на клієнтському сайті.',riskAsk:'Відкрити редагування поля',cancel:'Скасувати',continue:'Продовжити',editing:'Редагування товару.',editingNote:'Усі поля нижче зберігаються в існуючий товар. Артикул, категорія та підкатегорія захищені попередженням.',save:'Зберегти зміни',saving:'Зберігаю…',condition:'Стан товару · можна вибрати кілька',removePhoto:'Видалити фото',photo:'Фото',required:'Заповніть назву, артикул і ціну.',needCategory:'Оберіть категорію.',saved:'Усі зміни товару збережено.',editorFail:'Не вдалося відкрити редактор.',notFound:'Товар не знайдено.'},
+    ru:{sku:'Артикул',category:'Категория',subcategory:'Подкатегория',riskTitle:'Внимание: важное поле',riskText:'Изменение этого поля может повлиять на отображение и связи товара на клиентском сайте.',riskAsk:'Открыть изменение поля',cancel:'Отмена',continue:'Продолжить',editing:'Редактирование товара.',editingNote:'Все поля ниже сохраняются в существующий товар. Артикул, категория и подкатегория защищены предупреждением.',save:'Сохранить изменения',saving:'Сохраняю…',condition:'Состояние товара · можно выбрать несколько',removePhoto:'Удалить фото',photo:'Фото',required:'Заполните название, артикул и цену.',needCategory:'Выберите категорию.',saved:'Все изменения товара сохранены.',editorFail:'Не удалось открыть редактор.',notFound:'Товар не найден.'},
+    en:{sku:'SKU / Article',category:'Category',subcategory:'Subcategory',riskTitle:'Important field',riskText:'Changing this field may affect how the product is displayed and linked on the storefront.',riskAsk:'Open editing for',cancel:'Cancel',continue:'Continue',editing:'Editing product.',editingNote:'All fields below update the existing product. SKU, category and subcategory are protected by a warning.',save:'Save changes',saving:'Saving…',condition:'Product condition · select multiple',removePhoto:'Remove photo',photo:'Photo',required:'Enter product name, SKU and price.',needCategory:'Choose a category.',saved:'All product changes saved.',editorFail:'Could not open the editor.',notFound:'Product not found.'},
+    be:{sku:'Артыкул',category:'Катэгорыя',subcategory:'Падкатэгорыя',riskTitle:'Увага: важнае поле',riskText:'Змена гэтага поля можа паўплываць на адлюстраванне і сувязі тавару на кліенцкім сайце.',riskAsk:'Адкрыць рэдагаванне поля',cancel:'Адмена',continue:'Працягнуць',editing:'Рэдагаванне тавару.',editingNote:'Усе палі ніжэй захоўваюцца ў існуючы тавар. Артыкул, катэгорыя і падкатэгорыя абаронены папярэджаннем.',save:'Захаваць змены',saving:'Захоўваю…',condition:'Стан тавару · можна выбраць некалькі',removePhoto:'Выдаліць фота',photo:'Фота',required:'Запоўніце назву, артыкул і цану.',needCategory:'Выберыце катэгорыю.',saved:'Усе змены тавару захаваны.',editorFail:'Не ўдалося адкрыць рэдактар.',notFound:'Тавар не знойдзены.'},
+    zh:{sku:'货号',category:'分类',subcategory:'子分类',riskTitle:'注意：重要字段',riskText:'更改此字段可能影响商品在客户端商店中的显示和关联。',riskAsk:'允许编辑',cancel:'取消',continue:'继续',editing:'编辑商品。',editingNote:'以下字段将更新现有商品。货号、分类和子分类受警告保护。',save:'保存更改',saving:'正在保存…',condition:'商品状态 · 可多选',removePhoto:'删除照片',photo:'照片',required:'请填写商品名称、货号和价格。',needCategory:'请选择分类。',saved:'商品更改已保存。',editorFail:'无法打开编辑器。',notFound:'未找到商品。'}
+  };
+  const EL=()=>EDIT_I18N[(typeof getUiPrefs==='function'?getUiPrefs().language:'uk')]||EDIT_I18N.uk;
+  const fieldKey=label=>label==='Артикул'?'sku':label==='Категория'?'category':label==='Подкатегория'?'subcategory':label;
+  async function risk(label){
     if(!editCtx)return true;
     if(editCtx.unlocked.has(label))return true;
-    const ok=confirm(`Точно хотите открыть изменение поля «${label}»?\n\nИзменение этого поля может повлиять на отображение и связи товара на клиентском сайте.`);
+    const k=fieldKey(label), t=EL();
+    const ok=await window.kv23Confirm({
+      icon:'!',
+      title:t.riskTitle,
+      message:`${t.riskAsk} «${t[k]}»?`,
+      detail:t.riskText,
+      confirmText:t.continue,
+      cancelText:t.cancel,
+      tone:'warning'
+    });
     if(ok)editCtx.unlocked.add(label);
     return ok;
   }
   function protectInput(el,label){
     if(!el)return;
-    const guard=e=>{if(editCtx&&!editCtx.unlocked.has(label)&&!risk(label)){e.preventDefault();e.stopPropagation();el.blur();return false}el.classList.add('kv-protected-flash');setTimeout(()=>el.classList.remove('kv-protected-flash'),350)};
+    let reopening=false;
+    const guard=async e=>{
+      if(reopening||!editCtx||editCtx.unlocked.has(label))return;
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();el.blur();
+      if(await risk(label)){
+        reopening=true;el.classList.add('kv-protected-flash');el.focus({preventScroll:true});
+        setTimeout(()=>{reopening=false;el.classList.remove('kv-protected-flash')},350);
+      }
+    };
     el.addEventListener('pointerdown',guard,true);
     el.addEventListener('focus',guard,true);
   }
   function protectChoice(id,label){
     const head=document.querySelector(`#${id} .kv-choice-head`);if(!head)return;
-    head.addEventListener('click',e=>{if(editCtx&&!editCtx.unlocked.has(label)&&!risk(label)){e.preventDefault();e.stopImmediatePropagation()}},true);
+    let reopening=false;
+    head.addEventListener('click',async e=>{
+      if(reopening||!editCtx||editCtx.unlocked.has(label))return;
+      e.preventDefault();e.stopPropagation();e.stopImmediatePropagation();
+      if(await risk(label)){reopening=true;head.click();setTimeout(()=>reopening=false,0)}
+    },true);
   }
   function setField(id,v){const e=document.getElementById(id);if(e)e.value=v??''}
   function selectedConditions(){return [...document.querySelectorAll('#kvEditConditions [data-edit-condition].selected')].map(x=>x.dataset.editCondition)}
-  function conditionMulti(selected){const set=new Set(selected);const labels={new:'Новое',unworn:'Не ношенное',like_new:'Как новое',used:'Б/У'};return `<div class="field full"><label>Состояние товара · можно выбрать несколько</label><div id="kvEditConditions" class="kv-edit-conditions">${CONDS.map(c=>`<button type="button" class="kv-option ${set.has(c)?'selected':''}" data-edit-condition="${c}">${labels[c]} <span class="kv-check">✓</span></button>`).join('')}</div></div>`}
+  function conditionMulti(selected){const set=new Set(selected), l=(typeof KV7_CONDITIONS!=='undefined'?(KV7_CONDITIONS[(typeof getUiPrefs==='function'?getUiPrefs().language:'uk')]||KV7_CONDITIONS.uk||KV7_CONDITIONS.ru):{new:'Новое',unworn:'Не ношенное',like_new:'Как новое',used:'Б/У'});return `<div class="field full"><label>${EL().condition}</label><div id="kvEditConditions" class="kv-edit-conditions">${CONDS.map(c=>`<button type="button" class="kv-option ${set.has(c)?'selected':''}" data-edit-condition="${c}">${l[c]||c} <span class="kv-check">✓</span></button>`).join('')}</div></div>`}
   function renderExistingPhotos(images){
     const picker=document.querySelector('#kvCreateProduct .kv-image-picker');if(!picker)return;
     const box=document.createElement('div');box.className='kv-edit-existing-photos';box.id='kvEditExistingPhotos';
-    box.innerHTML=(images||[]).map(x=>{const url=x.image_url||x.url||'';return `<div class="kv-edit-existing-photo" data-image-id="${esc22(x.id)}">${url?`<img src="${esc22(url)}" alt="">`:'<div class="muted" style="padding:20px">Фото</div>'}<button type="button" data-edit-remove-image="${esc22(x.id)}">Удалить фото</button></div>`}).join('');
+    box.innerHTML=(images||[]).map(x=>{const url=x.image_url||x.url||'';return `<div class="kv-edit-existing-photo" data-image-id="${esc22(x.id)}">${url?`<img src="${esc22(url)}" alt="">`:`<div class="muted" style="padding:20px">${EL().photo}</div>`}<button type="button" data-edit-remove-image="${esc22(x.id)}">${EL().removePhoto}</button></div>`}).join('');
     picker.insertBefore(box,picker.firstChild);
   }
   function syncStock(vars){
@@ -5503,13 +5534,13 @@ window.openCreateProduct=async function(){
 
   window.kv20EditProduct=async function(id){
     if(!adminCategories.length||!adminSubcategories.length)await loadCategories();
-    const p=byProduct(id);if(!p)return showToast('Товар не найден.','error');
+    const p=byProduct(id);if(!p)return showToast(EL().notFound,'error');
     const rel=await kvLoadProductRelations(id), vars=rel.variants||[], images=rel.images||[];
     await window.openCreateProduct();
     editCtx={id:String(id),product:p,vars,images,unlocked:new Set(),removedImages:new Set()};
-    const studio=document.getElementById('kvCreateProduct');if(!studio)return showToast('Не удалось открыть редактор.','error');
+    const studio=document.getElementById('kvCreateProduct');if(!studio)return showToast(EL().editorFail,'error');
     studio.classList.add('kv-edit-mode');studio.dataset.editId=String(id);
-    const note=studio.querySelector('.studio-note');if(note)note.innerHTML='<strong>Редактирование товара.</strong> Все поля ниже сохраняются в существующий товар. Артикул, категория и подкатегория защищены предупреждением.';
+    const note=studio.querySelector('.studio-note');if(note)note.innerHTML=`<strong>${EL().editing}</strong> ${EL().editingNote}`;
     setField('kvName',p.name??p.title??'');setField('kvSku',p.sku??'');setField('kvPrice',p.price??'');setField('kvOldPrice',p.old_price??'');setField('kvDescription',p.description??'');setField('kvBrand',p.brand??'KrisVane');setField('kvPublished',String(!!p.is_published));
     const pubChoice=document.getElementById('kvPublishedChoice');if(pubChoice){const pv=String(!!p.is_published);const pvl=document.getElementById('kvPublishedChoiceValue');if(pvl)pvl.textContent=(p.is_published?(typeof kv3==='function'?kv3('yes'):'Да'):(typeof kv3==='function'?kv3('no'):'Нет'));pubChoice.querySelectorAll('.kv-option').forEach(x=>x.classList.toggle('selected',x.dataset.value===pv));}
     const bv=document.getElementById('kvBrandValue');if(bv)bv.textContent=p.brand||'KrisVane';kv2CreateState.brand=p.brand||'KrisVane';
@@ -5518,17 +5549,17 @@ window.openCreateProduct=async function(){
     if(typeof kv7RenderSizes==='function')kv7RenderSizes(false);setTimeout(()=>{try{window.kv16RenderSuitNumeric?.()}catch(_){};if(typeof kv20SyncCreateStock==='function')kv20SyncCreateStock();syncStock(vars);},280);
     document.getElementById('kvConditionChoice')?.closest('.field')?.replaceWith((()=>{const d=document.createElement('div');d.className='field full';d.innerHTML=conditionMulti(condsOf(p)).replace(/^<div class="field full">|<\/div>$/g,'');return d})());
     renderExistingPhotos(images);
-    const actions=studio.querySelector('.kv-form-actions'),save=document.getElementById('kvCreateBtn');if(save){save.textContent='Сохранить изменения';save.onclick=()=>kv22SaveEdit(id)}
+    const actions=studio.querySelector('.kv-form-actions'),save=document.getElementById('kvCreateBtn');if(save){save.textContent=EL().save;save.onclick=()=>kv22SaveEdit(id)}
     protectInput(document.getElementById('kvSku'),'Артикул');protectChoice('kvCategoryChoice','Категория');protectChoice('kvSubcategoryChoice','Подкатегория');
     kv2Dirty=false;const u=document.getElementById('kvUnsaved');if(u)u.hidden=true;
   };
 
   document.addEventListener('click',e=>{const b=e.target.closest('[data-edit-condition]');if(!b)return;e.preventDefault();e.stopPropagation();b.classList.toggle('selected');kv2MarkDirty()},true);
-  document.addEventListener('click',e=>{const b=e.target.closest('[data-edit-remove-image]');if(!b||!editCtx)return;e.preventDefault();if(!confirm('Удалить эту фотографию после сохранения?'))return;editCtx.removedImages.add(String(b.dataset.editRemoveImage));b.closest('.kv-edit-existing-photo')?.remove();kv2MarkDirty()},true);
+  document.addEventListener('click',async e=>{const b=e.target.closest('[data-edit-remove-image]');if(!b||!editCtx)return;e.preventDefault();if(!(await window.kv23Confirm({icon:'×',title:EL().removePhoto,message:EL().removePhoto+'?',detail:'',confirmText:EL().continue,cancelText:EL().cancel,tone:'danger'})))return;editCtx.removedImages.add(String(b.dataset.editRemoveImage));b.closest('.kv-edit-existing-photo')?.remove();kv2MarkDirty()},true);
 
   window.kv22SaveEdit=async function(id){
     const p=byProduct(id),btn=document.getElementById('kvCreateBtn');if(!p||!editCtx)return;const name=document.getElementById('kvName').value.trim(),sku=document.getElementById('kvSku').value.trim(),price=Number(document.getElementById('kvPrice').value);if(!name||!sku||!Number.isFinite(price)||price<0)return showToast('Заполните название, артикул и цену.','error');if(!kv2CreateState.category)return showToast('Выберите категорию.','error');
-    btn.disabled=true;btn.textContent='Сохраняю…';try{
+    btn.disabled=true;btn.textContent=EL().saving;try{
       const {cat,sub}=await kv2EnsureTaxonomy(kv2CreateState.category,kv2CreateState.subcategory),payload={},set=(k,v)=>{if(k in p)payload[k]=v};
       set('name',name);set('title',name);set('sku',sku);set('slug',kv2Slug(name));set('brand',kv2CreateState.brand);set('description',document.getElementById('kvDescription').value.trim());set('price',price);const op=document.getElementById('kvOldPrice').value;set('old_price',op===''?null:Number(op));set('category_id',cat.id);set('subcategory_id',sub?.id||null);set('is_published',document.getElementById('kvPublished').value==='true');
       const conditions=selectedConditions(),primary=conditions[0]||null;payload.conditions=conditions;set('is_new',conditions.includes('new'));set('condition',primary);set('product_condition',primary);set('item_condition',primary);
@@ -5536,14 +5567,66 @@ window.openCreateProduct=async function(){
       await syncVariants(p,editCtx.vars);
       for(const imageId of editCtx.removedImages){const rr=await supabaseClient.from('product_images').delete().eq('id',imageId);if(rr.error)throw rr.error}
       await uploadNewPhotos(p,name);
-      kv2Dirty=false;showToast('Все изменения товара сохранены.');closeAdminModal(true);loadedAdminViews.delete('products');await loadProducts();
-    }catch(err){console.error('kv22 save',err);showToast(err.message||String(err),'error')}finally{if(btn){btn.disabled=false;btn.textContent='Сохранить изменения'}}
+      kv2Dirty=false;showToast(EL().saved);closeAdminModal(true);loadedAdminViews.delete('products');await loadProducts();
+    }catch(err){console.error('kv22 save',err);showToast(err.message||String(err),'error')}finally{if(btn){btn.disabled=false;btn.textContent=EL().save}}
   };
 
   /* Risk guard also applies before category/subcategory option selection. */
-  const chooseCat=window.kv2ChooseCategory;window.kv2ChooseCategory=function(v){if(editCtx&&!editCtx.unlocked.has('Категория')&&!risk('Категория'))return;return chooseCat.apply(this,arguments)};
-  const chooseSub=window.kv2ChooseSubcategory;window.kv2ChooseSubcategory=function(v){if(editCtx&&!editCtx.unlocked.has('Подкатегория')&&!risk('Подкатегория'))return;return chooseSub.apply(this,arguments)};
+  const chooseCat=window.kv2ChooseCategory;window.kv2ChooseCategory=function(v){if(editCtx&&!editCtx.unlocked.has('Категория'))return;return chooseCat.apply(this,arguments)};
+  const chooseSub=window.kv2ChooseSubcategory;window.kv2ChooseSubcategory=function(v){if(editCtx&&!editCtx.unlocked.has('Подкатегория'))return;return chooseSub.apply(this,arguments)};
   const baseClose=window.closeAdminModal;window.closeAdminModal=function(force=false){const modal=document.getElementById('adminModal');const wasShown=modal?.classList.contains('show');const r=baseClose.apply(this,arguments);const isShown=modal?.classList.contains('show');if(force||(wasShown&&!isShown))editCtx=null;return r};
 })();
 </script>
 
+
+
+<style id="kv23-polish-style">
+.kv23-confirm-shade{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;padding:20px;background:rgba(0,0,0,.58);backdrop-filter:blur(12px);animation:kv23Fade .18s ease}
+.kv23-confirm{width:min(470px,100%);border:1px solid color-mix(in srgb,var(--accent) 38%,var(--border));border-radius:22px;background:linear-gradient(145deg,color-mix(in srgb,var(--panel) 96%,var(--accent) 4%),var(--panel2));color:var(--text);box-shadow:0 28px 80px rgba(0,0,0,.48),0 0 34px rgba(var(--glow-rgb),.18);padding:22px;animation:kv23Pop .22s cubic-bezier(.2,.8,.2,1)}
+.kv23-confirm-head{display:flex;gap:13px;align-items:flex-start}.kv23-confirm-icon{width:42px;height:42px;flex:0 0 42px;border-radius:14px;display:grid;place-items:center;font-weight:900;font-size:22px;background:color-mix(in srgb,var(--accent) 18%,transparent);border:1px solid color-mix(in srgb,var(--accent) 45%,var(--border));color:var(--accent)}
+.kv23-confirm h3{margin:1px 0 6px;font-size:19px}.kv23-confirm p{margin:0;color:var(--text);line-height:1.5}.kv23-confirm-detail{margin-top:11px!important;color:var(--muted)!important;font-size:13px}
+.kv23-confirm-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:20px}.kv23-confirm-actions .btn{min-width:112px}
+.kv23-global{margin-bottom:16px;border:1px solid color-mix(in srgb,var(--accent) 30%,var(--border));background:linear-gradient(135deg,color-mix(in srgb,var(--panel) 96%,var(--accent) 4%),var(--panel));box-shadow:0 12px 34px rgba(0,0,0,.14)}
+.kv23-global-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:14px}.kv23-global-card{padding:16px;border:1px solid var(--border);border-radius:16px;background:color-mix(in srgb,var(--panel2) 84%,transparent)}
+.kv23-global-card h4{margin:0 0 6px}.kv23-global-card p{margin:0 0 12px;color:var(--muted);font-size:13px;line-height:1.45}.kv23-row{display:flex;gap:9px;flex-wrap:wrap;align-items:end}.kv23-row .field{min-width:130px;flex:1}.kv23-row .btn{min-height:42px}
+.kv23-promo-preview{margin-top:10px;padding:10px 12px;border-radius:12px;border:1px dashed color-mix(in srgb,var(--accent) 50%,var(--border));color:var(--text);font-weight:750}
+@media(max-width:850px){.kv23-global-grid{grid-template-columns:1fr}}
+@keyframes kv23Fade{from{opacity:0}to{opacity:1}}@keyframes kv23Pop{from{opacity:0;transform:translateY(8px) scale(.97)}to{opacity:1;transform:none}}
+html[data-motion="none"] .kv23-confirm-shade,html[data-motion="none"] .kv23-confirm{animation:none}
+</style>
+<script id="kv23-polish-global">
+(function(){
+const T={
+ uk:{global:'Глобальні зміни',globalHint:'Дії одразу для всього каталогу. Перед застосуванням KrisVane покаже підтвердження.',discount:'Масова знижка',discountHint:'Поточна ціна стане старою, а нова ціна зменшиться на задане значення.',type:'Тип',uah:'грн',percent:'%',value:'Значення',apply:'Застосувати до всіх товарів',promo:'Рекламний рядок',promoHint:'Цей текст буде показано на головній сторінці магазину під головною карткою.',promoPh:'Наприклад: 🔥 АКЦІЯ НА ВСЕ — -5% 🔥',enabled:'Показувати',savePromo:'Зберегти рекламу',confirmDiscount:'Застосувати масову знижку?',confirmDetail:'Буде змінено ціну всіх товарів. Поточна ціна буде записана як стара.',done:'Ціни оновлено',promoSaved:'Рекламний рядок збережено',cancel:'Скасувати',continue:'Продовжити'},
+ ru:{global:'Глобальные изменения',globalHint:'Действия сразу для всего каталога. Перед применением KrisVane покажет подтверждение.',discount:'Массовая скидка',discountHint:'Текущая цена станет старой, а новая цена уменьшится на заданное значение.',type:'Тип',uah:'грн',percent:'%',value:'Значение',apply:'Применить ко всем товарам',promo:'Рекламная строка',promoHint:'Этот текст будет показан на главной странице магазина под главной карточкой.',promoPh:'Например: 🔥 АКЦИЯ НА ВСЁ — -5% 🔥',enabled:'Показывать',savePromo:'Сохранить рекламу',confirmDiscount:'Применить массовую скидку?',confirmDetail:'Будет изменена цена всех товаров. Текущая цена будет записана как старая.',done:'Цены обновлены',promoSaved:'Рекламная строка сохранена',cancel:'Отмена',continue:'Продолжить'},
+ en:{global:'Global changes',globalHint:'Actions for the entire catalog. KrisVane asks for confirmation before applying them.',discount:'Bulk discount',discountHint:'The current price becomes the old price and the new price is reduced by the chosen amount.',type:'Type',uah:'UAH',percent:'%',value:'Value',apply:'Apply to all products',promo:'Promo message',promoHint:'This text appears on the storefront home page below the main hero card.',promoPh:'Example: 🔥 SALE ON EVERYTHING — -5% 🔥',enabled:'Show',savePromo:'Save promo',confirmDiscount:'Apply bulk discount?',confirmDetail:'Prices of all products will change. Current prices will be stored as old prices.',done:'Prices updated',promoSaved:'Promo message saved',cancel:'Cancel',continue:'Continue'},
+ be:{global:'Глабальныя змены',globalHint:'Дзеянні адразу для ўсяго каталога. Перад ужываннем KrisVane пакажа пацвярджэнне.',discount:'Масавая зніжка',discountHint:'Бягучая цана стане старой, а новая паменшыцца на зададзенае значэнне.',type:'Тып',uah:'грн',percent:'%',value:'Значэнне',apply:'Ужыць да ўсіх тавараў',promo:'Рэкламны радок',promoHint:'Гэты тэкст будзе паказаны на галоўнай старонцы крамы пад галоўнай карткай.',promoPh:'Напрыклад: 🔥 АКЦЫЯ НА ЎСЁ — -5% 🔥',enabled:'Паказваць',savePromo:'Захаваць рэкламу',confirmDiscount:'Ужыць масавую зніжку?',confirmDetail:'Будзе зменена цана ўсіх тавараў. Бягучая цана будзе запісана як старая.',done:'Цэны абноўлены',promoSaved:'Рэкламны радок захаваны',cancel:'Адмена',continue:'Працягнуць'},
+ zh:{global:'全局更改',globalHint:'一次对整个商品目录执行操作。应用前 KrisVane 会要求确认。',discount:'批量折扣',discountHint:'当前价格将成为原价，新价格按指定数值降低。',type:'类型',uah:'UAH',percent:'%',value:'数值',apply:'应用到全部商品',promo:'促销文案',promoHint:'该文字会显示在商店首页主卡片下方。',promoPh:'例如：🔥 全场促销 -5% 🔥',enabled:'显示',savePromo:'保存促销',confirmDiscount:'应用批量折扣？',confirmDetail:'所有商品价格都会改变，当前价格会保存为原价。',done:'价格已更新',promoSaved:'促销文案已保存',cancel:'取消',continue:'继续'}
+};
+const L=()=>T[(typeof getUiPrefs==='function'?getUiPrefs().language:'uk')]||T.uk;
+window.kv23Confirm=function(o={}){
+ return new Promise(resolve=>{
+   const old=document.getElementById('kv23ConfirmShade');if(old)old.remove();
+   const d=document.createElement('div');d.className='kv23-confirm-shade';d.id='kv23ConfirmShade';
+   const t=L(), esc=s=>typeof escapeHtml==='function'?escapeHtml(String(s??'')):String(s??'');
+   d.innerHTML=`<div class="kv23-confirm" role="dialog" aria-modal="true"><div class="kv23-confirm-head"><div class="kv23-confirm-icon">${esc(o.icon||'!')}</div><div><h3>${esc(o.title||'KrisVane')}</h3><p>${esc(o.message||'')}</p>${o.detail?`<p class="kv23-confirm-detail">${esc(o.detail)}</p>`:''}</div></div><div class="kv23-confirm-actions"><button class="btn btn-secondary" data-no>${esc(o.cancelText||t.cancel)}</button><button class="btn ${o.tone==='danger'?'btn-danger':'btn-primary'}" data-yes>${esc(o.confirmText||t.continue)}</button></div></div>`;
+   const done=v=>{d.remove();resolve(v)};d.querySelector('[data-no]').onclick=()=>done(false);d.querySelector('[data-yes]').onclick=()=>done(true);d.addEventListener('click',e=>{if(e.target===d)done(false)});document.body.appendChild(d);d.querySelector('[data-yes]').focus();
+ });
+};
+function mount(){
+ const host=document.getElementById('productsAdminContainer')?.closest('.panel');if(!host||document.getElementById('kv23Global'))return;
+ const t=L(), panel=document.createElement('div');panel.className='panel kv23-global';panel.id='kv23Global';
+ panel.innerHTML=`<div class="section-head"><div><h3>${t.global}</h3><p>${t.globalHint}</p></div></div><div class="kv23-global-grid">
+ <div class="kv23-global-card"><h4>${t.discount}</h4><p>${t.discountHint}</p><div class="kv23-row"><div class="field"><label>${t.type}</label><select id="kv23DiscountType" class="select"><option value="fixed">${t.uah}</option><option value="percent">${t.percent}</option></select></div><div class="field"><label>${t.value}</label><input id="kv23DiscountValue" class="input" type="number" min="0" step="0.01" value="5"></div><button class="btn btn-primary" id="kv23ApplyDiscount">${t.apply}</button></div></div>
+ <div class="kv23-global-card"><h4>${t.promo}</h4><p>${t.promoHint}</p><div class="field"><input id="kv23PromoText" class="input" maxlength="220" placeholder="${t.promoPh}"></div><div class="kv23-row" style="margin-top:9px"><label style="display:flex;align-items:center;gap:8px"><input id="kv23PromoEnabled" type="checkbox" checked> ${t.enabled}</label><button class="btn btn-secondary" id="kv23SavePromo">${t.savePromo}</button></div><div class="kv23-promo-preview" id="kv23PromoPreview" hidden></div></div>
+ </div>`;
+ host.parentNode.insertBefore(panel,host);loadPromo();panel.querySelector('#kv23PromoText').addEventListener('input',preview);panel.querySelector('#kv23PromoEnabled').addEventListener('change',preview);panel.querySelector('#kv23SavePromo').onclick=savePromo;panel.querySelector('#kv23ApplyDiscount').onclick=applyDiscount;
+}
+function preview(){const x=document.getElementById('kv23PromoPreview'),v=document.getElementById('kv23PromoText')?.value.trim();if(!x)return;x.hidden=!v;x.textContent=v||''}
+async function loadPromo(){try{const {data,error}=await supabaseClient.from('storefront_announcements').select('*').eq('id',1).maybeSingle();if(error)throw error;if(data){document.getElementById('kv23PromoText').value=data.message||'';document.getElementById('kv23PromoEnabled').checked=!!data.enabled;preview()}}catch(e){console.warn('promo load',e)}}
+async function savePromo(){const b=document.getElementById('kv23SavePromo'),message=document.getElementById('kv23PromoText').value.trim(),enabled=document.getElementById('kv23PromoEnabled').checked;b.disabled=true;try{const {error}=await supabaseClient.from('storefront_announcements').upsert({id:1,message,enabled,updated_at:new Date().toISOString()});if(error)throw error;showToast(L().promoSaved)}catch(e){showToast(e.message||String(e),'error')}finally{b.disabled=false}}
+async function applyDiscount(){const type=document.getElementById('kv23DiscountType').value,value=Number(document.getElementById('kv23DiscountValue').value);if(!(value>0))return;const products=adminProducts.filter(p=>Number.isFinite(Number(p.price)));if(!products.length)return;const t=L();const ok=await kv23Confirm({title:t.confirmDiscount,message:type==='percent'?`-${value}%`:`-${value} ${t.uah}`,detail:`${t.confirmDetail} (${products.length})`,confirmText:t.continue,cancelText:t.cancel});if(!ok)return;const b=document.getElementById('kv23ApplyDiscount');b.disabled=true;try{for(const p of products){const old=Number(p.price),next=Math.max(0,type==='percent'?old*(1-value/100):old-value);const {error}=await supabaseClient.from('products').update({old_price:old,price:Math.round(next*100)/100}).eq('id',p.id);if(error)throw error}showToast(`${t.done}: ${products.length}`);loadedAdminViews.delete('products');await loadProducts()}catch(e){showToast(e.message||String(e),'error')}finally{b.disabled=false}}
+const oldApply=window.applyUiPrefs;window.applyUiPrefs=function(){const r=oldApply.apply(this,arguments);const old=document.getElementById('kv23Global');if(old)old.remove();setTimeout(mount,20);return r};
+setTimeout(mount,250);
+})();
+</script>
