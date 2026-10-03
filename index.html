@@ -1475,11 +1475,11 @@ body[data-glow="off"] .heroBox::after{display:none}
                     </select>
                   </div>
                   <div class="filterField">
-                    <label>Цена от</label>
-                    <input id="priceMin" type="number" min="0" inputmode="numeric" placeholder="0 грн">
+                    <label>Цена от (₴)</label>
+                    <input id="priceMin" type="number" min="0" inputmode="numeric" placeholder="0 ₴">
                   </div>
                   <div class="filterField">
-                    <label>Цена до</label>
+                    <label>Цена до (₴)</label>
                     <input id="priceMax" type="number" min="0" inputmode="numeric" placeholder="Без лимита">
                   </div>
                   <div class="filterField">
@@ -1489,7 +1489,9 @@ body[data-glow="off"] .heroBox::after{display:none}
                       <option value="priceAsc">Сначала дешевле</option>
                       <option value="priceDesc">Сначала дороже</option>
                       <option value="new">Сначала новые</option>
+                      <option value="old">Сначала старые</option>
                       <option value="nameAsc">По названию А–Я</option>
+                      <option value="nameDesc">По названию Я–А</option>
                     </select>
                   </div>
                 </div>
@@ -1632,6 +1634,10 @@ body[data-glow="off"] .heroBox::after{display:none}
                       <option value="en">English</option>
                       <option value="be">Беларуская</option>
                       <option value="zh">中文</option>
+                      <option value="pl">Polski</option>
+                      <option value="de">Deutsch</option>
+                      <option value="fr">Français</option>
+                      <option value="es">Español</option>
                     </select>
                   </div>
 
@@ -1828,7 +1834,7 @@ const view = {
   ...viewDefaults,
   ...savedView
 };
-const SUPPORTED_LANGUAGES = new Set(["uk","ru","en","be","zh"]);
+const SUPPORTED_LANGUAGES = new Set(["uk","ru","en","be","zh","pl","de","fr","es"]);
 try {
   const sharedLanguage = localStorage.getItem("kv_language");
   if (SUPPORTED_LANGUAGES.has(sharedLanguage)) view.language = sharedLanguage;
@@ -1923,7 +1929,7 @@ const I18N = {
   ru: {},
   en: {
     "Каталог":"Catalog","Товары KrisVane из каталога магазина.":"KrisVane products from the store catalog.","Избранное":"Favorites","Вернуться в магазин":"Back to store","Фильтры":"Filters","Сбросить фильтр":"Reset filters","Сбросить":"Reset","Применить":"Apply","Ничего не найдено":"Nothing found","Попробуйте изменить поиск или фильтры.":"Try changing your search or filters.","Настройки вида":"Appearance settings","Поиск товаров, брендов, категорий…":"Search products, brands, categories…",
-    "Твой стиль.":"Your style.","Твои правила.":"Your rules.","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"KrisVane clothing, footwear and accessories. Easy catalog, sizes, favorites, cart and Nova Poshta delivery.","Смотреть ассортимент":"Browse selection","Новинки":"New arrivals","Категория":"Category","Подкатегория":"Subcategory","Бренд":"Brand","Размер":"Size","Состояние / NEW":"Condition / NEW","Наличие":"Availability","Цена от":"Price from","Цена до":"Price to","Сортировка":"Sort","Все категории":"All categories","Все подкатегории":"All subcategories","Все бренды":"All brands","Все размеры":"All sizes","Любое состояние":"Any condition","Все товары":"All products","В наличии":"In stock","Нет в наличии":"Out of stock","Без лимита":"No limit","По умолчанию":"Default","Сначала дешевле":"Price: low to high","Сначала дороже":"Price: high to low","Сначала новые":"Newest first","По названию А–Я":"Name A–Z","Новое":"New","Б/У":"Pre-owned","Уценка":"Discounted","Показать ещё":"Show more","Интернет-магазин одежды, обуви и аксессуаров.":"Online clothing, footwear and accessories store.","Покупателям":"For customers","Корзина":"Cart","Доставка":"Delivery","Украина":"Ukraine","Аккаунт":"Account","Имя, аватар и настройки аккаунта":"Name, avatar and account settings","Сохранённые товары":"Saved products","Товары перед оформлением":"Products before checkout","Покупки":"Purchases","Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta city and branch are selected at checkout","Мои заказы":"My orders","История и статусы заказов":"Order history and statuses","Настройки":"Settings","Тема, язык, плотность, анимации и оформление":"Theme, language, density, animations and appearance","Тема":"Theme","Тёмная · фиолетовая":"Dark · purple","Тёмная · синяя":"Dark · blue","Графитовая":"Graphite","Полночная · синяя":"Midnight · blue","Изумрудная":"Emerald","Розовая":"Pink","Янтарная":"Amber","Океан":"Ocean","Рубиновая":"Ruby","Лайм":"Lime","Монохромная":"Monochrome","Светлая":"Light","Язык сайта":"Site language","Плотность интерфейса":"Interface density","Обычная":"Normal","Компактная":"Compact","Анимации":"Animations","Полные · рекомендуется":"Full · recommended","Упрощённые":"Simplified","Нет":"None","Размер текста":"Text size","Обычный":"Normal","Меньше":"Smaller","Больше":"Larger","Эффект свечения":"Glow effect","Обычное":"Normal","Яркое":"Bright","Мягкое":"Soft","Запоминать вид и место на сайте":"Remember view and position","Да":"Yes","Сбросить оформление":"Reset appearance","Сессия":"Session","Войти / Регистрация":"Sign in / Register","Войти в аккаунт KrisVane":"Sign in to your KrisVane account","Итого":"Total","Оформить заказ":"Checkout","Главная":"Home","Корзина пока пуста.":"Your cart is empty.","Корзина пуста":"Cart is empty","Добавлено в корзину":"Added to cart","Корзина готова. Следующий этап — форма доставки и защищённый checkout.":"Your cart is ready. Next comes delivery details and secure checkout.","Город и отделение Nova Poshta выбираются при оформлении заказа.":"Nova Poshta city and branch are selected during checkout.","Раздел «Мои заказы» подготовлен к следующему этапу.":"The My Orders section is ready for the next stage.","Нет фото":"No photo","Артикул":"SKU","Товар":"Product","Сначала выберите размер":"Select a size first","Размер не применяется":"Size does not apply","Больше товара сейчас нет в наличии":"No more stock is currently available","Пользователь":"User","Управление входом":"Sign-in management","Сначала выберите категорию":"Select a category first","Нет подкатегорий":"No subcategories","Открыть меню":"Open menu","Мобильная навигация":"Mobile navigation","Меню KrisVane":"KrisVane menu"
+    "Твой стиль.":"Your style.","Твои правила.":"Your rules.","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"KrisVane clothing, footwear and accessories. Easy catalog, sizes, favorites, cart and Nova Poshta delivery.","Смотреть ассортимент":"Browse selection","Новинки":"New arrivals","Категория":"Category","Подкатегория":"Subcategory","Бренд":"Brand","Размер":"Size","Состояние / NEW":"Condition / NEW","Наличие":"Availability","Цена от":"Price from","Цена до":"Price to","Сортировка":"Sort","Все категории":"All categories","Все подкатегории":"All subcategories","Все бренды":"All brands","Все размеры":"All sizes","Любое состояние":"Any condition","Все товары":"All products","В наличии":"In stock","Нет в наличии":"Out of stock","Без лимита":"No limit","По умолчанию":"Default","Сначала дешевле":"Price: low to high","Сначала дороже":"Price: high to low","Сначала новые":"Newest first","По названию А–Я":"Name A–Z","Новое":"New","Б/У":"Pre-owned","Уценка":"Discounted","Показать ещё":"Show more","Интернет-магазин одежды, обуви и аксессуаров.":"Online clothing, footwear and accessories store.","Покупателям":"For customers","Корзина":"Cart","Доставка":"Delivery","Украина":"Ukraine","Аккаунт":"Account","Имя, аватар и настройки аккаунта":"Name, avatar and account settings","Сохранённые товары":"Saved products","Товары перед оформлением":"Products before checkout","Покупки":"Purchases","Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta city and branch are selected at checkout","Мои заказы":"My orders","История и статусы заказов":"Order history and statuses","Настройки":"Settings","Тема, язык, плотность, анимации и оформление":"Theme, language, density, animations and appearance","Тема":"Theme","Тёмная · фиолетовая":"Dark · purple","Тёмная · синяя":"Dark · blue","Графитовая":"Graphite","Полночная · синяя":"Midnight · blue","Изумрудная":"Emerald","Розовая":"Pink","Янтарная":"Amber","Океан":"Ocean","Рубиновая":"Ruby","Лайм":"Lime","Монохромная":"Monochrome","Светлая":"Light","Язык сайта":"Site language","Плотность интерфейса":"Interface density","Обычная":"Normal","Компактная":"Compact","Анимации":"Animations","Полные · рекомендуется":"Full · recommended","Упрощённые":"Simplified","Нет":"None","Размер текста":"Text size","Обычный":"Normal","Меньше":"Smaller","Больше":"Larger","Эффект свечения":"Glow effect","Обычное":"Normal","Яркое":"Bright","Мягкое":"Soft","Запоминать вид и место на сайте":"Remember view and position","Да":"Yes","Сбросить оформление":"Reset appearance","Сессия":"Session","Войти / Регистрация":"Sign in / Register","Войти в аккаунт KrisVane":"Sign in to your KrisVane account","Итого":"Total","Оформить заказ":"Checkout","Главная":"Home","Корзина пока пуста.":"Your cart is empty.","Корзина пуста":"Cart is empty","Добавлено в корзину":"Added to cart","Корзина готова. Следующий этап — форма доставки и защищённый checkout.":"Your cart is ready. Next comes delivery details and secure checkout.","Город и отделение Nova Poshta выбираются при оформлении заказа.":"Nova Poshta city and branch are selected during checkout.","Раздел «Мои заказы» подготовлен к следующему этапу.":"The My Orders section is ready for the next stage.","Нет фото":"No photo","Артикул":"Item number","Товар":"Product","Сначала выберите размер":"Select a size first","Размер не применяется":"Size does not apply","Больше товара сейчас нет в наличии":"No more stock is currently available","Пользователь":"User","Управление входом":"Sign-in management","Сначала выберите категорию":"Select a category first","Нет подкатегорий":"No subcategories","Открыть меню":"Open menu","Мобильная навигация":"Mobile navigation","Меню KrisVane":"KrisVane menu"
   },
   be: {
     "Каталог":"Каталог","Товары KrisVane из каталога магазина.":"Тавары KrisVane з каталога крамы.","Избранное":"Абранае","Вернуться в магазин":"Вярнуцца ў краму","Фильтры":"Фільтры","Сбросить фильтр":"Скінуць фільтр","Сбросить":"Скінуць","Применить":"Ужыць","Ничего не найдено":"Нічога не знойдзена","Попробуйте изменить поиск или фильтры.":"Паспрабуйце змяніць пошук або фільтры.","Настройки вида":"Налады выгляду","Поиск товаров, брендов, категорий…":"Пошук тавараў, брэндаў, катэгорый…","Твой стиль.":"Твой стыль.","Твои правила.":"Твае правілы.","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"Адзенне, абутак і аксэсуары KrisVane. Зручны каталог, памеры, абранае, кошык і дастаўка Новай поштай.","Смотреть ассортимент":"Глядзець асартымент","Новинки":"Навінкі","Категория":"Катэгорыя","Подкатегория":"Падкатэгорыя","Бренд":"Брэнд","Размер":"Памер","Состояние / NEW":"Стан / NEW","Наличие":"Наяўнасць","Цена от":"Цана ад","Цена до":"Цана да","Сортировка":"Сартаванне","Все категории":"Усе катэгорыі","Все подкатегории":"Усе падкатэгорыі","Все бренды":"Усе брэнды","Все размеры":"Усе памеры","Любое состояние":"Любы стан","Все товары":"Усе тавары","В наличии":"У наяўнасці","Нет в наличии":"Няма ў наяўнасці","Без лимита":"Без ліміту","По умолчанию":"Па змаўчанні","Сначала дешевле":"Спачатку таннейшыя","Сначала дороже":"Спачатку даражэйшыя","Сначала новые":"Спачатку новыя","По названию А–Я":"Па назве А–Я","Новое":"Новае","Б/У":"Б/У","Уценка":"Уцэнка","Показать ещё":"Паказаць яшчэ","Интернет-магазин одежды, обуви и аксессуаров.":"Інтэрнэт-крама адзення, абутку і аксесуараў.","Покупателям":"Пакупнікам","Корзина":"Кошык","Доставка":"Дастаўка","Украина":"Украіна","Аккаунт":"Акаўнт","Имя, аватар и настройки аккаунта":"Імя, аватар і налады акаўнта","Сохранённые товары":"Захаваныя тавары","Товары перед оформлением":"Тавары перад афармленнем","Покупки":"Пакупкі","Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta, горад і аддзяленне — на этапе афармлення","Мои заказы":"Мае заказы","История и статусы заказов":"Гісторыя і статусы заказаў","Настройки":"Налады","Тема, язык, плотность, анимации и оформление":"Тэма, мова, шчыльнасць, анімацыі і афармленне","Тема":"Тэма","Тёмная · фиолетовая":"Цёмная · фіялетавая","Тёмная · синяя":"Цёмная · сіняя","Графитовая":"Графітавая","Полночная · синяя":"Паўночная · сіняя","Изумрудная":"Ізумрудная","Розовая":"Ружовая","Янтарная":"Бурштынавая","Океан":"Акіян","Рубиновая":"Рубінавая","Лайм":"Лайм","Монохромная":"Манахромная","Светлая":"Светлая","Язык сайта":"Мова сайта","Плотность интерфейса":"Шчыльнасць інтэрфейсу","Обычная":"Звычайная","Компактная":"Кампактная","Анимации":"Анімацыі","Полные · рекомендуется":"Поўныя · рэкамендуецца","Упрощённые":"Спрошчаныя","Нет":"Няма","Размер текста":"Памер тэксту","Обычный":"Звычайны","Меньше":"Менш","Больше":"Больш","Эффект свечения":"Эфект свячэння","Обычное":"Звычайнае","Яркое":"Яркае","Мягкое":"Мяккае","Запоминать вид и место на сайте":"Запамінаць выгляд і месца на сайце","Да":"Так","Сбросить оформление":"Скінуць афармленне","Сессия":"Сесія","Войти / Регистрация":"Увайсці / Рэгістрацыя","Войти в аккаунт KrisVane":"Увайсці ў акаўнт KrisVane","Итого":"Разам","Оформить заказ":"Аформіць заказ","Главная":"Галоўная","Корзина пока пуста.":"Кошык пакуль пусты.","Корзина пуста":"Кошык пусты","Добавлено в корзину":"Дададзена ў кошык","Нет фото":"Няма фота","Артикул":"Артыкул","Товар":"Тавар","Сначала выберите размер":"Спачатку выберыце памер","Размер не применяется":"Памер не ўжываецца","Пользователь":"Карыстальнік","Сначала выберите категорию":"Спачатку выберыце катэгорыю","Нет подкатегорий":"Няма падкатэгорый","Открыть меню":"Адкрыць меню","Мобильная навигация":"Мабільная навігацыя","Меню KrisVane":"Меню KrisVane"
@@ -1943,6 +1949,51 @@ const TAXONOMY_I18N = {
 const RU_IDENTITY = new Proxy({}, {get:(_,key)=>String(key)});
 I18N.ru = RU_IDENTITY;
 
+// ===== KrisVane v25 — compact extra language packs =====
+// Only interface/taxonomy tokens are translated. Product names, brands, SKU,
+// e-mail addresses and size values never enter these dictionaries.
+const KV_EXTRA_I18N = {
+  pl:{
+    "Каталог":"Katalog","Товары KrisVane из каталога магазина.":"Produkty KrisVane z katalogu sklepu.","Избранное":"Ulubione","Вернуться в магазин":"Wróć do sklepu","Фильтры":"Filtry","Сбросить фильтр":"Resetuj filtry","Сбросить":"Resetuj","Применить":"Zastosuj","Ничего не найдено":"Nic nie znaleziono","Попробуйте изменить поиск или фильтры.":"Spróbuj zmienić wyszukiwanie lub filtry.","Настройки вида":"Ustawienia wyglądu","Поиск товаров, брендов, категорий…":"Szukaj produktów, marek, kategorii…","Твой стиль.":"Twój styl.","Твои правила.":"Twoje zasady.","Смотреть ассортимент":"Zobacz asortyment","Новинки":"Nowości","Категория":"Kategoria","Подкатегория":"Podkategoria","Бренд":"Marka","Размер":"Rozmiar","Состояние / NEW":"Stan / NEW","Наличие":"Dostępność","Цена от":"Cena od","Цена до":"Cena do","Сортировка":"Sortowanie","Все категории":"Wszystkie kategorie","Все подкатегории":"Wszystkie podkategorie","Все бренды":"Wszystkie marki","Все размеры":"Wszystkie rozmiary","Любое состояние":"Dowolny stan","Все товары":"Wszystkie produkty","В наличии":"Dostępne","Нет в наличии":"Brak w magazynie","Без лимита":"Bez limitu","По умолчанию":"Domyślnie","Сначала дешевле":"Najpierw tańsze","Сначала дороже":"Najpierw droższe","Сначала новые":"Najpierw najnowsze","По названию А–Я":"Nazwa A–Z","Новое":"Nowe","Б/У":"Używane","Уценка":"Przecenione","Показать ещё":"Pokaż więcej","Покупателям":"Dla klientów","Корзина":"Koszyk","Доставка":"Dostawa","Украина":"Ukraina","Аккаунт":"Konto","Мои заказы":"Moje zamówienia","Настройки":"Ustawienia","Тема":"Motyw","Язык сайта":"Język strony","Плотность интерфейса":"Gęstość interfejsu","Обычная":"Normalna","Компактная":"Kompaktowa","Анимации":"Animacje","Нет":"Brak","Размер текста":"Rozmiar tekstu","Меньше":"Mniejszy","Больше":"Większy","Да":"Tak","Сессия":"Sesja","Войти / Регистрация":"Zaloguj / Rejestracja","Итого":"Razem","Оформить заказ":"Złóż zamówienie","Главная":"Strona główna","Корзина пока пуста.":"Koszyk jest pusty.","Корзина пуста":"Koszyk jest pusty","Добавлено в корзину":"Dodano do koszyka","Нет фото":"Brak zdjęcia","Артикул":"Numer artykułu","Товар":"Produkt","Сначала выберите размер":"Najpierw wybierz rozmiar","Размер не применяется":"Rozmiar nie dotyczy","Больше товара сейчас нет в наличии":"Brak większej ilości w magazynie","Сначала выберите категорию":"Najpierw wybierz kategorię","Нет подкатегорий":"Brak podkategorii","Добавить в корзину":"Dodaj do koszyka","Удалить":"Usuń","шт.":"szt.","нет":"brak"
+  },
+  de:{
+    "Каталог":"Katalog","Товары KrisVane из каталога магазина.":"KrisVane-Produkte aus dem Shop-Katalog.","Избранное":"Favoriten","Вернуться в магазин":"Zurück zum Shop","Фильтры":"Filter","Сбросить фильтр":"Filter zurücksetzen","Сбросить":"Zurücksetzen","Применить":"Anwenden","Ничего не найдено":"Nichts gefunden","Попробуйте изменить поиск или фильтры.":"Ändere die Suche oder die Filter.","Настройки вида":"Darstellung","Поиск товаров, брендов, категорий…":"Produkte, Marken, Kategorien suchen…","Твой стиль.":"Dein Stil.","Твои правила.":"Deine Regeln.","Смотреть ассортимент":"Sortiment ansehen","Новинки":"Neuheiten","Категория":"Kategorie","Подкатегория":"Unterkategorie","Бренд":"Marke","Размер":"Größe","Состояние / NEW":"Zustand / NEW","Наличие":"Verfügbarkeit","Цена от":"Preis ab","Цена до":"Preis bis","Сортировка":"Sortierung","Все категории":"Alle Kategorien","Все подкатегории":"Alle Unterkategorien","Все бренды":"Alle Marken","Все размеры":"Alle Größen","Любое состояние":"Beliebiger Zustand","Все товары":"Alle Produkte","В наличии":"Auf Lager","Нет в наличии":"Nicht auf Lager","Без лимита":"Ohne Limit","По умолчанию":"Standard","Сначала дешевле":"Preis aufsteigend","Сначала дороже":"Preis absteigend","Сначала новые":"Neueste zuerst","По названию А–Я":"Name A–Z","Новое":"Neu","Б/У":"Gebraucht","Уценка":"Reduziert","Показать ещё":"Mehr anzeigen","Покупателям":"Für Kunden","Корзина":"Warenkorb","Доставка":"Lieferung","Украина":"Ukraine","Аккаунт":"Konto","Мои заказы":"Meine Bestellungen","Настройки":"Einstellungen","Тема":"Design","Язык сайта":"Seitensprache","Плотность интерфейса":"Oberflächendichte","Обычная":"Normal","Компактная":"Kompakt","Анимации":"Animationen","Нет":"Keine","Размер текста":"Textgröße","Меньше":"Kleiner","Больше":"Größer","Да":"Ja","Сессия":"Sitzung","Войти / Регистрация":"Anmelden / Registrieren","Итого":"Gesamt","Оформить заказ":"Zur Kasse","Главная":"Startseite","Корзина пока пуста.":"Der Warenkorb ist leer.","Корзина пуста":"Warenkorb ist leer","Добавлено в корзину":"Zum Warenkorb hinzugefügt","Нет фото":"Kein Foto","Артикул":"Artikelnummer","Товар":"Produkt","Сначала выберите размер":"Wähle zuerst eine Größe","Размер не применяется":"Keine Größe erforderlich","Больше товара сейчас нет в наличии":"Keine weitere Menge verfügbar","Сначала выберите категорию":"Wähle zuerst eine Kategorie","Нет подкатегорий":"Keine Unterkategorien","Добавить в корзину":"In den Warenkorb","Удалить":"Entfernen","шт.":"Stk.","нет":"nicht verfügbar"
+  },
+  fr:{
+    "Каталог":"Catalogue","Товары KrisVane из каталога магазина.":"Produits KrisVane du catalogue de la boutique.","Избранное":"Favoris","Вернуться в магазин":"Retour à la boutique","Фильтры":"Filtres","Сбросить фильтр":"Réinitialiser les filtres","Сбросить":"Réinitialiser","Применить":"Appliquer","Ничего не найдено":"Aucun résultat","Попробуйте изменить поиск или фильтры.":"Essayez de modifier la recherche ou les filtres.","Настройки вида":"Paramètres d’affichage","Поиск товаров, брендов, категорий…":"Rechercher des produits, marques, catégories…","Твой стиль.":"Ton style.","Твои правила.":"Tes règles.","Смотреть ассортимент":"Voir la collection","Новинки":"Nouveautés","Категория":"Catégorie","Подкатегория":"Sous-catégorie","Бренд":"Marque","Размер":"Taille","Состояние / NEW":"État / NEW","Наличие":"Disponibilité","Цена от":"Prix min.","Цена до":"Prix max.","Сортировка":"Tri","Все категории":"Toutes les catégories","Все подкатегории":"Toutes les sous-catégories","Все бренды":"Toutes les marques","Все размеры":"Toutes les tailles","Любое состояние":"Tous les états","Все товары":"Tous les produits","В наличии":"En stock","Нет в наличии":"Rupture de stock","Без лимита":"Sans limite","По умолчанию":"Par défaut","Сначала дешевле":"Prix croissant","Сначала дороже":"Prix décroissant","Сначала новые":"Plus récents","По названию А–Я":"Nom A–Z","Новое":"Neuf","Б/У":"D’occasion","Уценка":"Remisé","Показать ещё":"Afficher plus","Покупателям":"Clients","Корзина":"Panier","Доставка":"Livraison","Украина":"Ukraine","Аккаунт":"Compte","Мои заказы":"Mes commandes","Настройки":"Paramètres","Тема":"Thème","Язык сайта":"Langue du site","Плотность интерфейса":"Densité de l’interface","Обычная":"Normale","Компактная":"Compacte","Анимации":"Animations","Нет":"Aucune","Размер текста":"Taille du texte","Меньше":"Plus petit","Больше":"Plus grand","Да":"Oui","Сессия":"Session","Войти / Регистрация":"Connexion / Inscription","Итого":"Total","Оформить заказ":"Commander","Главная":"Accueil","Корзина пока пуста.":"Votre panier est vide.","Корзина пуста":"Panier vide","Добавлено в корзину":"Ajouté au panier","Нет фото":"Pas de photo","Артикул":"Référence","Товар":"Produit","Сначала выберите размер":"Choisissez d’abord une taille","Размер не применяется":"Taille non applicable","Больше товара сейчас нет в наличии":"Aucune quantité supplémentaire disponible","Сначала выберите категорию":"Choisissez d’abord une catégorie","Нет подкатегорий":"Aucune sous-catégorie","Добавить в корзину":"Ajouter au panier","Удалить":"Supprimer","шт.":"pce","нет":"indisponible"
+  },
+  es:{
+    "Каталог":"Catálogo","Товары KrisVane из каталога магазина.":"Productos KrisVane del catálogo de la tienda.","Избранное":"Favoritos","Вернуться в магазин":"Volver a la tienda","Фильтры":"Filtros","Сбросить фильтр":"Restablecer filtros","Сбросить":"Restablecer","Применить":"Aplicar","Ничего не найдено":"No se encontraron resultados","Попробуйте изменить поиск или фильтры.":"Prueba a cambiar la búsqueda o los filtros.","Настройки вида":"Ajustes de apariencia","Поиск товаров, брендов, категорий…":"Buscar productos, marcas, categorías…","Твой стиль.":"Tu estilo.","Твои правила.":"Tus reglas.","Смотреть ассортимент":"Ver colección","Новинки":"Novedades","Категория":"Categoría","Подкатегория":"Subcategoría","Бренд":"Marca","Размер":"Talla","Состояние / NEW":"Estado / NEW","Наличие":"Disponibilidad","Цена от":"Precio mín.","Цена до":"Precio máx.","Сортировка":"Ordenar","Все категории":"Todas las categorías","Все подкатегории":"Todas las subcategorías","Все бренды":"Todas las marcas","Все размеры":"Todas las tallas","Любое состояние":"Cualquier estado","Все товары":"Todos los productos","В наличии":"En stock","Нет в наличии":"Agotado","Без лимита":"Sin límite","По умолчанию":"Predeterminado","Сначала дешевле":"Precio: menor a mayor","Сначала дороже":"Precio: mayor a menor","Сначала новые":"Más recientes","По названию А–Я":"Nombre A–Z","Новое":"Nuevo","Б/У":"Usado","Уценка":"Rebajado","Показать ещё":"Mostrar más","Покупателям":"Clientes","Корзина":"Carrito","Доставка":"Entrega","Украина":"Ucrania","Аккаунт":"Cuenta","Мои заказы":"Mis pedidos","Настройки":"Ajustes","Тема":"Tema","Язык сайта":"Idioma del sitio","Плотность интерфейса":"Densidad de la interfaz","Обычная":"Normal","Компактная":"Compacta","Анимации":"Animaciones","Нет":"Ninguna","Размер текста":"Tamaño del texto","Меньше":"Más pequeño","Больше":"Más grande","Да":"Sí","Сессия":"Sesión","Войти / Регистрация":"Iniciar sesión / Registrarse","Итого":"Total","Оформить заказ":"Finalizar compra","Главная":"Inicio","Корзина пока пуста.":"El carrito está vacío.","Корзина пуста":"Carrito vacío","Добавлено в корзину":"Añadido al carrito","Нет фото":"Sin foto","Артикул":"Referencia","Товар":"Producto","Сначала выберите размер":"Primero elige una talla","Размер не применяется":"La talla no aplica","Больше товара сейчас нет в наличии":"No hay más unidades disponibles","Сначала выберите категорию":"Primero elige una categoría","Нет подкатегорий":"No hay subcategorías","Добавить в корзину":"Añadir al carrito","Удалить":"Eliminar","шт.":"ud.","нет":"no disponible"
+  }
+};
+Object.entries(KV_EXTRA_I18N).forEach(([lang,pack])=>{ I18N[lang]=pack; });
+Object.assign(I18N.pl,{"Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta — miasto i oddział wybierzesz podczas składania zamówienia","Войти в аккаунт KrisVane":"Zaloguj się do konta KrisVane","Город и отделение Nova Poshta выбираются при оформлении заказа.":"Miasto i oddział Nova Poshta wybiera się podczas składania zamówienia.","Графитовая":"Grafitowy","Запоминать вид и место на сайте":"Zapamiętuj wygląd i pozycję na stronie","Изумрудная":"Szmaragdowy","Имя, аватар и настройки аккаунта":"Nazwa, awatar i ustawienia konta","Интернет-магазин одежды, обуви и аксессуаров.":"Sklep internetowy z odzieżą, obuwiem i akcesoriami.","История и статусы заказов":"Historia i statusy zamówień","Корзина готова. Следующий этап — форма доставки и защищённый checkout.":"Koszyk jest gotowy. Następny krok to dane dostawy i bezpieczna finalizacja zakupu.","Лайм":"Limonkowy","Меню KrisVane":"Menu KrisVane","Мобильная навигация":"Nawigacja mobilna","Монохромная":"Monochromatyczny","Мягкое":"Delikatny","Обычное":"Normalny","Обычный":"Normalny","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"Odzież, obuwie i akcesoria KrisVane. Wygodny katalog, rozmiary, ulubione, koszyk i dostawa Nova Poshta.","Океан":"Ocean","Открыть меню":"Otwórz menu","Покупки":"Zakupy","Полночная · синяя":"Północny · niebieski","Полные · рекомендуется":"Pełne · zalecane","Пользователь":"Użytkownik","Раздел «Мои заказы» подготовлен к следующему этапу.":"Sekcja „Moje zamówienia” jest przygotowana do kolejnego etapu.","Розовая":"Różowy","Рубиновая":"Rubinowy","Сбросить оформление":"Resetuj wygląd","Светлая":"Jasny","Сохранённые товары":"Zapisane produkty","Тема, язык, плотность, анимации и оформление":"Motyw, język, gęstość, animacje i wygląd","Товары перед оформлением":"Produkty przed finalizacją","Тёмная · синяя":"Ciemny · niebieski","Тёмная · фиолетовая":"Ciemny · fioletowy","Управление входом":"Zarządzanie logowaniem","Упрощённые":"Uproszczone","Эффект свечения":"Efekt poświaty","Янтарная":"Bursztynowy","Яркое":"Jasny"});
+Object.assign(I18N.de,{"Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta – Stadt und Filiale werden beim Checkout ausgewählt","Войти в аккаунт KrisVane":"Bei KrisVane anmelden","Город и отделение Nova Poshta выбираются при оформлении заказа.":"Stadt und Nova-Poshta-Filiale werden beim Checkout ausgewählt.","Графитовая":"Graphit","Запоминать вид и место на сайте":"Ansicht und Position auf der Seite merken","Изумрудная":"Smaragd","Имя, аватар и настройки аккаунта":"Name, Avatar und Kontoeinstellungen","Интернет-магазин одежды, обуви и аксессуаров.":"Onlineshop für Kleidung, Schuhe und Accessoires.","История и статусы заказов":"Bestellverlauf und Status","Корзина готова. Следующий этап — форма доставки и защищённый checkout.":"Der Warenkorb ist bereit. Als Nächstes folgen Lieferdaten und sicherer Checkout.","Лайм":"Limette","Меню KrisVane":"KrisVane-Menü","Мобильная навигация":"Mobile Navigation","Монохромная":"Monochrom","Мягкое":"Sanft","Обычное":"Normal","Обычный":"Normal","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"KrisVane Kleidung, Schuhe und Accessoires. Bequemer Katalog, Größen, Favoriten, Warenkorb und Nova-Poshta-Lieferung.","Океан":"Ozean","Открыть меню":"Menü öffnen","Покупки":"Einkäufe","Полночная · синяя":"Mitternacht · Blau","Полные · рекомендуется":"Voll · empfohlen","Пользователь":"Benutzer","Раздел «Мои заказы» подготовлен к следующему этапу.":"Der Bereich „Meine Bestellungen“ ist für den nächsten Schritt vorbereitet.","Розовая":"Rosa","Рубиновая":"Rubin","Сбросить оформление":"Darstellung zurücksetzen","Светлая":"Hell","Сохранённые товары":"Gespeicherte Produkte","Тема, язык, плотность, анимации и оформление":"Design, Sprache, Dichte, Animationen und Darstellung","Товары перед оформлением":"Produkte vor dem Checkout","Тёмная · синяя":"Dunkel · Blau","Тёмная · фиолетовая":"Dunkel · Violett","Управление входом":"Anmeldung verwalten","Упрощённые":"Vereinfacht","Эффект свечения":"Leuchteffekt","Янтарная":"Bernstein","Яркое":"Hell"});
+Object.assign(I18N.fr,{"Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta — ville et agence à choisir lors de la commande","Войти в аккаунт KrisVane":"Se connecter au compte KrisVane","Город и отделение Nova Poshta выбираются при оформлении заказа.":"La ville et l’agence Nova Poshta sont choisies lors de la commande.","Графитовая":"Graphite","Запоминать вид и место на сайте":"Mémoriser l’affichage et la position sur le site","Изумрудная":"Émeraude","Имя, аватар и настройки аккаунта":"Nom, avatar et paramètres du compte","Интернет-магазин одежды, обуви и аксессуаров.":"Boutique en ligne de vêtements, chaussures et accessoires.","История и статусы заказов":"Historique et statuts des commandes","Корзина готова. Следующий этап — форма доставки и защищённый checkout.":"Le panier est prêt. Étape suivante : livraison et paiement sécurisé.","Лайм":"Citron vert","Меню KrisVane":"Menu KrisVane","Мобильная навигация":"Navigation mobile","Монохромная":"Monochrome","Мягкое":"Doux","Обычное":"Normal","Обычный":"Normal","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"Vêtements, chaussures et accessoires KrisVane. Catalogue pratique, tailles, favoris, panier et livraison Nova Poshta.","Океан":"Océan","Открыть меню":"Ouvrir le menu","Покупки":"Achats","Полночная · синяя":"Minuit · bleu","Полные · рекомендуется":"Complètes · recommandé","Пользователь":"Utilisateur","Раздел «Мои заказы» подготовлен к следующему этапу.":"La section « Mes commandes » est prête pour l’étape suivante.","Розовая":"Rose","Рубиновая":"Rubis","Сбросить оформление":"Réinitialiser l’apparence","Светлая":"Clair","Сохранённые товары":"Produits enregistrés","Тема, язык, плотность, анимации и оформление":"Thème, langue, densité, animations et apparence","Товары перед оформлением":"Produits avant validation","Тёмная · синяя":"Sombre · bleu","Тёмная · фиолетовая":"Sombre · violet","Управление входом":"Gestion de la connexion","Упрощённые":"Simplifiées","Эффект свечения":"Effet de lueur","Янтарная":"Ambre","Яркое":"Intense"});
+Object.assign(I18N.es,{"Nova Poshta, город и отделение — на этапе оформления":"Nova Poshta: ciudad y sucursal se eligen al finalizar la compra","Войти в аккаунт KrisVane":"Iniciar sesión en KrisVane","Город и отделение Nova Poshta выбираются при оформлении заказа.":"La ciudad y la sucursal de Nova Poshta se eligen al finalizar la compra.","Графитовая":"Grafito","Запоминать вид и место на сайте":"Recordar la vista y la posición en el sitio","Изумрудная":"Esmeralda","Имя, аватар и настройки аккаунта":"Nombre, avatar y ajustes de la cuenta","Интернет-магазин одежды, обуви и аксессуаров.":"Tienda online de ropa, calzado y accesorios.","История и статусы заказов":"Historial y estados de pedidos","Корзина готова. Следующий этап — форма доставки и защищённый checkout.":"El carrito está listo. El siguiente paso son los datos de entrega y el pago seguro.","Лайм":"Lima","Меню KrisVane":"Menú KrisVane","Мобильная навигация":"Navegación móvil","Монохромная":"Monocromo","Мягкое":"Suave","Обычное":"Normal","Обычный":"Normal","Одежда, обувь и аксессуары KrisVane. Удобный каталог, размеры, избранное, корзина и доставка Новой почтой.":"Ropa, calzado y accesorios KrisVane. Catálogo cómodo, tallas, favoritos, carrito y entrega con Nova Poshta.","Океан":"Océano","Открыть меню":"Abrir menú","Покупки":"Compras","Полночная · синяя":"Medianoche · azul","Полные · рекомендуется":"Completas · recomendado","Пользователь":"Usuario","Раздел «Мои заказы» подготовлен к следующему этапу.":"La sección «Mis pedidos» está preparada para la siguiente etapa.","Розовая":"Rosa","Рубиновая":"Rubí","Сбросить оформление":"Restablecer apariencia","Светлая":"Claro","Сохранённые товары":"Productos guardados","Тема, язык, плотность, анимации и оформление":"Tema, idioma, densidad, animaciones y apariencia","Товары перед оформлением":"Productos antes de finalizar la compra","Тёмная · синяя":"Oscuro · azul","Тёмная · фиолетовая":"Oscuro · violeta","Управление входом":"Gestión de inicio de sesión","Упрощённые":"Simplificadas","Эффект свечения":"Efecto de brillo","Янтарная":"Ámbar","Яркое":"Intenso"});
+// v26: user-facing product code label. Avoid the technical acronym “SKU”.
+Object.assign(I18N.uk,{"Артикул":"Артикул"});
+Object.assign(I18N.ru,{"Артикул":"Артикул"});
+Object.assign(I18N.en,{"Артикул":"Item number"});
+Object.assign(I18N.be,{"Артикул":"Артыкул"});
+Object.assign(I18N.zh,{"Артикул":"货号"});
+Object.assign(I18N.pl,{"Артикул":"Numer artykułu"});
+Object.assign(I18N.de,{"Артикул":"Artikelnummer"});
+Object.assign(I18N.fr,{"Артикул":"Référence article"});
+Object.assign(I18N.es,{"Артикул":"Referencia"});
+Object.assign(I18N.uk,{"Сначала старые":"Спочатку старі","По названию Я–А":"За назвою Я–А","Цена от (₴)":"Ціна від (₴)","Цена до (₴)":"Ціна до (₴)"});
+Object.assign(I18N.ru,{"Сначала старые":"Сначала старые","По названию Я–А":"По названию Я–А","Цена от (₴)":"Цена от (₴)","Цена до (₴)":"Цена до (₴)"});
+Object.assign(I18N.en,{"Сначала старые":"Oldest first","По названию Я–А":"Name Z–A","Цена от (₴)":"Price from (₴)","Цена до (₴)":"Price to (₴)"});
+Object.assign(I18N.be,{"Сначала старые":"Спачатку старыя","По названию Я–А":"Па назве Я–А","Цена от (₴)":"Цана ад (₴)","Цена до (₴)":"Цана да (₴)"});
+Object.assign(I18N.zh,{"Сначала старые":"最早上架","По названию Я–А":"名称 Z–A","Цена от (₴)":"最低价格 (₴)","Цена до (₴)":"最高价格 (₴)"});
+Object.assign(I18N.pl,{"Сначала старые":"Najstarsze","По названию Я–А":"Nazwa Z–A","Цена от (₴)":"Cena od (₴)","Цена до (₴)":"Cena do (₴)"});
+Object.assign(I18N.de,{"Сначала старые":"Älteste zuerst","По названию Я–А":"Name Z–A","Цена от (₴)":"Preis ab (₴)","Цена до (₴)":"Preis bis (₴)"});
+Object.assign(I18N.fr,{"Сначала старые":"Plus anciens","По названию Я–А":"Nom Z–A","Цена от (₴)":"Prix min. (₴)","Цена до (₴)":"Prix max. (₴)"});
+Object.assign(I18N.es,{"Сначала старые":"Más antiguos","По названию Я–А":"Nombre Z–A","Цена от (₴)":"Precio mín. (₴)","Цена до (₴)":"Precio máx. (₴)"});
+
+
+
+
 // Extra client-facing phrases that are not product/brand data.
 Object.assign(I18N.uk,{"KRISVANE / NEW DROP":"KRISVANE / НОВЕ НАДХОДЖЕННЯ","NEW":"НОВЕ"});
 Object.assign(I18N.en,{"KRISVANE / NEW DROP":"KRISVANE / NEW DROP","NEW":"NEW"});
@@ -1954,6 +2005,16 @@ Object.assign(I18N.zh,{"KRISVANE / NEW DROP":"KRISVANE / 新品上架","NEW":"�
 // so every known translation is first restored to the canonical Russian source,
 // then translated to the newly selected language. Brand/product names are absent
 // from these dictionaries and therefore stay untouched.
+
+
+const KV_TAX_EXTRA = {
+  pl:{"Одежда":"Odzież","Обувь":"Obuwie","Костюмы":"Garnitury i komplety","Сумки и рюкзаки":"Torby i plecaki","Аксессуары":"Akcesoria","Головные уборы":"Nakrycia głowy","Худи":"Bluzy z kapturem","Свитшоты":"Bluzy","Футболки":"T-shirty","Лонгсливы":"Koszulki z długim rękawem","Рубашки":"Koszule","Поло":"Koszulki polo","Свитеры":"Swetry","Кардиганы":"Kardigany","Водолазки":"Golfy","Кофты":"Bluzy","Толстовки":"Bluzy","Куртки":"Kurtki","Пуховики":"Kurtki puchowe","Ветровки":"Wiatrówki","Бомберы":"Bomberki","Парки":"Parki","Пальто":"Płaszcze","Жилеты":"Kamizelki","Джинсы":"Jeansy","Брюки":"Spodnie","Штаны":"Spodnie","Джоггеры":"Joggery","Шорты":"Szorty","Юбки":"Spódnice","Платья":"Sukienki","Сарафаны":"Sukienki letnie","Комбинезоны":"Kombinezony","Леггинсы":"Legginsy","Нижнее бельё":"Bielizna","Носки":"Skarpetki","Домашняя одежда":"Odzież domowa","Кроссовки":"Sneakersy","Кеды":"Trampki","Ботинки":"Buty","Туфли":"Półbuty","Лоферы":"Mokasyny","Мокасины":"Mokasyny","Сандалии":"Sandały","Босоножки":"Sandały damskie","Шлёпанцы":"Klapki","Сабо":"Chodaki","Балетки":"Baleriny","Сапоги":"Kozaki","Полусапоги":"Botki","Ботфорты":"Kozaki za kolano","Угги":"Buty UGG","Домашняя обувь":"Kapcie","Спортивные костюмы":"Dresy","Брючные костюмы":"Garnitury spodniowe","Костюмы с юбкой":"Komplety ze spódnicą","Костюмы-тройки":"Garnitury trzyczęściowe","Комплекты":"Komplety","Рюкзаки":"Plecaki","Сумки через плечо":"Torby crossbody","Сумки на плечо":"Torby na ramię","Шопперы":"Shopperki","Поясные сумки":"Nerki","Спортивные сумки":"Torby sportowe","Дорожные сумки":"Torby podróżne","Клатчи":"Kopertówki","Портфели":"Aktówki","Сумки для ноутбука":"Torby na laptopa","Кошельки":"Portfele","Кардхолдеры":"Etui na karty","Ремни":"Paski","Зонты":"Parasole","Очки":"Okulary","Солнцезащитные очки":"Okulary przeciwsłoneczne","Шарфы":"Szaliki","Платки":"Chusty","Перчатки":"Rękawiczki","Варежки":"Rękawice","Галстуки":"Krawaty","Бабочки":"Muszki","Брелоки":"Breloki","Чехлы":"Etui","Косметички":"Kosmetyczki","Кепки":"Czapki z daszkiem","Бейсболки":"Bejsbolówki","Панамы":"Kapelusze typu bucket","Шапки":"Czapki","Бини":"Beanie","Береты":"Berety","Шляпы":"Kapelusze","Козырьки":"Daszki","Балаклавы":"Kominiarki"},
+  de:{"Одежда":"Bekleidung","Обувь":"Schuhe","Костюмы":"Anzüge & Sets","Сумки и рюкзаки":"Taschen & Rucksäcke","Аксессуары":"Accessoires","Головные уборы":"Kopfbedeckungen","Худи":"Hoodies","Свитшоты":"Sweatshirts","Футболки":"T-Shirts","Лонгсливы":"Langarmshirts","Рубашки":"Hemden","Поло":"Poloshirts","Свитеры":"Pullover","Кардиганы":"Cardigans","Водолазки":"Rollkragenpullover","Кофты":"Oberteile","Толстовки":"Sweatshirts","Куртки":"Jacken","Пуховики":"Daunenjacken","Ветровки":"Windbreaker","Бомберы":"Bomberjacken","Парки":"Parkas","Пальто":"Mäntel","Жилеты":"Westen","Джинсы":"Jeans","Брюки":"Hosen","Штаны":"Hosen","Джоггеры":"Jogginghosen","Шорты":"Shorts","Юбки":"Röcke","Платья":"Kleider","Сарафаны":"Sommerkleider","Комбинезоны":"Overalls","Леггинсы":"Leggings","Нижнее бельё":"Unterwäsche","Носки":"Socken","Домашняя одежда":"Loungewear","Кроссовки":"Sneaker","Кеды":"Stoffschuhe","Ботинки":"Stiefel","Туфли":"Halbschuhe","Лоферы":"Loafer","Мокасины":"Mokassins","Сандалии":"Sandalen","Босоножки":"Offene Sandalen","Шлёпанцы":"Slides","Сабо":"Clogs","Балетки":"Ballerinas","Сапоги":"Hohe Stiefel","Полусапоги":"Stiefeletten","Ботфорты":"Overknee-Stiefel","Угги":"UGG-Boots","Домашняя обувь":"Hausschuhe","Спортивные костюмы":"Trainingsanzüge","Брючные костюмы":"Hosenanzüge","Костюмы с юбкой":"Kostüme mit Rock","Костюмы-тройки":"Dreiteilige Anzüge","Комплекты":"Sets","Рюкзаки":"Rucksäcke","Сумки через плечо":"Umhängetaschen","Сумки на плечо":"Schultertaschen","Шопперы":"Shopper","Поясные сумки":"Gürteltaschen","Спортивные сумки":"Sporttaschen","Дорожные сумки":"Reisetaschen","Клатчи":"Clutches","Портфели":"Aktentaschen","Сумки для ноутбука":"Laptoptaschen","Кошельки":"Geldbörsen","Кардхолдеры":"Kartenetuis","Ремни":"Gürtel","Зонты":"Regenschirme","Очки":"Brillen","Солнцезащитные очки":"Sonnenbrillen","Шарфы":"Schals","Платки":"Tücher","Перчатки":"Handschuhe","Варежки":"Fäustlinge","Галстуки":"Krawatten","Бабочки":"Fliegen","Брелоки":"Schlüsselanhänger","Чехлы":"Hüllen","Косметички":"Kosmetiktaschen","Кепки":"Caps","Бейсболки":"Baseballcaps","Панамы":"Bucket Hats","Шапки":"Mützen","Бини":"Beanies","Береты":"Barette","Шляпы":"Hüte","Козырьки":"Visiere","Балаклавы":"Sturmhauben"},
+  fr:{"Одежда":"Vêtements","Обувь":"Chaussures","Костюмы":"Costumes et ensembles","Сумки и рюкзаки":"Sacs et sacs à dos","Аксессуары":"Accessoires","Головные уборы":"Couvre-chefs","Худи":"Sweats à capuche","Свитшоты":"Sweat-shirts","Футболки":"T-shirts","Лонгсливы":"T-shirts manches longues","Рубашки":"Chemises","Поло":"Polos","Свитеры":"Pulls","Кардиганы":"Cardigans","Водолазки":"Cols roulés","Кофты":"Hauts","Толстовки":"Sweat-shirts","Куртки":"Vestes","Пуховики":"Doudounes","Ветровки":"Coupe-vent","Бомберы":"Bombers","Парки":"Parkas","Пальто":"Manteaux","Жилеты":"Gilets","Джинсы":"Jeans","Брюки":"Pantalons","Штаны":"Pantalons","Джоггеры":"Joggers","Шорты":"Shorts","Юбки":"Jupes","Платья":"Robes","Сарафаны":"Robes d’été","Комбинезоны":"Combinaisons","Леггинсы":"Leggings","Нижнее бельё":"Sous-vêtements","Носки":"Chaussettes","Домашняя одежда":"Tenues d’intérieur","Кроссовки":"Baskets","Кеды":"Baskets en toile","Ботинки":"Bottines","Туфли":"Chaussures de ville","Лоферы":"Mocassins","Мокасины":"Mocassins","Сандалии":"Sandales","Босоножки":"Sandales ouvertes","Шлёпанцы":"Claquettes","Сабо":"Sabots","Балетки":"Ballerines","Сапоги":"Bottes","Полусапоги":"Bottines","Ботфорты":"Cuissardes","Угги":"Bottes UGG","Домашняя обувь":"Chaussons","Спортивные костюмы":"Survêtements","Брючные костюмы":"Tailleurs-pantalons","Костюмы с юбкой":"Tailleurs-jupes","Костюмы-тройки":"Costumes trois pièces","Комплекты":"Ensembles","Рюкзаки":"Sacs à dos","Сумки через плечо":"Sacs bandoulière","Сумки на плечо":"Sacs à l’épaule","Шопперы":"Cabas","Поясные сумки":"Sacs banane","Спортивные сумки":"Sacs de sport","Дорожные сумки":"Sacs de voyage","Клатчи":"Pochettes","Портфели":"Porte-documents","Сумки для ноутбука":"Sacs pour ordinateur","Кошельки":"Portefeuilles","Кардхолдеры":"Porte-cartes","Ремни":"Ceintures","Зонты":"Parapluies","Очки":"Lunettes","Солнцезащитные очки":"Lunettes de soleil","Шарфы":"Écharpes","Платки":"Foulards","Перчатки":"Gants","Варежки":"Moufles","Галстуки":"Cravates","Бабочки":"Nœuds papillon","Брелоки":"Porte-clés","Чехлы":"Étuis","Косметички":"Trousses de toilette","Кепки":"Casquettes","Бейсболки":"Casquettes de baseball","Панамы":"Bobs","Шапки":"Bonnets","Бини":"Bonnets beanie","Береты":"Bérets","Шляпы":"Chapeaux","Козырьки":"Visières","Балаклавы":"Cagoules"},
+  es:{"Одежда":"Ropa","Обувь":"Calzado","Костюмы":"Trajes y conjuntos","Сумки и рюкзаки":"Bolsos y mochilas","Аксессуары":"Accesorios","Головные уборы":"Sombreros y gorras","Худи":"Sudaderas con capucha","Свитшоты":"Sudaderas","Футболки":"Camisetas","Лонгсливы":"Camisetas de manga larga","Рубашки":"Camisas","Поло":"Polos","Свитеры":"Jerséis","Кардиганы":"Cárdigans","Водолазки":"Jerséis de cuello alto","Кофты":"Prendas superiores","Толстовки":"Sudaderas","Куртки":"Chaquetas","Пуховики":"Chaquetas de plumas","Ветровки":"Cortavientos","Бомберы":"Bombers","Парки":"Parkas","Пальто":"Abrigos","Жилеты":"Chalecos","Джинсы":"Vaqueros","Брюки":"Pantalones","Штаны":"Pantalones","Джоггеры":"Joggers","Шорты":"Pantalones cortos","Юбки":"Faldas","Платья":"Vestidos","Сарафаны":"Vestidos de verano","Комбинезоны":"Monos","Леггинсы":"Leggings","Нижнее бельё":"Ropa interior","Носки":"Calcetines","Домашняя одежда":"Ropa de casa","Кроссовки":"Zapatillas","Кеды":"Zapatillas de lona","Ботинки":"Botines","Туфли":"Zapatos de vestir","Лоферы":"Mocasines","Мокасины":"Mocasines","Сандалии":"Sandalias","Босоножки":"Sandalias abiertas","Шлёпанцы":"Chanclas","Сабо":"Zuecos","Балетки":"Bailarinas","Сапоги":"Botas","Полусапоги":"Botines","Ботфорты":"Botas por encima de la rodilla","Угги":"Botas UGG","Домашняя обувь":"Zapatillas de casa","Спортивные костюмы":"Chándales","Брючные костюмы":"Trajes de pantalón","Костюмы с юбкой":"Trajes con falda","Костюмы-тройки":"Trajes de tres piezas","Комплекты":"Conjuntos","Рюкзаки":"Mochilas","Сумки через плечо":"Bolsos bandolera","Сумки на плечо":"Bolsos de hombro","Шопперы":"Bolsos shopper","Поясные сумки":"Riñoneras","Спортивные сумки":"Bolsas de deporte","Дорожные сумки":"Bolsas de viaje","Клатчи":"Clutches","Портфели":"Maletines","Сумки для ноутбука":"Bolsas para portátil","Кошельки":"Carteras","Кардхолдеры":"Tarjeteros","Ремни":"Cinturones","Зонты":"Paraguas","Очки":"Gafas","Солнцезащитные очки":"Gafas de sol","Шарфы":"Bufandas","Платки":"Pañuelos","Перчатки":"Guantes","Варежки":"Manoplas","Галстуки":"Corbatas","Бабочки":"Pajaritas","Брелоки":"Llaveros","Чехлы":"Fundas","Косметички":"Neceser","Кепки":"Gorras","Бейсболки":"Gorras de béisbol","Панамы":"Sombreros bucket","Шапки":"Gorros","Бини":"Gorros beanie","Береты":"Boinas","Шляпы":"Sombreros","Козырьки":"Viseras","Балаклавы":"Pasamontañas"}
+};
+Object.entries(KV_TAX_EXTRA).forEach(([lang,pack])=>{ TAXONOMY_I18N[lang]=pack; });
+
 const I18N_REVERSE = new Map();
 for (const lang of ["uk","en","be","zh"]) {
   for (const [source,value] of Object.entries(I18N[lang]||{})) {
@@ -2007,6 +2068,18 @@ function translateSource(source, lang=view.language||"uk") {
     if (size) translated = (dict["Размер"] || "Размер") + ": " + size[1];
   }
   return leading + (translated || core) + trailing;
+}
+
+
+// v28 — product content localization comes from the product translations JSONB field.
+// No word-by-word substitution: if a complete translation is unavailable, KrisVane
+// shows the original text instead of mixing two languages in one title/description.
+function productLocalizedField(product, field){
+  const lang=view.language||"uk";
+  const raw=String(product?.[field]||"");
+  if(!raw||lang==="ru")return raw;
+  const direct=product?.translations?.[lang]?.[field] ?? product?.[`${field}_${lang}`];
+  return direct ? String(direct) : raw;
 }
 
 function translateNode(node, force=false) {
@@ -2577,17 +2650,16 @@ function relevantBrandsForCatalog() {
 
 const FILTER_CATALOG = {
   brands: [
-    "KrisVane","Nike","adidas","Jordan","Puma","New Balance","Reebok","ASICS",
-    "Converse","Vans","Under Armour","Fila","Skechers","Salomon","Timberland",
-    "Dr. Martens","Crocs","UGG","The North Face","Columbia","Lacoste","Levi's",
-    "Tommy Hilfiger","Calvin Klein","Hugo Boss","Diesel","Zara","H&M","Mango",
-    "Bershka","Pull&Bear","Stradivarius","Massimo Dutti","Uniqlo","COS",
-    "Carhartt WIP","Champion","Supreme","Stüssy","Stone Island","CP Company",
-    "Off-White","Palm Angels","Fear of God","Essentials","Balenciaga","Gucci",
-    "Prada","Louis Vuitton","Dior","Versace","Burberry","Moncler","Armani"
+    "KrisVane","Nike","adidas","Puma","New Balance","Reebok","ASICS","Converse","Vans","Jordan","Under Armour",
+    "The North Face","Columbia","Patagonia","Carhartt WIP","Levi’s","Lee","Wrangler","Dickies","Champion","Lacoste",
+    "Tommy Hilfiger","Calvin Klein","Hugo Boss","Ralph Lauren","Guess","Diesel","G-Star RAW","Zara","Mango","H&M",
+    "Uniqlo","COS","Massimo Dutti","Bershka","Pull&Bear","Stradivarius","Reserved","Cropp","House","Sinsay","Gucci",
+    "Prada","Versace","Balenciaga","Burberry","Louis Vuitton","Dior","Saint Laurent","Givenchy","Valentino","Moncler",
+    "Stone Island","Off-White","Supreme","Palm Angels","Fear of God","Essentials","Rick Owens","Dr. Martens","Timberland",
+    "UGG","Birkenstock","Crocs","Salomon","Merrell","Skechers"
   ],
   sizes: [
-    "XXXS","XXS","XS","S","M","L","XL","XXL","XXXL","4XL","5XL",
+    "XXXS","XXS","XS","S","M","L","XL","XXL","XXXL","4XL",
     "28","29","30","31","32","33","34","35","36","37","38","39","40","41",
     "42","43","44","45","46","47","48","49","50",
     "80","86","92","98","104","110","116","122","128","134","140","146",
@@ -2722,6 +2794,11 @@ function countForFilter(key, value) {
   }).length;
 }
 
+
+function refreshEnhancedSelect(select){
+  if(!select)return;
+  if(typeof select._kvRebuild==="function") select._kvRebuild();
+}
 function setCountedOptions(select, options, selected, emptyLabel, key) {
   if (!select) return;
 
@@ -2741,6 +2818,7 @@ function setCountedOptions(select, options, selected, emptyLabel, key) {
   select.value = [...select.options].some(option =>
     option.value === selectedString
   ) ? selectedString : "";
+  refreshEnhancedSelect(select);
 }
 
 /* ===== KrisVane v18 — staged filter state ===== */
@@ -2756,12 +2834,13 @@ const FILTER_ADMIN_SHOE_SIZES=Array.from({length:28},(_,i)=>{
 const FILTER_ADMIN_SUIT_NUMERIC=["38–40","40–42","42–44","44–46","46–48","48–50","50–52","52–54","54–56","56–58","58–60","60–62"];
 
 const FILTER_BRAND_ORDER=[
-  "Nike","adidas","Gucci","Louis Vuitton","Puma","Jordan","New Balance","Prada","Dior",
-  "Balenciaga","The North Face","Calvin Klein","Tommy Hilfiger","Hugo Boss","Lacoste",
-  "Armani","Versace","Burberry","Moncler","Levi's","Under Armour","Reebok","ASICS",
-  "Converse","Vans","Stone Island","Off-White","Supreme","Carhartt WIP","Champion",
-  "Timberland","Dr. Martens","UGG","Crocs","Salomon","Skechers","Fila","Diesel","Guess",
-  "Massimo Dutti","Mango","Zara","H&M","Bershka","Pull&Bear","Stradivarius","COS","Uniqlo","KrisVane"
+  "Nike","adidas","Gucci","Louis Vuitton","Puma","Jordan","New Balance","Prada","Dior","Balenciaga","The North Face",
+  "Calvin Klein","Tommy Hilfiger","Hugo Boss","Lacoste","Versace","Burberry","Moncler","Levi’s","Under Armour","Reebok",
+  "ASICS","Converse","Vans","Stone Island","Off-White","Supreme","Carhartt WIP","Champion","Timberland","Dr. Martens",
+  "UGG","Crocs","Salomon","Skechers","Patagonia","Columbia","Ralph Lauren","Guess","Diesel","G-Star RAW","Saint Laurent",
+  "Givenchy","Valentino","Palm Angels","Fear of God","Essentials","Rick Owens","Birkenstock","Merrell","Lee","Wrangler",
+  "Dickies","Massimo Dutti","Mango","Zara","H&M","Bershka","Pull&Bear","Stradivarius","Reserved","Cropp","House","Sinsay",
+  "COS","Uniqlo","KrisVane"
 ];
 
 function filterCategoryName(value=filterDraft.category){
@@ -2800,6 +2879,7 @@ function setStrictOptions(select,items,selected,emptyLabel,key,disabled=false){
   }).join("");
   select.value=[...select.options].some(o=>o.value===selectedString)?selectedString:"";
   select.disabled=disabled;
+  refreshEnhancedSelect(select);
 }
 function syncStrictDependents(){
   const subs=strictSubcategoryOptions();
@@ -2839,8 +2919,10 @@ function syncFilterOptions(){
       <option value="available">В наличии · ${countForFilter("stock","available")}</option>
       <option value="out">Нет в наличии · ${countForFilter("stock","out")}</option>`;
     stock.value=filterDraft.stock||"all";
+    refreshEnhancedSelect(stock);
   }
   $("#sort").value=filterDraft.sort||"default";
+  refreshEnhancedSelect($("#sort"));
   $("#priceMin").value=filterDraft.priceMin??"";
   $("#priceMax").value=filterDraft.priceMax??"";
   $("#search").value=state.query;
@@ -2872,7 +2954,9 @@ function applyFilters(){
   if(state.sort==="priceAsc")a.sort((x,y)=>Number(x.price)-Number(y.price));
   if(state.sort==="priceDesc")a.sort((x,y)=>Number(y.price)-Number(x.price));
   if(state.sort==="new")a.sort((x,y)=>new Date(y.created_at)-new Date(x.created_at));
-  if(state.sort==="nameAsc")a.sort((x,y)=>String(x.name||"").localeCompare(String(y.name||""),"ru"));
+  if(state.sort==="old")a.sort((x,y)=>new Date(x.created_at)-new Date(y.created_at));
+  if(state.sort==="nameAsc")a.sort((x,y)=>String(productLocalizedField(x,"name")||"").localeCompare(String(productLocalizedField(y,"name")||""),view.language||"ru",{numeric:true,sensitivity:"base"}));
+  if(state.sort==="nameDesc")a.sort((x,y)=>String(productLocalizedField(y,"name")||"").localeCompare(String(productLocalizedField(x,"name")||""),view.language||"ru",{numeric:true,sensitivity:"base"}));
   state.filtered = a;
   state.page = 1;
   renderProducts();
@@ -2890,12 +2974,12 @@ function renderProducts(){
   $("#products").innerHTML=show.map(p=>{
     const img=firstImage(p),fav=state.favorites.has(String(p.id)),stock=productAvailable(p);
     return `<article class="card" data-product="${esc(p.id)}">
-            <div class="pic">${img?`<img src="${esc(img)}" alt="${esc(p.name)}" loading="lazy">`:`<div class="noimg">Нет фото</div>`}
+            <div class="pic">${img?`<img src="${esc(img)}" alt="${esc(productLocalizedField(p,"name"))}" loading="lazy">`:`<div class="noimg">Нет фото</div>`}
       ${p.is_new?`<span class="tag">NEW</span>`:""}<button class="heart ${fav?"on":""}" data-fav="${esc(p.id)}">${fav?"♥":"♡"}</button>
           </div>
           <div class="info">
             <div class="brand">${esc(p.brand||"KrisVane")}</div>
-            <div class="name">${esc(p.name||"Товар")}</div>
+            <div class="name">${esc(productLocalizedField(p,"name")||translateSource("Товар"))}</div>
             <div class="prices">
               <span class="price">${money(p.price)}</span>${p.old_price?`<span class="old">${money(p.old_price)}</span>`:""}</div>
       ${!stock?`<div style="color:var(--muted);font-size:12px;margin-top:5px">Нет в наличии</div>`:""}</div>
@@ -2912,7 +2996,7 @@ function openProduct(id){
   const imgs=productImages(p.id),vs=productVariants(p.id),main=firstImage(p);
   $("#productModal").innerHTML=`<div class="productView">
             <div class="gallery">
-              <div class="mainImg">${main?`<img id="mainProductImg" src="${esc(main)}" alt="${esc(p.name)}">`:`<div class="noimg">Нет фото</div>`}</div>
+              <div class="mainImg">${main?`<img id="mainProductImg" src="${esc(main)}" alt="${esc(productLocalizedField(p,"name"))}">`:`<div class="noimg">Нет фото</div>`}</div>
               <div class="thumbs">${imgs.map(im=>{const u=imageUrl(im);return u?`<button class="thumb" data-thumb="${esc(u)}">
                 <img src="${esc(u)}">
               </button>`:""}).join("")}</div>
@@ -2921,20 +3005,20 @@ function openProduct(id){
               <div style="display:flex;justify-content:space-between;gap:15px">
                 <div>
                   <div class="brand">${esc(p.brand||"KrisVane")}</div>
-                  <h3>${esc(p.name)}</h3>
+                  <h3>${esc(productLocalizedField(p,"name"))}</h3>
                 </div>
                 <button class="close" id="closeProduct">✕</button>
               </div>
               <div class="prices">
                 <span class="price" style="font-size:24px">${money(p.price)}</span>${p.old_price?`<span class="old">${money(p.old_price)}</span>`:""}</div>
-                <p class="detailDesc">${esc(p.description||"")}</p>
+                <p class="detailDesc">${esc(productLocalizedField(p,"description"))}</p>
     ${vs.length?`<div class="sizeTitle">Размер</div>
-                <div class="sizes">${vs.map(v=>`<button class="size" data-variant="${esc(v.id)}" ${available(v)<=0?"disabled":""}>${esc(v.name||v.size||v.variant_name||v.sku||"Размер")} ${available(v)<=0?"· нет":""}</button>`).join("")}</div>`:""}
+                <div class="sizes">${vs.map(v=>`<button class="size" data-variant="${esc(v.id)}" ${available(v)<=0?"disabled":""}>${esc(v.name||v.size||v.variant_name||v.sku||"Размер")} · ${available(v)>0?`${available(v)} ${translateSource("шт.")}`:translateSource("нет")}</button>`).join("")}</div>`:""}
                 <div class="buyrow">
                   <button class="primary" id="addCart" ${vs.length?"disabled":""}>Добавить в корзину</button>
                   <button class="secondary" id="modalFav">${state.favorites.has(String(p.id))?"♥":"♡"}</button>
                 </div>
-                <p style="color:var(--muted);font-size:12px">Артикул: ${esc(p.sku||"—")}</p>
+                <p style="color:var(--muted);font-size:12px">${esc(translateSource("Артикул"))}: ${esc(p.sku||"—")}</p>
               </div>
             </div>`;
   $("#modalShade").classList.add("open");$("#productModal").classList.add("open");document.body.style.overflow="hidden";
@@ -3089,6 +3173,9 @@ function enhanceSelect(select) {
   wrapper.append(select, button, drop);
 
   function rebuild() {
+    // v26: native select may become enabled after category changes; mirror it every rebuild.
+    button.disabled = !!select.disabled;
+    wrapper.classList.toggle("disabled", !!select.disabled);
     const selected = select.options[select.selectedIndex];
     value.textContent = selected?.textContent || "—";
 
@@ -3151,9 +3238,10 @@ function enhanceSelect(select) {
     });
   }
 
-  const observer = new MutationObserver(rebuild);
-  observer.observe(select, {childList: true, subtree: true, attributes: true});
-
+  // v25: no permanent MutationObserver per select. Rebuilding every select on
+  // DOM mutations could create large callback storms after repeated filter/language
+  // interactions. Dynamic option writers call this hook explicitly instead.
+  select._kvRebuild = rebuild;
   select.addEventListener("change", rebuild);
 
   button.addEventListener("click", event => {
@@ -3500,6 +3588,10 @@ appearanceBindings.forEach(([selector, key]) => {
     view[key] = event.target.value;
     applyAppearance();
     applyLanguage();
+    if (key === "language" && Array.isArray(state.filtered)) {
+      renderProducts();
+      if (state.selectedProduct && $("#productModal")?.classList.contains("open")) openProduct(state.selectedProduct.id);
+    }
     saveView();
   });
 });
@@ -3549,6 +3641,7 @@ let haloLast=0,haloRandomAt=0;
 function animateHeroHalo(now){
   const hero=document.querySelector(".heroBox");
   if(!hero){requestAnimationFrame(animateHeroHalo);return}
+  if(document.hidden){ haloLast=now; requestAnimationFrame(animateHeroHalo); return; }
   if(!haloLast) haloLast=now;
   const dt=Math.min((now-haloLast)/1000,.05); haloLast=now;
 
@@ -3571,19 +3664,6 @@ function animateHeroHalo(now){
 }
 requestAnimationFrame(animateHeroHalo);
 
-
-/* v25 storefront promo banner */
-async function kv25LoadPromoBanner(){
-  try{
-    const hero=document.querySelector('.heroBox');if(!hero)return;
-    const {data,error}=await sb.from('storefront_announcements').select('message,enabled').eq('id',1).maybeSingle();
-    if(error||!data?.enabled||!String(data.message||'').trim())return;
-    let banner=document.getElementById('kvPromoBanner');
-    if(!banner){banner=document.createElement('div');banner.id='kvPromoBanner';banner.className='kv-promo-banner';hero.insertAdjacentElement('afterend',banner)}
-    const text=document.createElement('div');text.className='kv-promo-text';text.textContent=String(data.message).trim();banner.replaceChildren(text);
-  }catch(e){console.warn('KrisVane promo:',e)}
-}
-kv25LoadPromoBanner();
 </script>
     
 
@@ -3678,11 +3758,3 @@ body[data-motion="off"] .filterDropSpace{
 
 </body>
   </html>
-<style id="kv25-promo-style">
-.kv-promo-banner{margin-top:18px;border:1px solid color-mix(in srgb,var(--accent) 38%,var(--line));border-radius:20px;background:linear-gradient(120deg,color-mix(in srgb,var(--panel) 94%,var(--accent) 6%),color-mix(in srgb,var(--panel2) 92%,var(--accent2) 8%));box-shadow:0 14px 38px rgba(0,0,0,.16),0 0 24px color-mix(in srgb,var(--accent) 14%,transparent);padding:15px 18px;display:flex;align-items:center;justify-content:center;text-align:center;position:relative;overflow:hidden}
-.kv-promo-banner::before{content:"";position:absolute;inset:-70% 35%;background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--accent) 18%,transparent),transparent);transform:rotate(18deg);animation:kvPromoSweep 7s ease-in-out infinite}
-.kv-promo-text{position:relative;z-index:1;font-weight:900;letter-spacing:.02em;font-size:clamp(15px,2vw,20px);white-space:pre-wrap}
-body[data-motion="none"] .kv-promo-banner::before{animation:none}
-@keyframes kvPromoSweep{0%,65%,100%{transform:translateX(-150%) rotate(18deg)}80%{transform:translateX(150%) rotate(18deg)}}
-@media(max-width:760px){.kv-promo-banner{margin-top:13px;border-radius:16px;padding:13px 14px}}
-</style>
